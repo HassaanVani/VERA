@@ -1,0 +1,228 @@
+"use client";
+import { useState, useId } from "react";
+import { ArrowUpRight, FileSpreadsheet, MoveUpRight } from "lucide-react";
+import type { Scenario } from "@/lib/contracts";
+import { multiply } from "@/lib/domain";
+
+export function TransformationDiagram({
+  scenario,
+  decorative = false,
+}: {
+  scenario: Scenario;
+  decorative?: boolean;
+}) {
+  const arrow = useId().replace(/:/g, "");
+  const points = scenario.vectors.map((v) => ({
+    ...v,
+    output: multiply(scenario.matrix, v.input),
+  }));
+  const bound =
+    Math.max(
+      5,
+      ...points.flatMap((p) => [...p.input, ...p.output].map(Math.abs)),
+    ) + 1;
+  const scale = 130 / bound,
+    x = (n: number) => 170 + n * scale,
+    y = (n: number) => 170 - n * scale;
+  return (
+    <svg
+      viewBox="0 0 340 340"
+      className={decorative ? "hero-diagram" : "vector-diagram"}
+      role="img"
+      aria-label="Dashed blue arrows are input vectors. Solid teal arrows are transformed vectors on the same coordinate axes."
+    >
+      <defs>
+        <marker
+          id={arrow}
+          markerWidth="7"
+          markerHeight="7"
+          refX="5"
+          refY="3"
+          orient="auto"
+        >
+          <path d="M0,0 L6,3 L0,6" fill="context-stroke" />
+        </marker>
+      </defs>
+      {Array.from({ length: 13 }, (_, i) => i - 6).map((n) => (
+        <g key={n} className="diagram-grid">
+          <line x1={x(n)} y1="20" x2={x(n)} y2="320" />
+          <line x1="20" y1={y(n)} x2="320" y2={y(n)} />
+        </g>
+      ))}
+      <g className="diagram-axis">
+        <line x1="14" y1="170" x2="326" y2="170" />
+        <line x1="170" y1="14" x2="170" y2="326" />
+      </g>
+      <polygon
+        points={`${x(0)},${y(0)} ${x(scenario.matrix[0][0])},${y(scenario.matrix[1][0])} ${x(scenario.matrix[0][0] + scenario.matrix[0][1])},${y(scenario.matrix[1][0] + scenario.matrix[1][1])} ${x(scenario.matrix[0][1])},${y(scenario.matrix[1][1])}`}
+        fill="rgba(29,107,255,.10)"
+        stroke="#388bff"
+        strokeDasharray="4 5"
+      />
+      {points.map((p, i) => (
+        <g key={p.label}>
+          <line
+            x1="170"
+            y1="170"
+            x2={x(p.input[0])}
+            y2={y(p.input[1])}
+            stroke="#337bff"
+            strokeWidth="2"
+            strokeDasharray="4 3"
+            markerEnd={`url(#${arrow})`}
+          />
+          <line
+            x1="170"
+            y1="170"
+            x2={x(p.output[0])}
+            y2={y(p.output[1])}
+            stroke="#087d8f"
+            strokeWidth="2.5"
+            markerEnd={`url(#${arrow})`}
+          />
+          <text
+            x={x(p.output[0]) + 8}
+            y={y(p.output[1]) - 7}
+            fill="currentColor"
+            fontSize="11"
+          >{`A${["u", "v", "w", "p", "q", "r"][i]}`}</text>
+        </g>
+      ))}
+      <text x="321" y="187" fill="currentColor" fontSize="12">
+        x
+      </text>
+      <text x="181" y="20" fill="currentColor" fontSize="12">
+        y
+      </text>
+      {!decorative && (
+        <text x="20" y="334" fill="currentColor" fontSize="10">
+          Dashed: input · Solid: transformed · Grid: 1
+        </text>
+      )}
+    </svg>
+  );
+}
+export default function Exhibits({ scenario }: { scenario: Scenario }) {
+  const [tab, setTab] = useState("calibration");
+  const tabId = useId();
+  const tabs = [
+    ["calibration", "01 Calibration"],
+    ["vectors", "02 Measurements"],
+    ["diagram", "03 Diagram"],
+  ];
+  return (
+    <section className="exhibit-panel" aria-label="Supporting exhibits">
+      <div className="exhibit-heading">
+        <span className="eyebrow">
+          <FileSpreadsheet size={14} /> EXHIBIT DESK
+        </span>
+        <span className="badge synthetic">Synthetic data</span>
+      </div>
+      <div
+        className="exhibit-tabs"
+        role="tablist"
+        aria-label="Exhibit"
+        onKeyDown={(event) => {
+          if (!["ArrowRight", "ArrowLeft", "Home", "End"].includes(event.key))
+            return;
+          event.preventDefault();
+          const current = tabs.findIndex(([value]) => value === tab);
+          const next =
+            event.key === "Home"
+              ? 0
+              : event.key === "End"
+                ? tabs.length - 1
+                : (current +
+                    (event.key === "ArrowRight" ? 1 : -1) +
+                    tabs.length) %
+                  tabs.length;
+          setTab(tabs[next][0]);
+          (event.currentTarget.children[next] as HTMLButtonElement).focus();
+        }}
+      >
+        {tabs.map(([value, label]) => (
+          <button
+            key={value}
+            id={`${tabId}-${value}`}
+            role="tab"
+            aria-selected={tab === value}
+            aria-controls={`${tabId}-panel`}
+            tabIndex={tab === value ? 0 : -1}
+            onClick={() => setTab(value)}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+      <div
+        className="paper"
+        role="tabpanel"
+        id={`${tabId}-panel`}
+        aria-labelledby={`${tabId}-${tab}`}
+        tabIndex={0}
+      >
+        <div className="paper-top">
+          <span>
+            <MoveUpRight size={20} /> {scenario.company}
+          </span>
+          <span>LAB / 001</span>
+        </div>
+        <h3>
+          {tab === "calibration"
+            ? scenario.title
+            : tab === "vectors"
+              ? "Vector measurement log"
+              : "Transformation field"}
+        </h3>
+        <p className="paper-sub">FICTIONAL SOURCE DOCUMENT · FOR PRACTICE</p>
+        {tab === "calibration" ? (
+          <>
+            <p>{scenario.context}</p>
+            <div className="matrix-block">
+              <span>A =</span>
+              <div className="matrix">
+                {scenario.matrix.flat().map((n, i) => (
+                  <span key={i}>{n}</span>
+                ))}
+              </div>
+            </div>
+            <div className="paper-note">
+              <ArrowUpRight size={14} /> Coordinates are dimensionless. Apply
+              this same matrix to every probe.
+            </div>
+          </>
+        ) : tab === "vectors" ? (
+          <>
+            <p>
+              Recorded input and output coordinates from the common calibration
+              dataset.
+            </p>
+            <table>
+              <thead>
+                <tr>
+                  <th>Probe</th>
+                  <th>Input</th>
+                  <th>Output</th>
+                </tr>
+              </thead>
+              <tbody>
+                {scenario.vectors.map((v) => (
+                  <tr key={v.label}>
+                    <td>{v.label}</td>
+                    <td>({v.input.join(", ")})</td>
+                    <td>({multiply(scenario.matrix, v.input).join(", ")})</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </>
+        ) : (
+          <TransformationDiagram scenario={scenario} />
+        )}
+        <footer>
+          VERA EXHIBITS <span>Generated from one shared dataset</span>
+        </footer>
+      </div>
+    </section>
+  );
+}
