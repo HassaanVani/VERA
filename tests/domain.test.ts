@@ -1,0 +1,16 @@
+import { describe, it, expect } from "vitest";
+import { demoPacket, demoBlueprint, demoScenario, demoExam } from "../lib/demo";
+import { Blueprint, Exam, Scenario } from "../lib/contracts";
+import { checkExam, blueprintIssues, scenarioIssues, multiply, sourceOverlapRate, results } from "../lib/domain";
+const packet = demoPacket(), b = demoBlueprint(packet), s = demoScenario(), e = demoExam(b, s);
+describe("assessment contracts and shared numerical source", () => {
+  it("has a valid original saved demonstration with coherent answers and totals", () => { expect(Blueprint.parse(b)).toEqual(b); expect(Scenario.parse(s)).toEqual(s); expect(Exam.parse(e)).toEqual(e); expect(checkExam(e,b,s,"")).toEqual([]); expect(multiply(s.matrix,[2,-1])).toEqual([5,-1]); });
+  it("rejects zero eigenvectors and incorrect eigenpairs", () => { const bad = structuredClone(s); bad.eigenpairs[0].vector=[0,0]; expect(scenarioIssues(bad)[0].code).toBe("EIGENPAIR"); bad.eigenpairs[0].vector=[1,0]; expect(scenarioIssues(bad)).toHaveLength(1); });
+  it("blocks numerical claims inconsistent with the scenario", () => { const bad=structuredClone(e); bad.questions[0].claims=[{kind:"determinant",answer:9}]; expect(checkExam(bad,b,s,"").some(i=>i.code==="NUMERICAL_CLAIM")).toBe(true); });
+  it("checks scalar MC keys and detects multiple mathematically correct options", () => { const bad = structuredClone(e); bad.questions[0].answer = "B"; expect(checkExam(bad,b,s,"").some(i=>i.code==="MC_NUMERICAL_KEY")).toBe(true); bad.questions[1].options[1] = "2"; expect(checkExam(bad,b,s,"").filter(i=>i.code==="MC_NUMERICAL_KEY")).toHaveLength(2); });
+  it("rejects totals, mismatched slots, numbering, duplicate options and rubric errors", () => { const bad=structuredClone(e); bad.questions[0].points=7; bad.questions[0].number=9; bad.questions[0].options=["1","1","2","3"]; const codes=checkExam(bad,b,s,"").map(i=>i.code); for(const code of ["POINT_SUM","NUMBERING","SLOT_ALIGNMENT","MC_OPTIONS","RUBRIC_SUM"]) expect(codes).toContain(code); });
+  it("checks evidence IDs and page bounds instead of accepting invented citations", () => { const bad=structuredClone(b); bad.observations[0].evidence[0].page=999; expect(blueprintIssues(bad,packet).some(i=>i.code==="INVALID_REFERENCE")).toBe(true); });
+  it("will not count generated references as instructor evidence", () => { const p=structuredClone(packet); p.documents[0].role="generated-reference"; expect(blueprintIssues(b,p).some(i=>i.code==="EVIDENCE_ROLE")).toBe(true); });
+  it("detects close source copies without claiming semantic originality", () => { const text="Explain how a nonzero vector can retain its direction after applying a linear transformation to its coordinates."; expect(sourceOverlapRate(text,text)).toBe(1); expect(sourceOverlapRate("Compute the determinant.",text)).toBe(0); });
+  it("scores MC deterministically and clamps self scores", () => { const exam={id:"e",packetId:packet.id,revisionId:"r",scenario:s,exam:e,issues:[],review:{questions:[]},ready:true,repairAttempts:0,fixture:true,createdAt:""}; const r=results(exam,{id:"a",examId:"e",startedAt:0,endsAt:0,responses:{1:"A",2:"B"},selfScores:{3:999}}); expect(r[0].earned).toBe(6);expect(r[1].earned).toBe(0);expect(r[2].earned).toBe(6); });
+});
