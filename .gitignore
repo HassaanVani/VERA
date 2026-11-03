@@ -6,3 +6,5 @@ node_modules/
 *.tsbuildinfo
 test-results/
 output/
+__pycache__/
+*.py[cod]

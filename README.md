@@ -87,3 +87,5 @@ See [interface research and overhaul](docs/UI-OVERHAUL.md) for the design ration
 The builder's supplied textbook and JEFF-generated exam are not redistributed. The JEFF exam is excluded from instructor-format inference and held-out evaluation.
 
 Interaction principles and the research-to-implementation audit: [UX.md](UX.md) and [UX-RESEARCH.md](docs/UX-RESEARCH.md).
+
+Live evaluation on public course material: [MIT OpenCourseWare protocol and results](docs/MIT-EVALUATION.md). Worker and evaluation commands accept ignored .env or .env.local files.

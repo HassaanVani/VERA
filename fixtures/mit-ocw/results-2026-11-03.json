@@ -1,0 +1,288 @@
+{
+  "recordedAt": "2026-11-03T11:14:31.091Z",
+  "study": "Exploratory development evaluation, not a prospective exam prediction or a full exam grade",
+  "initial": {
+    "batch": "first-live-2026-11-03",
+    "protocolSha256": "6d7c96a084c9b723d4fd23c5a9f89d38a478375a470379b1c09caa624dded03c",
+    "inference": {
+      "maxOutputTokens": 9000,
+      "reasoningEffort": "auto"
+    },
+    "metrics": [
+      {
+        "candidate": "direct-meta",
+        "attempts": 3,
+        "failed": 3,
+        "passed": 0,
+        "failureRate": 1,
+        "meanLatencyMsIncludingFailures": 56753,
+        "costUsdIncludingUncertain": 0.2258475,
+        "generatedQuestions": 0,
+        "numericalErrors": 0,
+        "sourceOverlapWarnings": 0,
+        "heldoutLexicalOverlapRates": [
+          [],
+          [],
+          []
+        ],
+        "conceptualCorrectness": "Requires external assessment of full reasoning, beyond the machine-readable claims.",
+        "fullMitCoverage": "Not established: this protocol restricts both arms to VERA's 2x2 scope."
+      },
+      {
+        "candidate": "vera",
+        "attempts": 3,
+        "failed": 3,
+        "passed": 0,
+        "failureRate": 1,
+        "meanLatencyMsIncludingFailures": 106136.33333333333,
+        "costUsdIncludingUncertain": 0.3273055,
+        "generatedQuestions": 0,
+        "numericalErrors": 0,
+        "sourceOverlapWarnings": 0,
+        "heldoutLexicalOverlapRates": [
+          [],
+          [],
+          []
+        ],
+        "conceptualCorrectness": "Requires external assessment of full reasoning, beyond the machine-readable claims.",
+        "fullMitCoverage": "Not established: this protocol restricts both arms to VERA's 2x2 scope."
+      }
+    ]
+  },
+  "configured": {
+    "batch": "configured-2026-11-03",
+    "protocolSha256": "4186696ddc813d4851ee727fb3e3666c482114530e4c6a3ae43ddcd74487c5c2",
+    "inference": {
+      "maxOutputTokens": 16000,
+      "reasoningEffort": "low"
+    },
+    "metrics": [
+      {
+        "candidate": "direct-meta",
+        "attempts": 3,
+        "failed": 0,
+        "passed": 3,
+        "failureRate": 0,
+        "meanLatencyMsIncludingFailures": 24209.333333333332,
+        "costUsdIncludingUncertain": 0.15469825000000004,
+        "generatedQuestions": 9,
+        "numericalErrors": 0,
+        "sourceOverlapWarnings": 0,
+        "heldoutLexicalOverlapRates": [
+          [
+            {
+              "number": 1,
+              "rate": 0
+            },
+            {
+              "number": 2,
+              "rate": 0
+            },
+            {
+              "number": 3,
+              "rate": 0
+            }
+          ],
+          [
+            {
+              "number": 1,
+              "rate": 0
+            },
+            {
+              "number": 2,
+              "rate": 0
+            },
+            {
+              "number": 3,
+              "rate": 0
+            }
+          ],
+          [
+            {
+              "number": 1,
+              "rate": 0
+            },
+            {
+              "number": 2,
+              "rate": 0
+            },
+            {
+              "number": 3,
+              "rate": 0
+            }
+          ]
+        ],
+        "conceptualCorrectness": "Requires external assessment of full reasoning, beyond the machine-readable claims.",
+        "fullMitCoverage": "Not established: this protocol restricts both arms to VERA's 2x2 scope."
+      },
+      {
+        "candidate": "vera",
+        "attempts": 3,
+        "failed": 0,
+        "passed": 3,
+        "failureRate": 0,
+        "meanLatencyMsIncludingFailures": 104076,
+        "costUsdIncludingUncertain": 0.3525872499999999,
+        "generatedQuestions": 9,
+        "numericalErrors": 0,
+        "sourceOverlapWarnings": 0,
+        "heldoutLexicalOverlapRates": [
+          [
+            {
+              "number": 1,
+              "rate": 0
+            },
+            {
+              "number": 2,
+              "rate": 0
+            },
+            {
+              "number": 3,
+              "rate": 0
+            }
+          ],
+          [
+            {
+              "number": 1,
+              "rate": 0
+            },
+            {
+              "number": 2,
+              "rate": 0
+            },
+            {
+              "number": 3,
+              "rate": 0
+            }
+          ],
+          [
+            {
+              "number": 1,
+              "rate": 0
+            },
+            {
+              "number": 2,
+              "rate": 0
+            },
+            {
+              "number": 3,
+              "rate": 0
+            }
+          ]
+        ],
+        "conceptualCorrectness": "Requires external assessment of full reasoning, beyond the machine-readable claims.",
+        "fullMitCoverage": "Not established: this protocol restricts both arms to VERA's 2x2 scope."
+      }
+    ]
+  },
+  "independentAudit": {
+    "generatedQuestionCount": 18,
+    "numericalClaims": 39,
+    "numericalClaimsFailed": 0,
+    "scenarioEigenpairs": 12,
+    "scenarioEigenpairsFailed": 0,
+    "heldoutNumericChecks": 9,
+    "heldoutNumericChecksTotal": 9,
+    "heldoutIsUnderlyingModel": true,
+    "heldoutIsExamGrade": false
+  },
+  "postHocFindings": {
+    "label": "Exploratory agent inspection; these were not preregistered metrics",
+    "sourceMatrixReuse": [
+      {
+        "candidate": "vera",
+        "repeat": 2,
+        "matches": [
+          {
+            "source": "mit-eigenvalues",
+            "page": 2
+          }
+        ]
+      }
+    ],
+    "answerHintLabels": [
+      {
+        "candidate": "direct-meta",
+        "repeat": 1,
+        "count": 1
+      },
+      {
+        "candidate": "vera",
+        "repeat": 1,
+        "count": 1
+      },
+      {
+        "candidate": "vera",
+        "repeat": 2,
+        "count": 1
+      },
+      {
+        "candidate": "direct-meta",
+        "repeat": 2,
+        "count": 2
+      },
+      {
+        "candidate": "vera",
+        "repeat": 3,
+        "count": 2
+      }
+    ],
+    "uniqueMatrices": {
+      "directMeta": 1,
+      "vera": 2
+    },
+    "heldoutWorkedStep": {
+      "part": "2b",
+      "finding": "The final projection formula is correct, but an intermediate equality omits R from A=QR.",
+      "counterexample": {
+        "Q": [
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            1
+          ]
+        ],
+        "R": [
+          [
+            2,
+            0
+          ],
+          [
+            0,
+            3
+          ]
+        ],
+        "b": [
+          1,
+          1
+        ],
+        "incorrectIntermediate": [
+          "1/2",
+          "1/3"
+        ],
+        "correctProjection": [
+          1,
+          1
+        ]
+      }
+    },
+    "referenceCautions": [
+      "The question and solution PDFs use different point allocations.",
+      "The solution PDF page 2 prints an inconsistent nullspace equation; its displayed basis and projection direction imply 2x+y+3z=0."
+    ]
+  },
+  "limitations": [
+    "Exploratory evaluation. The evaluator inspected the target before freezing this protocol; the target is withheld from generation calls, not unknown to the evaluator.",
+    "2011 lecture summaries are used with 2010 assessments. This is cross-semester development evidence, not chronological prediction of a future test.",
+    "Public MIT assessments may occur in model training data; pretraining contamination cannot be ruled out.",
+    "Both arms use identical student-selected slots and sources. Analysis, review and repair are VERA's extra operations; this is a workflow comparison, not equal compute.",
+    "The real MIT quiz includes 3D projections, least squares/QR, and general n-by-n reasoning beyond VERA's supported domain.",
+    "Numerical checks do not establish full correctness of natural-language solutions, conceptual originality, or learning outcomes.",
+    "The separate held-out solve measures the underlying Meta model, not VERA's generation pipeline. Official solutions are excluded from that solve.",
+    "Keep all failed attempts in the denominator. Do not silently replace a failure or rerun an existing batch. Any changed protocol needs a new batch ID.",
+    "Follow-up configuration selected after the initial 9000-token/default-effort batch exposed truncation. Report both versions; this is development iteration, not a fresh confirmatory benchmark."
+  ]
+}

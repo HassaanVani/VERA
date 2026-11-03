@@ -1,0 +1,46 @@
+{
+  "protocolSha256": "4186696ddc813d4851ee727fb3e3666c482114530e4c6a3ae43ddcd74487c5c2",
+  "frozenAt": "2026-11-03T10:54:06.571Z",
+  "sources": [
+    {
+      "id": "mit-eigenvalues",
+      "partition": "generation",
+      "role": "lecture-notes",
+      "name": "MIT 18.06SC Fall 2011 Lecture 21 summary",
+      "url": "https://ocw.mit.edu/courses/18-06sc-linear-algebra-fall-2011/1999c9f4accdbef05571a1014438f8dd_MIT18_06SCF11_Ses2.8sum.pdf",
+      "sha256": "b339359c086e37146cd0afebb6d6ecdd81691fc76d1b81a468b19baf0fe938ff"
+    },
+    {
+      "id": "mit-determinants",
+      "partition": "generation",
+      "role": "lecture-notes",
+      "name": "MIT 18.06SC Fall 2011 Lecture 18 summary",
+      "url": "https://ocw.mit.edu/courses/18-06sc-linear-algebra-fall-2011/5dd3f8ec0a398fd74264fef3fd591f81_MIT18_06SCF11_Ses2.5sum.pdf",
+      "sha256": "aea16eae29ec03cfc3bda4d8c0019d55b56e839d490ecddde62b2e2caeda27bc"
+    },
+    {
+      "id": "mit-prior-quiz",
+      "partition": "generation",
+      "role": "past-exam",
+      "name": "MIT 18.06 Spring 2010 Quiz 1 (prior assessment)",
+      "url": "https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/e9bbec7a9a25a87715e8edd75e21d7b9_MIT18_06S10_exam1_s10.pdf",
+      "sha256": "b5f28732378182d884e9cf7dcc711ea7c8bdba288c7933975697a1db10a2fff2"
+    },
+    {
+      "id": "mit-target-quiz",
+      "partition": "heldout-question",
+      "role": "past-exam",
+      "name": "MIT 18.06 Spring 2010 Quiz 2 (held out from generation)",
+      "url": "https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/892238e7e16a658abd5813bea8399170_MIT18_06S10_exam2_s10.pdf",
+      "sha256": "ca54e2175f51c144e678668e7e3aee3c6cfc8be229ccdf06f57bcc238a8fa842"
+    },
+    {
+      "id": "mit-target-solutions",
+      "partition": "heldout-solution",
+      "role": "solutions",
+      "name": "MIT 18.06 Spring 2010 Quiz 2 official solutions (evaluation only)",
+      "url": "https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/d669bf89c103559d51427d0916c5db61_MIT18_06S10_exam2_s10_soln.pdf",
+      "sha256": "bba3056cc2f8e29b5656f95fec248bcfe0cd79a3d2c9157a895fb3518c5dafc4"
+    }
+  ]
+}

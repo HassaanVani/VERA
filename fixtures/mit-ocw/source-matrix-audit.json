@@ -1,0 +1,9 @@
+{
+  "status": "Post-hoc qualitative audit aid; not a preregistered accuracy metric or plagiarism verdict",
+  "matrices": [
+    { "source": "mit-eigenvalues", "page": 1, "matrix": [[0, 1], [1, 0]] },
+    { "source": "mit-eigenvalues", "page": 2, "matrix": [[3, 1], [1, 3]] },
+    { "source": "mit-eigenvalues", "page": 3, "matrix": [[0, -1], [1, 0]] },
+    { "source": "mit-eigenvalues", "page": 3, "matrix": [[3, 1], [0, 3]] }
+  ]
+}

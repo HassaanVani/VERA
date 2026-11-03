@@ -1,0 +1,85 @@
+{
+  "id": "mit-ocw-configured-v2",
+  "course": "MIT 18.06 / 18.06SC Linear Algebra, Gilbert Strang",
+  "license": "CC BY-NC-SA 4.0; see resource notices and https://ocw.mit.edu/terms/",
+  "sourcePolicy": "Raw PDFs and extracted pages stay in ignored local storage. No MIT endorsement. No fine-tuning. Standard-mode inference only.",
+  "repeats": 3,
+  "order": [
+    [
+      "direct-meta",
+      "vera"
+    ],
+    [
+      "vera",
+      "direct-meta"
+    ],
+    [
+      "direct-meta",
+      "vera"
+    ]
+  ],
+  "batchCeilingUsd": 12,
+  "model": "muse-spark-1.3",
+  "pricingCheckedAt": "2026-11-03",
+  "inputUsdPerMillion": 1.25,
+  "outputUsdPerMillion": 4.25,
+  "studentSettings": {
+    "questions": 3,
+    "points": 100,
+    "minutes": 60,
+    "format": "free-response",
+    "scope": "2x2 real matrices, determinants, trace, eigenpairs, and transformation reasoning"
+  },
+  "limitations": [
+    "Exploratory evaluation. The evaluator inspected the target before freezing this protocol; the target is withheld from generation calls, not unknown to the evaluator.",
+    "2011 lecture summaries are used with 2010 assessments. This is cross-semester development evidence, not chronological prediction of a future test.",
+    "Public MIT assessments may occur in model training data; pretraining contamination cannot be ruled out.",
+    "Both arms use identical student-selected slots and sources. Analysis, review and repair are VERA's extra operations; this is a workflow comparison, not equal compute.",
+    "The real MIT quiz includes 3D projections, least squares/QR, and general n-by-n reasoning beyond VERA's supported domain.",
+    "Numerical checks do not establish full correctness of natural-language solutions, conceptual originality, or learning outcomes.",
+    "The separate held-out solve measures the underlying Meta model, not VERA's generation pipeline. Official solutions are excluded from that solve.",
+    "Keep all failed attempts in the denominator. Do not silently replace a failure or rerun an existing batch. Any changed protocol needs a new batch ID.",
+    "Follow-up configuration selected after the initial 9000-token/default-effort batch exposed truncation. Report both versions; this is development iteration, not a fresh confirmatory benchmark."
+  ],
+  "sources": [
+    {
+      "id": "mit-eigenvalues",
+      "partition": "generation",
+      "role": "lecture-notes",
+      "name": "MIT 18.06SC Fall 2011 Lecture 21 summary",
+      "url": "https://ocw.mit.edu/courses/18-06sc-linear-algebra-fall-2011/1999c9f4accdbef05571a1014438f8dd_MIT18_06SCF11_Ses2.8sum.pdf"
+    },
+    {
+      "id": "mit-determinants",
+      "partition": "generation",
+      "role": "lecture-notes",
+      "name": "MIT 18.06SC Fall 2011 Lecture 18 summary",
+      "url": "https://ocw.mit.edu/courses/18-06sc-linear-algebra-fall-2011/5dd3f8ec0a398fd74264fef3fd591f81_MIT18_06SCF11_Ses2.5sum.pdf"
+    },
+    {
+      "id": "mit-prior-quiz",
+      "partition": "generation",
+      "role": "past-exam",
+      "name": "MIT 18.06 Spring 2010 Quiz 1 (prior assessment)",
+      "url": "https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/e9bbec7a9a25a87715e8edd75e21d7b9_MIT18_06S10_exam1_s10.pdf"
+    },
+    {
+      "id": "mit-target-quiz",
+      "partition": "heldout-question",
+      "role": "past-exam",
+      "name": "MIT 18.06 Spring 2010 Quiz 2 (held out from generation)",
+      "url": "https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/892238e7e16a658abd5813bea8399170_MIT18_06S10_exam2_s10.pdf"
+    },
+    {
+      "id": "mit-target-solutions",
+      "partition": "heldout-solution",
+      "role": "solutions",
+      "name": "MIT 18.06 Spring 2010 Quiz 2 official solutions (evaluation only)",
+      "url": "https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/d669bf89c103559d51427d0916c5db61_MIT18_06S10_exam2_s10_soln.pdf"
+    }
+  ],
+  "inference": {
+    "maxOutputTokens": 16000,
+    "reasoningEffort": "low"
+  }
+}
