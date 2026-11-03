@@ -1,3 +1,4 @@
+import { illustratedPacket } from "@/lib/illustrated-demo";
 import { NextRequest } from "next/server";
 import { readFile } from "node:fs/promises";
 import nodePath from "node:path";
@@ -234,7 +235,11 @@ export async function POST(
       const input = await req.json();
       const packet = put(
         "packet",
-        input.kind === "general" ? generalDemoPacket() : demoPacket(),
+        input.kind === "illustrated"
+          ? illustratedPacket()
+          : input.kind === "general"
+            ? generalDemoPacket()
+            : demoPacket(),
       );
       return json({ packetId: packet.id, job: queue("analyze", packet.id) });
     }

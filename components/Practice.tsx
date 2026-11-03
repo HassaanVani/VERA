@@ -21,12 +21,14 @@ export default function Practice({
   onSubmit,
   onExit,
   update,
+  onSource,
 }: {
   attempt: Attempt;
   exam: PublicCheckedExam;
   onSubmit: () => void;
   onExit: () => void;
   update: (path: string, body: unknown) => Promise<unknown>;
+  onSource?: (documentId: string, page: number) => void;
 }) {
   const navigationKey = `vera:practice-nav:${attempt.id}`;
   const [{ index, flags }, setNavigation] = useState<{
@@ -59,6 +61,7 @@ export default function Practice({
   });
   const [now, setNow] = useState(() => Date.now()),
     [error, setError] = useState("");
+  const [timerHidden, setTimerHidden] = useState(false);
   const [submitting, setSubmitting] = useState(false),
     [mobilePane, setMobilePane] = useState("questions");
   const [confirmFinish, setConfirmFinish] = useState(false);
@@ -177,6 +180,15 @@ export default function Practice({
             Finish attempt
           </button>
           {!untimed && (
+            <button
+              className="text-button timer-toggle"
+              onClick={() => setTimerHidden(!timerHidden)}
+              disabled={seconds <= 60}
+            >
+              {timerHidden && seconds > 60 ? "Show timer" : "Hide timer"}
+            </button>
+          )}
+          {!untimed && (!timerHidden || seconds <= 60) && (
             <div
               className={`timer ${seconds < 60 ? "urgent" : ""}`}
               role="timer"
@@ -225,7 +237,7 @@ export default function Practice({
         </div>
       )}
       <div
-        className={`exam-layout practice-layout ${hasMaterial ? "" : "without-material"}`}
+        className={`exam-layout practice-layout assessment-desk ${hasMaterial ? "with-reference" : "without-material reading-only"}`}
         data-mobile-pane={mobilePane}
       >
         <div className="practice-questions">
@@ -263,7 +275,10 @@ export default function Practice({
               </button>
             ))}
           </nav>
-          <div className="question-nav-legend">
+          <div
+            className="question-nav-legend"
+            aria-label="Question status legend"
+          >
             <span>
               <CheckCircle2 size={12} /> Answered
             </span>
@@ -271,7 +286,7 @@ export default function Practice({
               <Flag size={12} /> Flagged for review
             </span>
           </div>
-          <article className="panel question-card">
+          <article className="question-card question-sheet">
             <div className="question-meta">
               <span>
                 QUESTION {q.number} / {exam.exam.questions.length}
@@ -279,7 +294,7 @@ export default function Practice({
               <span>{q.points} points</span>
             </div>
             <div className="question-topic">
-              <span className="badge">{q.topic}</span>
+              <span className="sheet-topic">{q.section || q.topic}</span>
               <button
                 className="text-button flag-button"
                 aria-pressed={flags.includes(q.number)}
@@ -294,17 +309,15 @@ export default function Practice({
             <h3 ref={heading} tabIndex={-1}>
               <MathText text={q.question} />
             </h3>
-            {q.objective && (
-              <p className="muted small">Objective: {q.objective}</p>
-            )}
-            {(q.type === "numeric" || q.type === "multiple-choice") && (
-              <p className="muted small">
-                Key-based scoring: all {q.points} points or zero.{" "}
-                {q.type === "numeric"
-                  ? "Only the final value and requested unit are scored; written method is not graded."
-                  : "Choose one option."}
+            <details className="question-scoring">
+              <summary>Scoring & objective</summary>
+              {q.objective && <p>{q.objective}</p>}
+              <p>
+                {q.type === "multiple-choice" || q.type === "numeric"
+                  ? `Key match: ${q.points} points or zero. ${q.type === "numeric" ? "Only the final value and requested unit are scored." : "Choose one option."}`
+                  : "Use the marking guide after submission to self-score your written response."}
               </p>
-            )}
+            </details>
             {q.subparts?.map((part) => (
               <p key={part.label}>
                 <strong>
@@ -358,8 +371,12 @@ export default function Practice({
                   maxLength={20000}
                   disabled={submitting || !seconds}
                   onChange={(event) => answer(q.number, event.target.value)}
-                  placeholder="Show your working and explain your answer…"
-                  rows={9}
+                  placeholder={
+                    q.type === "numeric"
+                      ? "Enter your answer…"
+                      : "Write your response. Include working where needed…"
+                  }
+                  rows={q.type === "numeric" ? 2 : 8}
                 />
               </label>
             )}
@@ -436,6 +453,7 @@ export default function Practice({
           scenario={exam.scenario}
           exhibits={exam.exam.exhibits}
           ids={q.exhibitIds}
+          onSource={onSource}
         />
       </div>
       {confirmFinish && (

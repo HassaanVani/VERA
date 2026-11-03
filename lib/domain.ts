@@ -1,3 +1,4 @@
+import { materialProblems } from "./supporting-material";
 import type {
   Blueprint,
   CheckedExam,
@@ -337,11 +338,12 @@ export function checkExam(
       );
   }
   const exhibitIds = new Set<string>();
-  for (const exhibit of e.exhibits ?? []) {
+  for (const [index, exhibit] of (e.exhibits ?? []).entries()) {
+    const exhibitPath = `exhibits.${index}`;
     if (exhibitIds.has(exhibit.id))
       add(
         "EXHIBIT_DUPLICATE",
-        "exhibits",
+        exhibitPath,
         "Exhibit identifiers must be unique.",
       );
     exhibitIds.add(exhibit.id);
@@ -356,7 +358,7 @@ export function checkExam(
     )
       add(
         "ANSWER_LEAK",
-        "exhibits",
+        exhibitPath,
         "A supporting-material label reveals an intended answer.",
       );
     if (
@@ -366,7 +368,7 @@ export function checkExam(
     )
       add(
         "EXHIBIT_TABLE",
-        "exhibits",
+        exhibitPath,
         "Shared table rows must match their columns.",
       );
     if (
@@ -378,13 +380,21 @@ export function checkExam(
     )
       add(
         "EXHIBIT_COORDINATES",
-        "exhibits",
+        exhibitPath,
         "Diagram coordinates must be finite and nonempty.",
       );
-    if (exhibit.points.length > 20 || exhibit.rows.length > 50)
+    for (const message of materialProblems(exhibit, packet))
+      add(
+        exhibit.source || (exhibit.kind === "passage" && !exhibit.synthetic)
+          ? "SOURCE_EXHIBIT"
+          : "DIAGRAM_STRUCTURE",
+        exhibitPath,
+        message,
+      );
+    if (exhibit.points.length > 40 || exhibit.rows.length > 50)
       add(
         "EXHIBIT_LIMIT",
-        "exhibits",
+        exhibitPath,
         "Exhibit exceeds the renderer's bounds.",
       );
   }

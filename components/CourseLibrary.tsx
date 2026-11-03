@@ -14,6 +14,7 @@ type Props = {
   busy: boolean;
   onUpload: () => void;
   onGeneralSample: () => void;
+  onIllustratedSample: () => void;
   onOpen: (
     packet: Packet,
     next: "packet" | "blueprint" | "exam" | "practice" | "results",
@@ -30,6 +31,7 @@ export default function CourseLibrary({
   busy,
   onUpload,
   onGeneralSample,
+  onIllustratedSample,
   onOpen,
 }: Props) {
   const [query, setQuery] = useState("");
@@ -270,6 +272,13 @@ export default function CourseLibrary({
               onClick={onGeneralSample}
             >
               Try evidence & decisions <ArrowRight size={15} />
+            </button>
+            <button
+              className="text-button"
+              disabled={busy}
+              onClick={onIllustratedSample}
+            >
+              Explore diagrams & documents <ArrowRight size={15} />
             </button>
           </div>
         </details>

@@ -1,4 +1,10 @@
 import {
+  illustratedBlueprint,
+  illustratedExam,
+  isIllustratedDemo,
+} from "./illustrated-demo";
+import { retrievePassages } from "./supporting-material";
+import {
   Blueprint,
   Scenario,
   Exam,
@@ -221,9 +227,11 @@ export async function runJob(
           })),
       );
     const raw = packet.fixture
-      ? isGeneralDemo(packet)
-        ? generalDemoBlueprint(packet)
-        : demoBlueprint(packet)
+      ? isIllustratedDemo(packet)
+        ? illustratedBlueprint(packet)
+        : isGeneralDemo(packet)
+          ? generalDemoBlueprint(packet)
+          : demoBlueprint(packet)
       : await call(
           "Understand course evidence",
           V2Blueprint,
@@ -264,9 +272,16 @@ export async function runJob(
     throw new Error("Approved blueprint failed invariants.");
   if (packet.fixture) {
     stage("Load labeled demonstration");
-    const result = isGeneralDemo(packet)
-      ? generalDemoExam(packet, b, revision.id)
-      : savedDemo(packet, revision.id, b, job.kind === "follow-up" ? 1 : 0);
+    const result = isIllustratedDemo(packet)
+      ? illustratedExam(
+          packet,
+          b,
+          revision.id,
+          job.kind === "follow-up" ? 1 : 0,
+        )
+      : isGeneralDemo(packet)
+        ? generalDemoExam(packet, b, revision.id)
+        : savedDemo(packet, revision.id, b, job.kind === "follow-up" ? 1 : 0);
     complete("Saved demonstration ready · no model calls", result.id, [
       { kind: "exam", value: result },
     ]);
@@ -280,10 +295,12 @@ export async function runJob(
     throw new Error(
       "The shared scenario failed numerical checks. No inconsistent exhibits were generated; retry with a new scenario.",
     );
+  const passages = b.schemaVersion === 2 ? retrievePassages(packet, b) : [];
+  if (passages.length) record("Retrieved source passages", passages);
   let exam = await call(
     "Generate questions and exhibits",
     b.schemaVersion === 2 ? V2Exam : Exam,
-    `${generationPrompt(b, scenario, job.focus)}${b.schemaVersion === 2 ? `\nUNTRUSTED_COURSE_EVIDENCE: ${packetText(packet)}` : ""}`,
+    `${generationPrompt(b, scenario, job.focus)}${b.schemaVersion === 2 ? `\nUNTRUSTED_COURSE_EVIDENCE: ${packetText(packet)}\nUNTRUSTED_RETRIEVED_PASSAGES: ${JSON.stringify(passages)}` : ""}`,
     b.schemaVersion === 2
       ? packet.documents.flatMap((d) =>
           d.pages
@@ -371,16 +388,43 @@ export async function runJob(
       patch.questions.some((q) => !affected.has(q.number))
     )
       throw new Error("Repair attempted to change unaffected questions.");
+    const materialReplacements =
+      b.schemaVersion === 2
+        ? ((patch as z.infer<typeof V2Patch>).exhibits ?? [])
+        : [];
+    const affectedMaterials = new Set(
+      issues
+        .filter((i) => i.severity === "error")
+        .flatMap((i) => {
+          const match = /^exhibits\.(\d+)(?:\.|$)/.exec(i.path);
+          const exhibit = match && exam.exhibits?.[Number(match[1])];
+          return exhibit ? [exhibit.id] : [];
+        }),
+    );
+    if (
+      new Set(materialReplacements.map((e) => e.id)).size !==
+        materialReplacements.length ||
+      materialReplacements.some((e) => !affectedMaterials.has(e.id))
+    )
+      throw new Error(
+        "Repair attempted to add or change unaffected supporting material.",
+      );
     record("Repair diff", {
       before: exam.questions,
       replacements: patch.questions,
       affected: [...affected],
+      exhibitsBefore: exam.exhibits,
+      exhibitReplacements: materialReplacements,
+      affectedExhibits: [...affectedMaterials],
     });
     exam = Exam.parse({
       ...exam,
       title: b.title,
       totalPoints: b.totalPoints,
       minutes: b.minutes,
+      exhibits: exam.exhibits?.map(
+        (e) => materialReplacements.find((p) => p.id === e.id) ?? e,
+      ),
       questions: exam.questions.map(
         (q) => patch.questions.find((p) => p.number === q.number) || q,
       ),

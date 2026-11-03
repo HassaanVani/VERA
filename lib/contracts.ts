@@ -127,6 +127,46 @@ export const Exhibit = z.object({
     }),
   ),
   synthetic: z.boolean(),
+  source: z
+    .object({
+      documentId: z.string().min(1),
+      page: z.number().int().positive(),
+    })
+    .optional(),
+  drawing: z
+    .object({
+      axes: z.enum(["cartesian", "none"]),
+      description: z.string().min(1).max(1500),
+      segments: z
+        .array(
+          z.object({
+            from: z.string(),
+            to: z.string(),
+            arrow: z.boolean(),
+            label: z.string().max(80),
+          }),
+        )
+        .max(24),
+      paths: z
+        .array(
+          z.object({
+            points: z.array(z.string()).min(2).max(40),
+            closed: z.boolean(),
+            label: z.string().max(80),
+          }),
+        )
+        .max(12),
+      circles: z
+        .array(
+          z.object({
+            center: z.string(),
+            radius: z.number().finite().positive().max(1e6),
+            label: z.string().max(80),
+          }),
+        )
+        .max(8),
+    })
+    .optional(),
 });
 export const Question = z.object({
   number: z.number().int().positive(),
@@ -224,7 +264,10 @@ export const V2Exam = Exam.extend({
   exhibits: z.array(Exhibit),
   questions: z.array(V2Question).min(1).max(12),
 });
-export const V2Patch = Patch.extend({ questions: z.array(V2Question) });
+export const V2Patch = Patch.extend({
+  questions: z.array(V2Question),
+  exhibits: z.array(Exhibit).optional(),
+});
 export type Blueprint = z.infer<typeof Blueprint>;
 export type Scenario = z.infer<typeof Scenario>;
 export type Exam = z.infer<typeof Exam>;

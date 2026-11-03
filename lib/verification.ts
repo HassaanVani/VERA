@@ -1,3 +1,4 @@
+import { materialProblems } from "./supporting-material";
 import type {
   Exam,
   Packet,
@@ -373,6 +374,22 @@ export function verifyExam(exam: Exam, context: Context): Verification[] {
         ...result,
       };
     });
+    for (const exhibit of (exam.exhibits ?? []).filter(
+      (e) => q.exhibitIds.includes(e.id) && (e.drawing || e.source),
+    )) {
+      const problems = materialProblems(exhibit, context.packet);
+      results.push({
+        question: q.number,
+        claim: null,
+        method: exhibit.source ? "source-excerpt" : "diagram-structure",
+        result: problems.length ? "failed" : "passed",
+        artifact: JSON.stringify({ exhibitId: exhibit.id, problems }),
+        checkerVersion: "supporting-material-1",
+        limitation: exhibit.source
+          ? "Verifies literal page text and location, not authenticity or historical interpretation."
+          : "Checks geometry references and bounded data, not conceptual relevance or every answer.",
+      });
+    }
     results.push({
       question: q.number,
       claim: null,

@@ -33,10 +33,7 @@ import ExamPlanEditor from "./ExamPlanEditor";
 import CourseLibrary from "./CourseLibrary";
 import Brand from "./Brand";
 import CourseMaterials from "./CourseMaterials";
-
-import Exhibits from "./Exhibits";
-
-import MathText from "./MathText";
+import ExamPreview from "./ExamPreview";
 
 import Practice from "./Practice";
 
@@ -799,6 +796,7 @@ export default function Workspace() {
                   busy={busy || !!active}
                   onUpload={openUpload}
                   onGeneralSample={() => void demo("general")}
+                  onIllustratedSample={() => void demo("illustrated")}
                   onOpen={(p, next, selectedExam) => {
                     setPacketId(p.id);
 
@@ -1101,69 +1099,11 @@ export default function Workspace() {
                       </div>
                     </div>
 
-                    <div
-                      className={`exam-layout ${exam.scenario || exam.exam.exhibits?.length ? "" : "without-material"}`}
-                    >
-                      <div>
-                        <div className="instructions panel">
-                          <span className="eyebrow">BEFORE YOU BEGIN</span>
-
-                          <p>{exam.exam.instructions}</p>
-
-                          <p className="muted small">
-                            Solutions unlock after you finish an attempt.
-                          </p>
-                        </div>
-
-                        {exam.exam.questions.map((q) => (
-                          <article
-                            className="panel question-card"
-                            key={q.number}
-                          >
-                            <div className="question-meta">
-                              <span>
-                                QUESTION {q.number.toString().padStart(2, "0")}
-                              </span>
-
-                              <span>
-                                {q.points} points · {q.minutes} min
-                              </span>
-                            </div>
-
-                            <span className="badge">{q.topic}</span>
-
-                            <h3>
-                              <MathText text={q.question} />
-                            </h3>
-
-                            <p className="muted small">
-                              {q.exhibitIds.length
-                                ? `Supporting material: ${q.exhibitIds.join(", ")}`
-                                : "No additional supporting material needed."}
-                            </p>
-
-                            {q.options.length > 0 && (
-                              <div className="readonly-options">
-                                {q.options.map((o, i) => (
-                                  <div key={i}>
-                                    <span className="option-letter">
-                                      {String.fromCharCode(65 + i)}
-                                    </span>
-
-                                    <MathText text={o} />
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                          </article>
-                        ))}
-                      </div>
-
-                      <Exhibits
-                        scenario={exam.scenario}
-                        exhibits={exam.exam.exhibits}
-                      />
-                    </div>
+                    <ExamPreview
+                      key={exam.id}
+                      exam={exam}
+                      onSource={openSource}
+                    />
                   </>
                 ))}
 
@@ -1174,6 +1114,7 @@ export default function Workspace() {
                     attempt={attempt}
                     exam={exam}
                     update={request}
+                    onSource={openSource}
                     onExit={() => goto("exam")}
                     onSubmit={() => {
                       void refresh().then(() => setView("results"));

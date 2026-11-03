@@ -3,6 +3,7 @@ import { useState, useId } from "react";
 import { ArrowUpRight, FileSpreadsheet, MoveUpRight } from "lucide-react";
 import type { Scenario, Exam } from "@/lib/contracts";
 import MathText from "./MathText";
+import GeometryDiagram from "./GeometryDiagram";
 import { multiply } from "@/lib/domain";
 
 export function TransformationDiagram({
@@ -234,10 +235,12 @@ export default function Exhibits({
   scenario,
   exhibits = [],
   ids,
+  onSource,
 }: {
   scenario?: Scenario;
   exhibits?: Exam["exhibits"];
   ids?: string[];
+  onSource?: (documentId: string, page: number) => void;
 }) {
   const available = exhibits.filter((e) => !ids || ids.includes(e.id));
   const [selected, setSelected] = useState("");
@@ -245,11 +248,6 @@ export default function Exhibits({
   if (scenario) return <MatrixExhibits scenario={scenario} />;
   if (!available.length) return null;
   const current = available.find((e) => e.id === selected) ?? available[0];
-  const bound =
-    Math.max(
-      1,
-      ...current.points.flatMap((p) => [Math.abs(p.x), Math.abs(p.y)]),
-    ) * 1.2;
   return (
     <aside className="exhibit-panel" aria-label="Supporting exhibits">
       <div className="exhibit-heading">
@@ -258,50 +256,54 @@ export default function Exhibits({
           {current.synthetic ? "Synthetic material" : "Source-based material"}
         </span>
       </div>
-      <div
-        className="exhibit-tabs"
-        role="tablist"
-        aria-label="Exhibit"
-        onKeyDown={(event) => {
-          if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key))
-            return;
-          event.preventDefault();
-          const index = available.indexOf(current);
-          const next =
-            event.key === "Home"
-              ? 0
-              : event.key === "End"
-                ? available.length - 1
-                : (index +
-                    (event.key === "ArrowRight" ? 1 : -1) +
-                    available.length) %
-                  available.length;
-          setSelected(available[next].id);
-          (event.currentTarget.children[next] as HTMLButtonElement).focus();
-        }}
-      >
-        {available.map((e) => (
-          <button
-            key={e.id}
-            id={`${tabId}-${e.id}`}
-            role="tab"
-            aria-selected={current.id === e.id}
-            aria-controls={`${tabId}-material`}
-            tabIndex={current.id === e.id ? 0 : -1}
-            onClick={() => setSelected(e.id)}
-          >
-            {e.title}
-          </button>
-        ))}
-      </div>
+      {available.length > 1 && (
+        <div
+          className="exhibit-tabs"
+          role="tablist"
+          aria-label="Exhibit"
+          onKeyDown={(event) => {
+            if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key))
+              return;
+            event.preventDefault();
+            const index = available.indexOf(current);
+            const next =
+              event.key === "Home"
+                ? 0
+                : event.key === "End"
+                  ? available.length - 1
+                  : (index +
+                      (event.key === "ArrowRight" ? 1 : -1) +
+                      available.length) %
+                    available.length;
+            setSelected(available[next].id);
+            (event.currentTarget.children[next] as HTMLButtonElement).focus();
+          }}
+        >
+          {available.map((e) => (
+            <button
+              key={e.id}
+              id={`${tabId}-${e.id}`}
+              role="tab"
+              aria-selected={current.id === e.id}
+              aria-controls={`${tabId}-material`}
+              tabIndex={current.id === e.id ? 0 : -1}
+              onClick={() => setSelected(e.id)}
+            >
+              {e.title}
+            </button>
+          ))}
+        </div>
+      )}
       <div
         className="paper"
-        role="tabpanel"
+        role={available.length > 1 ? "tabpanel" : "region"}
         id={`${tabId}-material`}
-        aria-labelledby={`${tabId}-${current.id}`}
+        aria-labelledby={
+          available.length > 1 ? `${tabId}-${current.id}` : `${tabId}-title`
+        }
         tabIndex={0}
       >
-        <h3>{current.title}</h3>
+        <h3 id={`${tabId}-title`}>{current.title}</h3>
         <p className="paper-sub">
           {current.synthetic
             ? "CREATED FOR THIS PRACTICE"
@@ -334,42 +336,17 @@ export default function Exhibits({
             </table>
           </div>
         )}
-        {current.kind === "diagram" && (
-          <>
-            <svg
-              viewBox="0 0 340 340"
-              role="img"
-              aria-label={`${current.title}. Coordinates listed below.`}
-            >
-              <line x1="10" y1="170" x2="330" y2="170" stroke="currentColor" />
-              <line x1="170" y1="10" x2="170" y2="330" stroke="currentColor" />
-              {current.points.map((p, i) => (
-                <g key={i}>
-                  <circle
-                    cx={170 + (p.x / bound) * 145}
-                    cy={170 - (p.y / bound) * 145}
-                    r="4"
-                    fill="#1766d9"
-                  />
-                  <text
-                    x={175 + (p.x / bound) * 145}
-                    y={165 - (p.y / bound) * 145}
-                    fill="currentColor"
-                    fontSize="12"
-                  >
-                    {p.label}
-                  </text>
-                </g>
-              ))}
-            </svg>
-            <ul>
-              {current.points.map((p, i) => (
-                <li key={i}>
-                  {p.label}: ({p.x}, {p.y})
-                </li>
-              ))}
-            </ul>
-          </>
+        {current.kind === "diagram" && <GeometryDiagram exhibit={current} />}
+        {current.source && (
+          <button
+            className="source-link original-source"
+            disabled={!onSource}
+            onClick={() =>
+              onSource?.(current.source!.documentId, current.source!.page)
+            }
+          >
+            View original · page {current.source.page}
+          </button>
         )}
         <footer>
           VERA <span>One shared reference for this assessment</span>

@@ -27,7 +27,13 @@ describe("structured supporting material", () => {
     const markup = renderToStaticMarkup(
       <Exhibits exhibits={[table]} ids={[table.id]} />,
     );
-    expect(markup).toContain('role="tablist"');
+    expect(markup).not.toContain('role="tablist"');
+    expect(markup).toContain('role="region"');
+    expect(
+      renderToStaticMarkup(
+        <Exhibits exhibits={[table, { ...table, id: "second" }]} />,
+      ),
+    ).toContain('role="tablist"');
     expect(markup).toContain('scope="col"');
     expect(markup).toContain("Measured values");
     expect(markup).toContain("Synthetic material");
@@ -58,10 +64,8 @@ describe("structured supporting material", () => {
     );
     const points = [...markup.matchAll(/<circle cx="([\d.]+)" cy="([\d.]+)"/g)];
     expect(points).toHaveLength(2);
-    expect(Number(points[0][1])).toBe(170);
-    expect(Number(points[0][2])).toBe(170);
-    expect(Number(points[1][1])).toBeGreaterThan(170);
-    expect(Number(points[1][2])).toBeLessThan(170);
+    expect(Number(points[1][1])).toBeGreaterThan(Number(points[0][1]));
+    expect(Number(points[1][2])).toBeLessThan(Number(points[0][2]));
     expect(markup).toContain("P: (1, 1)");
   });
   it("keeps the legacy parallelogram inside the sheet even when probes cancel large columns", () => {

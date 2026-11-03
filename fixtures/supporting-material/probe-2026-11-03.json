@@ -1,0 +1,162 @@
+{
+  "checkedAt": "2026-11-03T22:25:12.389Z",
+  "model": "muse-spark-1.3",
+  "pricingChecked": "2026-11-03",
+  "purpose": "One original-material capability probe; not a paired quality evaluation",
+  "status": "passed",
+  "elapsedMs": 60306,
+  "accountedUsd": 0.039742500000000014,
+  "localCeilingUsd": 1,
+  "ready": true,
+  "repairAttempts": 0,
+  "questions": 3,
+  "diagrams": [
+    {
+      "points": 6,
+      "segments": 1,
+      "paths": 1,
+      "circles": 1
+    }
+  ],
+  "sourcePassages": 1,
+  "providerCalls": 3,
+  "verificationCoverage": {
+    "passed": 10,
+    "failed": 0,
+    "unsupported": 3
+  },
+  "verification": [
+    {
+      "question": 1,
+      "claim": 0,
+      "method": "arithmetic",
+      "checkerVersion": "vera-checkers/2.0",
+      "result": "passed",
+      "artifact": "0.5*60*40 = 1200; proposed 1200 m²",
+      "limitation": "Checks this calculation only, not whether its formula answers the question or its units are physically valid."
+    },
+    {
+      "question": 1,
+      "claim": 1,
+      "method": "exhibit-consistency",
+      "checkerVersion": "vera-checkers/2.0",
+      "result": "passed",
+      "artifact": "{\"actual\":{\"label\":\"P\",\"x\":0,\"y\":0},\"proposed\":{\"kind\":\"coordinate\",\"exhibitId\":\"field-diagram\",\"label\":\"P\",\"x\":0,\"y\":0}}",
+      "limitation": "Checks coordinates against the shared diagram data, not conceptual reasoning."
+    },
+    {
+      "question": 1,
+      "claim": 2,
+      "method": "exhibit-consistency",
+      "checkerVersion": "vera-checkers/2.0",
+      "result": "passed",
+      "artifact": "{\"actual\":{\"label\":\"Q\",\"x\":60,\"y\":0},\"proposed\":{\"kind\":\"coordinate\",\"exhibitId\":\"field-diagram\",\"label\":\"Q\",\"x\":60,\"y\":0}}",
+      "limitation": "Checks coordinates against the shared diagram data, not conceptual reasoning."
+    },
+    {
+      "question": 1,
+      "claim": 3,
+      "method": "exhibit-consistency",
+      "checkerVersion": "vera-checkers/2.0",
+      "result": "passed",
+      "artifact": "{\"actual\":{\"label\":\"R\",\"x\":20,\"y\":40},\"proposed\":{\"kind\":\"coordinate\",\"exhibitId\":\"field-diagram\",\"label\":\"R\",\"x\":20,\"y\":40}}",
+      "limitation": "Checks coordinates against the shared diagram data, not conceptual reasoning."
+    },
+    {
+      "question": 1,
+      "claim": null,
+      "method": "diagram-structure",
+      "result": "passed",
+      "artifact": "{\"exhibitId\":\"field-diagram\",\"problems\":[]}",
+      "checkerVersion": "supporting-material-1",
+      "limitation": "Checks geometry references and bounded data, not conceptual relevance or every answer."
+    },
+    {
+      "question": 1,
+      "claim": null,
+      "method": "written-reasoning",
+      "result": "unsupported",
+      "artifact": "No automatic conceptual proof or essay-grade verification",
+      "checkerVersion": "vera-checkers/2.0",
+      "limitation": "Model review is provisional. Passing individual claims does not verify the entire answer."
+    },
+    {
+      "question": 2,
+      "claim": 0,
+      "method": "arithmetic",
+      "checkerVersion": "vera-checkers/2.0",
+      "result": "passed",
+      "artifact": "3.14*10^2 = 314; proposed 314 m²",
+      "limitation": "Checks this calculation only, not whether its formula answers the question or its units are physically valid."
+    },
+    {
+      "question": 2,
+      "claim": 1,
+      "method": "exhibit-consistency",
+      "checkerVersion": "vera-checkers/2.0",
+      "result": "passed",
+      "artifact": "{\"actual\":{\"label\":\"S\",\"x\":15,\"y\":55},\"proposed\":{\"kind\":\"coordinate\",\"exhibitId\":\"field-diagram\",\"label\":\"S\",\"x\":15,\"y\":55}}",
+      "limitation": "Checks coordinates against the shared diagram data, not conceptual reasoning."
+    },
+    {
+      "question": 2,
+      "claim": null,
+      "method": "diagram-structure",
+      "result": "passed",
+      "artifact": "{\"exhibitId\":\"field-diagram\",\"problems\":[]}",
+      "checkerVersion": "supporting-material-1",
+      "limitation": "Checks geometry references and bounded data, not conceptual relevance or every answer."
+    },
+    {
+      "question": 2,
+      "claim": null,
+      "method": "written-reasoning",
+      "result": "unsupported",
+      "artifact": "No automatic conceptual proof or essay-grade verification",
+      "checkerVersion": "vera-checkers/2.0",
+      "limitation": "Model review is provisional. Passing individual claims does not verify the entire answer."
+    },
+    {
+      "question": 3,
+      "claim": 0,
+      "method": "source-location",
+      "checkerVersion": "vera-checkers/2.0",
+      "result": "passed",
+      "artifact": "9a1f33f0-f0da-4266-8ec9-31cb34d899f9, page 2: We have sent two requests and received no written reply.",
+      "limitation": "Quote presence does not verify the claim's meaning, interpretation, or completeness."
+    },
+    {
+      "question": 3,
+      "claim": null,
+      "method": "source-excerpt",
+      "result": "passed",
+      "artifact": "{\"exhibitId\":\"petition-text\",\"problems\":[]}",
+      "checkerVersion": "supporting-material-1",
+      "limitation": "Verifies literal page text and location, not authenticity or historical interpretation."
+    },
+    {
+      "question": 3,
+      "claim": null,
+      "method": "written-reasoning",
+      "result": "unsupported",
+      "artifact": "No automatic conceptual proof or essay-grade verification",
+      "checkerVersion": "vera-checkers/2.0",
+      "limitation": "Model review is provisional. Passing individual claims does not verify the entire answer."
+    }
+  ],
+  "limitations": [
+    "One original-material capability probe, not a paired quality evaluation.",
+    "Two numeric items have checked arithmetic; all three items retain unsupported written-reasoning records.",
+    "Literal source matching does not establish authenticity or interpretation.",
+    "The authored fictional petition is not an authentic historical document.",
+    "Earlier frozen OCW results do not apply to this expanded engine."
+  ],
+  "implementationSha256": {
+    "lib/contracts.ts": "418c7862d4d8b12b0ef4483e7c968dd7ad6eedb58aae394afe5ef73ceb72cfde",
+    "lib/domain.ts": "77df8d66e90cc98933c70ee0a5b713cb1fce3903d81889a7209bc197f53df8e2",
+    "lib/pipeline.ts": "7555e5deceb5cae62fa2626366235dbae1a3fd6e5c442ef491642bd37dae3879",
+    "lib/prompts.ts": "f9135a61b94fbd505684b8f4d0dd01f3f28c65ba78c46b4920de42174d8b1a70",
+    "lib/verification.ts": "1205524776bc0d3003cc7a40fc664dba70e28beedf040b303b8717a083254961",
+    "lib/supporting-material.ts": "a91a54e1750559a360508c8527c53405a3b738895edc5cfbba6ee76beb44e60d"
+  }
+}

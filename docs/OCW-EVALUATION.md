@@ -1,5 +1,7 @@
 # Cross-subject OCW evaluation — November 3, 2026
 
+**Historical candidate:** the diagram/source-retrieval expansion was added after this comparison. Reproduce the frozen implementation from commit `606bab7` before running its restore/evaluation commands. The archived manifests and results are unchanged; their success rates do not describe the expanded engine.
+
 VERA now uses subject-independent assessment contracts. This evaluation tests selected materials from linear algebra, microeconomics, psychology and history; it does not establish reliable performance on every subject. No fine-tuning was performed. The [public machine-readable summary](../fixtures/ocw-cross-subject/results-2026-11-03.json) contains denominators, hashes, per-run statuses and reconciled costs without redistributing source PDFs or full model/student responses.
 
 ## Design and source separation
@@ -17,7 +19,7 @@ Attribution: Gilbert Strang; Jonathan Gruber and William Wheaton; John D. E. Gab
 
 Both candidates use Muse Spark 1.3 Standard mode, low reasoning, a 16,000-token output ceiling, identical explicit target settings, and the same permitted course evidence. Each target requests three questions, 30 points and 30 minutes, with subject-appropriate formats. These student-selected settings do not measure instructor-format inference accuracy or reproduce full exam coverage. Direct generation makes one structured generation call. VERA additionally analyzes sources, solves independently with the key withheld, compares solutions and permits two repair cycles. Both final artifacts receive common deterministic checks. Extra compute is part of the workflow comparison.
 
-There were two development pairs per course, followed by three final pairs per course. Order alternates within each course; two courses run concurrently. All completed, failed and blocked attempts remain in the denominator. The development evidence informed schema, prompt and checking changes. The candidate was frozen before the final run, and every frozen implementation hash still matches. No candidate generation/checking code was tuned against the final outcomes. Later UI/service fixes do not alter these frozen generation files.
+There were two development pairs per course, followed by three final pairs per course. Order alternates within each course; two courses run concurrently. All completed, failed and blocked attempts remain in the denominator. The development evidence informed schema, prompt and checking changes. The candidate was frozen before the final run, and every frozen implementation hash matched at that audit. No candidate generation/checking code was tuned against the final outcomes. The later diagram/source-retrieval feature changes those files and requires separate evaluation; use the historical commit above for exact reproduction.
 
 Public course material may have appeared in pretraining. This is a small exploratory workflow comparison, not a contamination-free prospective exam prediction, a representative benchmark or a learning-outcome study.
 
