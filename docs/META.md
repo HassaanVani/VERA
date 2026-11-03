@@ -22,9 +22,9 @@ VERA permits Standard mode and refuses identifiers containing `contributor`. Met
 
 ## Budget
 
-The configured Spark Standard-mode rates are USD 1.25/M input and USD 4.25/M output tokens, checked October 28, 2026. Caching discounts are ignored conservatively. Recheck current pricing and update the environment rates when changing models; a more expensive model must not inherit cheaper rates.
+The configured Spark Standard-mode rates are USD 1.25/M input and USD 4.25/M output tokens, rechecked November 3, 2026. Caching discounts are ignored conservatively. Recheck current pricing and update the environment rates when changing models; a more expensive model must not inherit cheaper rates.
 
-Each request reserves a conservative token ceiling using UTF-8 input bytes, schema size, an image allowance, and the 9,000-token output cap. A configurable per-call ceiling defaults to USD 0.50. SQLite transactions enforce USD 90 development and USD 30 demo buckets, USD 120 combined. The remaining USD 30 reserve cannot be selected as a bucket.
+Each request reserves a conservative token ceiling using UTF-8 input bytes, schema size, an image allowance, and the configurable output cap (16,000 tokens by default, including internal reasoning). A configurable per-call ceiling defaults to USD 0.50. SQLite transactions enforce USD 90 development and USD 30 demo buckets, USD 120 combined. The remaining USD 30 reserve cannot be selected as a bucket.
 
 Successful calls settle against reported token usage. Calls with missing usage, ambiguous transport failures, interrupted responses, or possible server-side work keep their reservation as uncertain. Explicit non-retryable HTTP rejections settle at zero. Retries reserve separately. The ledger is an application estimate, not a replacement for the Meta billing dashboard; reconcile unknown charges manually before larger batches.
 
@@ -33,3 +33,11 @@ Each call has a 90-second deadline; a complete job has an 8-minute deadline. HTT
 ## Current validation status
 
 Provider request shapes, schema rejection, missing credentials, Standard-mode enforcement, usage accounting, transport interruption, and truncated output are exercised with mocked transport tests. Actual account access, mathematical image understanding, model selection, latency, and quality require `npm run probe` and the live evaluation. The build environment did not expose a key, so those results remain pending.
+
+## November 3 live validation
+
+The text/JSON and mathematical-image probes passed on the user's account. A real MIT OpenCourseWare source packet exposed truncation with the original 9,000-token cap and model-selected reasoning. All six initial attempts are retained. The provider now defaults to explicit low reasoning and a configurable 16,000-token output limit; reservations account for that configured ceiling. Set META_REASONING_EFFORT or VERA_MAX_OUTPUT_TOKENS to change them within validated bounds. The per-call spending cap, 90-second deadline, and development allocation still apply. Non-stop output remains rejected and its finish reason is included in the recovery message.
+
+Meta's [reasoning documentation](https://dev.meta.ai/docs/reasoning) explains that reasoning tokens share the output-token allowance. The frozen follow-up comparison completed all six exams; independent arithmetic and the limitations are recorded in [MIT-EVALUATION.md](MIT-EVALUATION.md). Passing a probe or numerical checks is not a full correctness guarantee.
+
+Workers and CLI evaluation/probe commands use @next/env to load .env and .env.local with Next.js precedence. Credentials remain server-side and ignored by Git. .env.example contains no credential.

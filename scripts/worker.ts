@@ -1,3 +1,4 @@
+import "./environment.mjs";
 import { acquireWorker, heartbeat, releaseWorker, list, patchJob, get } from "../lib/store";
 import type { Job } from "../lib/contracts";
 import { runJob } from "../lib/pipeline";

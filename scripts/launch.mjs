@@ -2,7 +2,8 @@ import { spawn } from 'node:child_process';
 import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 const mode = process.argv[2] === 'start' ? 'start' : 'dev';
-try { process.loadEnvFile('.env.local'); } catch (error) { if (error.code !== 'ENOENT') throw error; }
+process.env.NODE_ENV ??= mode === 'dev' ? 'development' : 'production';
+await import('./environment.mjs');
 const common = ['--experimental-sqlite'];
 const children = [
   spawn(process.execPath, [...common, '--import', 'tsx', 'scripts/worker.ts'], { stdio: 'inherit' }),

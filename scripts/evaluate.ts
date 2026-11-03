@@ -1,3 +1,4 @@
+import "./environment.mjs";
 import { z } from "zod";
 import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";

@@ -1,10 +1,12 @@
+import "./environment.mjs";
 import { z } from "zod";
 import path from "node:path";
 import { mkdir, writeFile } from "node:fs/promises";
 import { MetaProvider, modelConfig } from "../lib/provider";
 import { put, usageSummary, id } from "../lib/store";
 
-const report = { checkedAt: new Date().toISOString(), model: modelConfig().model, status: "pending", cases: [] as { name: string; passed: boolean; error?: string }[] };
+const config = modelConfig();
+const report = { checkedAt: new Date().toISOString(), model: config.model, inference: { maxOutputTokens: config.maxOutputTokens, reasoningEffort: config.reasoningEffort || "auto" }, status: "pending", cases: [] as { name: string; passed: boolean; error?: string }[] };
 if (!process.env.MODEL_API_KEY) {
   console.log("PENDING: MODEL_API_KEY is not configured. No live calls or model quality claims made.");
 } else {

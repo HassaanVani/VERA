@@ -9,16 +9,18 @@
   "scripts": {
     "dev": "node scripts/launch.mjs dev",
     "start": "node scripts/launch.mjs start",
-    "worker": "tsx --env-file-if-exists=.env.local scripts/worker.ts",
+    "worker": "tsx scripts/worker.ts",
     "build": "next build",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "test": "vitest run",
     "check": "npm run lint && npm run typecheck && npm run test && npm run build",
-    "probe": "tsx --env-file-if-exists=.env.local scripts/probe.ts",
-    "evaluate": "tsx --env-file-if-exists=.env.local scripts/evaluate.ts"
+    "probe": "tsx scripts/probe.ts",
+    "evaluate": "tsx scripts/evaluate.ts",
+    "evaluate:mit": "tsx scripts/mit-evaluate.ts"
   },
   "dependencies": {
+    "@next/env": "16.4.3",
     "katex": "^0.16.22",
     "lucide-react": "^0.468.0",
     "next": "16.4.3",
