@@ -1,5 +1,5 @@
 "use client";
-import { Check, ChevronRight } from "lucide-react";
+import { Check } from "lucide-react";
 
 const steps = [
   { view: "packet", label: "Materials" },
@@ -38,8 +38,13 @@ export default function CourseJourney({
             >
               <span
                 className={`journey-number ${complete[index] ? "complete" : ""}`}
+                aria-hidden="true"
               >
-                {complete[index] ? <Check size={14} /> : index + 1}
+                {complete[index] ? (
+                  <Check size={13} />
+                ) : (
+                  String(index + 1).padStart(2, "0")
+                )}
               </span>
               <span>
                 <strong>{step.label}</strong>
@@ -65,7 +70,6 @@ export default function CourseJourney({
                           : "After practice"}
                 </small>
               </span>
-              <ChevronRight size={13} className="journey-chevron" />
             </button>
           </li>
         ))}

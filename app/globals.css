@@ -5,18 +5,18 @@
   font-display: swap;
 }
 :root {
-  --bg: #080b12;
-  --sidebar: #0a0e17;
-  --panel: #101620;
-  --panel-light: #141d2c;
-  --line: #212a3a;
-  --blue: #397dff;
-  --blue-light: #8ab6ff;
-  --cyan: #61cadb;
-  --text: #eef2fa;
-  --muted: #9ba7bc;
-  --faint: #6e7e98;
-  --radius: 12px;
+  --bg: #09152e;
+  --sidebar: #0b1833;
+  --panel: #101f3c;
+  --panel-light: #15294b;
+  --line: #293e62;
+  --blue: #698fff;
+  --blue-light: #b4ceff;
+  --cyan: #93cddd;
+  --text: #edf2fc;
+  --muted: #b1bfd8;
+  --faint: #9aaccb;
+  --radius: 7px;
   color-scheme: dark;
 }
 * {
@@ -138,17 +138,6 @@ textarea::placeholder {
 .app-shell {
   min-height: 100vh;
 }
-.sidebar {
-  position: fixed;
-  inset: 0 auto 0 0;
-  width: 242px;
-  background: var(--sidebar);
-  border-right: 1px solid #1b2331;
-  padding: 31px 20px 19px;
-  display: flex;
-  flex-direction: column;
-  z-index: 20;
-}
 .brand {
   display: flex;
   align-items: center;
@@ -157,103 +146,6 @@ textarea::placeholder {
   letter-spacing: 3.5px;
   font-weight: 800;
   line-height: 1;
-}
-.brand-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.brand-dot {
-  color: var(--blue);
-}
-.workspace-label {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 17px 10px;
-  background: #101724;
-  border: 1px solid #202b3f;
-  border-radius: 9px;
-  margin: 36px 0 28px;
-  font-size: 12px;
-  font-weight: 600;
-}
-.workspace-label > svg {
-  margin-left: auto;
-  color: #667893;
-}
-.workspace-label small {
-  display: block;
-  font-size: 12px;
-  letter-spacing: 1.5px;
-  color: #7e8fa9;
-  margin-top: 6px;
-}
-.nav-caption {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 1.8px;
-  color: #6d7d97;
-  margin: 0 12px 12px;
-}
-.sidebar nav {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-.sidebar nav button {
-  border: 1px solid transparent;
-  background: none;
-  text-align: left;
-  padding: 12px 12px;
-  border-radius: 7px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: #a0abc0;
-  font-size: 12px;
-  font-weight: 500;
-  min-height: 43px;
-}
-.sidebar nav button.active {
-  color: #a9c9ff;
-  background: linear-gradient(90deg, #152645, #101a2c);
-  border-color: #253c60;
-}
-.sidebar nav button.active svg {
-  color: #79aaff;
-}
-.sidebar nav button:hover {
-  background: #111c2d;
-}
-.nav-count {
-  margin-left: auto;
-  font-size: 12px;
-  background: #24334e;
-  padding: 1px 5px;
-  border-radius: 4px;
-}
-.sidebar-bottom {
-  margin-top: auto;
-  padding-top: 25px;
-}
-.sidebar-bottom > button {
-  border: 0;
-  background: none;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: #9dabc1;
-  padding: 10px 9px;
-  width: 100%;
-  font-size: 12px;
-}
-.sidebar-bottom > button > svg:last-child {
-  margin-left: auto;
-}
-.version {
-  margin-left: auto;
-  color: #596c89;
 }
 .main-shell {
   margin-left: 242px;
@@ -266,17 +158,6 @@ textarea::placeholder {
   justify-content: space-between;
   border-bottom: 1px solid #1b2330;
   background: rgba(9, 13, 21, 0.9);
-}
-.breadcrumb {
-  display: flex;
-  align-items: center;
-  gap: 13px;
-  font-size: 12px;
-  color: #74849e;
-}
-.breadcrumb strong {
-  font-weight: 500;
-  color: #b1bed3;
 }
 .topbar-right {
   display: flex;
@@ -311,9 +192,6 @@ textarea::placeholder {
   background: transparent;
   color: #a0b0c9;
   padding: 5px;
-}
-.mobile-menu {
-  display: none;
 }
 main {
   max-width: 1570px;
@@ -1698,11 +1576,6 @@ summary {
   }
 }
 @media (max-width: 1150px) {
-  .sidebar {
-    width: 205px;
-    padding-left: 14px;
-    padding-right: 14px;
-  }
   .main-shell {
     margin-left: 205px;
   }
@@ -1776,19 +1649,8 @@ summary {
   }
 }
 @media (max-width: 850px) {
-  .sidebar {
-    width: 190px;
-  }
   .main-shell {
     margin-left: 190px;
-  }
-  .sidebar nav button {
-    gap: 9px;
-    font-size: 12px;
-  }
-  .workspace-label {
-    padding: 12px 7px;
-    font-size: 12px;
   }
   .floating-tag {
     display: none;
@@ -1881,28 +1743,12 @@ summary {
   }
 }
 @media (max-width: 640px) {
-  .sidebar {
-    transform: translateX(-100%);
-    width: 242px;
-    transition: transform 0.2s;
-    box-shadow: 15px 0 50px #0006;
-  }
-  .sidebar.open {
-    transform: translateX(0);
-  }
   .main-shell {
     margin-left: 0;
-  }
-  .mobile-menu {
-    display: flex;
   }
   .topbar {
     height: 62px;
     padding: 0 18px;
-  }
-  .breadcrumb {
-    gap: 8px;
-    font-size: 12px;
   }
   .topbar-right {
     gap: 9px;

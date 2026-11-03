@@ -6,14 +6,12 @@ import {
   ArrowDownToLine,
   ArrowRight,
   ArrowUpRight,
-  Blocks,
   BookOpen,
   ChevronRight,
   CircleHelp,
   Clock3,
   FileText,
   FolderOpen,
-  Gauge,
   Layers3,
   LoaderCircle,
   Plus,
@@ -25,7 +23,6 @@ import {
   X,
   Zap,
   CircleAlert,
-  PanelLeftClose,
 } from "lucide-react";
 
 import type { Packet, Revision, Job, Attempt, Role } from "@/lib/contracts";
@@ -39,6 +36,7 @@ import GenerationProgress from "./GenerationProgress";
 import ExamPlanEditor from "./ExamPlanEditor";
 
 import CourseLibrary from "./CourseLibrary";
+import Brand from "./Brand";
 
 import Exhibits from "./Exhibits";
 
@@ -146,20 +144,6 @@ const roleName = (r: string) =>
     "generated-reference": "AI-generated reference",
   })[r] || r;
 
-const nav = [
-  { view: "overview", icon: Blocks, label: "Library" },
-
-  { view: "packet", icon: FolderOpen, label: "Materials" },
-
-  { view: "blueprint", icon: Layers3, label: "Exam plan" },
-
-  { view: "exam", icon: FileText, label: "Practice exam" },
-
-  { view: "results", icon: Target, label: "Results" },
-
-  { view: "activity", icon: Gauge, label: "Settings & activity" },
-] as const;
-
 async function request(route: string, body?: unknown) {
   const response = await fetch(
     `/api/${route}`,
@@ -186,30 +170,6 @@ async function request(route: string, body?: unknown) {
   if (!response.ok) throw new Error(result.error || "Request failed.");
 
   return result;
-}
-
-function Logo() {
-  return (
-    <div className="brand">
-      <span className="brand-icon">
-        <svg
-          width="28"
-          height="28"
-          viewBox="0 0 28 28"
-          fill="none"
-          aria-hidden="true"
-        >
-          <path d="M4 5H11L17 21H10L4 5Z" fill="#7ab1ff" />
-
-          <path d="M17 5H24L17 21H10L17 5Z" fill="#347aff" />
-        </svg>
-      </span>
-
-      <span>
-        VERA<span className="brand-dot">.</span>
-      </span>
-    </div>
-  );
 }
 
 function Empty({
@@ -243,7 +203,6 @@ export default function Workspace() {
     [error, setError] = useState(""),
     [uploadOpen, setUploadOpen] = useState(false),
     [source, setSource] = useState<{ url: string; name: string }>(),
-    [menu, setMenu] = useState(false),
     [startOpen, setStartOpen] = useState(false),
     [uploadReview, setUploadReview] = useState(false),
     [practiceMode, setPracticeMode] = useState<"timed" | "untimed">("timed");
@@ -253,7 +212,7 @@ export default function Workspace() {
     packetId: string;
   }>();
 
-  const [files, setFiles] = useState<{ file: File; role: Role }[]>([]),
+  const [files, setFiles] = useState<{ file: File; role: Role | "" }[]>([]),
     [packetName, setPacketName] = useState("");
 
   const watching = useRef<string>(""),
@@ -433,11 +392,9 @@ export default function Workspace() {
     window.history.pushState(null, "", `?${q}`);
 
     setView(v);
-
-    setMenu(false);
   };
 
-  const demo = (kind = "legacy") =>
+  const demo = (kind = "general") =>
     act(async () => {
       const r = await request("demo", { kind });
 
@@ -532,7 +489,16 @@ export default function Workspace() {
 
   useEffect(() => {
     if (navigationReady) {
-      document.title = `${nav.find((item) => item.view === view)?.label || "Practice session"} · VERA`;
+      const title = {
+        overview: "Library",
+        packet: "Materials",
+        blueprint: "Exam plan",
+        exam: "Practice exam",
+        results: "Review",
+        activity: "Settings & activity",
+        practice: "Practice session",
+      }[view];
+      document.title = `${title} · VERA`;
       window.scrollTo(0, 0);
 
       document.getElementById("main")?.focus({ preventScroll: true });
@@ -601,7 +567,7 @@ export default function Workspace() {
     setFiles([
       ...files,
 
-      ...incoming.map((file) => ({ file, role: "lecture-notes" as Role })),
+      ...incoming.map((file) => ({ file, role: "" as const })),
     ]);
 
     if (input.current) input.current.value = "";
@@ -613,95 +579,29 @@ export default function Workspace() {
         Skip to content
       </a>
 
-      {menu && (
-        <button
-          className="mobile-nav-backdrop"
-          aria-label="Close navigation"
-          onClick={() => setMenu(false)}
-        />
-      )}
-
-      <aside
-        id="workspace-navigation"
-        className={`sidebar ${menu ? "open" : ""}`}
-      >
-        <Logo />
-
-        <div className="workspace-label">
-          <BookOpen size={18} />
-
-          <div>
-            Study workspace<small>VERIFIED EXAM & REVISION ARCHITECT</small>
-          </div>
-        </div>
-
-        <p className="nav-caption">YOUR WORKSPACE</p>
-
-        <nav>
-          {nav.map((n) => (
-            <button
-              key={n.view}
-              onClick={() => goto(n.view)}
-              aria-current={view === n.view ? "page" : undefined}
-              className={
-                view === n.view || (view === "practice" && n.view === "exam")
-                  ? "active"
-                  : ""
-              }
-            >
-              <n.icon size={18} />
-
-              <span>{n.label}</span>
-
-              {n.view === "packet" && !!packet?.documents.length && (
-                <span className="nav-count">{packet?.documents.length}</span>
-              )}
-            </button>
-          ))}
-        </nav>
-
-        <div className="sidebar-course-label">
-          <span className="eyebrow">CURRENT COURSE</span>
-
-          <p>{packet?.name || "No course selected"}</p>
-        </div>
-
-        <div className="sidebar-bottom">
-          <button onClick={() => goto("activity")}>
-            <Settings2 size={17} /> Generation settings{" "}
-            <ArrowUpRight size={14} />
-          </button>
-
-          <p>
-            <ShieldCheck size={14} /> Files stored on this device.
-          </p>
-
-          <span className="version">VERA / LOCAL WORKSPACE</span>
-        </div>
-      </aside>
-
       <div className="main-shell">
         <header className="topbar">
-          <div className="breadcrumb">
-            <button
-              className="mobile-menu icon-button"
-              aria-label="Toggle navigation"
-              aria-expanded={menu}
-              aria-controls="workspace-navigation"
-              onClick={() => setMenu(!menu)}
-            >
-              <PanelLeftClose size={18} />
-            </button>
-
-            <span>Workspace</span>
-
-            <ChevronRight size={13} />
-
-            <strong>
-              {nav.find((n) => n.view === view)?.label || "Practice session"}
-            </strong>
+          <button
+            className="brand-home"
+            aria-label="Library"
+            onClick={() => goto("overview")}
+          >
+            <Brand />
+          </button>
+          <div className="header-location">
+            <span className="header-divider" aria-hidden="true" />
+            {view === "overview" ? (
+              "Your study space"
+            ) : view === "activity" ? (
+              "Settings & activity"
+            ) : (
+              <>
+                <span>Library</span>
+                <ChevronRight size={13} />
+                <span>{packet?.name || "Choose a course"}</span>
+              </>
+            )}
           </div>
-
           <div className="topbar-right">
             <span className="connection">
               <span className={`status-dot ${connected ? "" : "offline"}`} />{" "}
@@ -724,13 +624,13 @@ export default function Workspace() {
             <div>
               <div className="eyebrow">
                 {view === "overview"
-                  ? "A PLACE TO GET PREPARED"
+                  ? "YOUR WORK, IN ONE PLACE"
                   : packet?.name || "YOUR STUDY WORKSPACE"}
               </div>
 
               <h1>
                 {view === "overview"
-                  ? "Your course library."
+                  ? "Your courses"
                   : view === "packet"
                     ? "Course materials"
                     : view === "blueprint"
@@ -746,13 +646,13 @@ export default function Workspace() {
 
               <p>
                 {view === "overview"
-                  ? "Turn course materials into a practice exam—with the documents to solve it."
+                  ? "Pick up where you left off, or bring something new to practice."
                   : view === "packet"
                     ? "Inspect the extracted pages, then build an exam plan from your evidence."
                     : view === "blueprint"
                       ? "Check the evidence and shape the exam before generating questions."
                       : view === "exam"
-                        ? "Read the questions alongside their exhibits, or start a timed attempt."
+                        ? "Preview the questions, then choose how you want to practice."
                         : view === "activity"
                           ? "Manage live generation and see where your credits go."
                           : view === "results"
@@ -761,14 +661,10 @@ export default function Workspace() {
               </p>
             </div>
 
-            {view !== "practice" && (
-              <button
-                className={view === "overview" ? "primary" : "secondary"}
-                onClick={openUpload}
-              >
+            {view === "overview" && data?.packets.some((p) => !p.fixture) && (
+              <button className="primary" onClick={openUpload}>
                 <Plus size={17} />
-
-                {view === "overview" ? "Add course materials" : "New course"}
+                Add course materials
               </button>
             )}
           </div>
@@ -921,7 +817,6 @@ export default function Workspace() {
                   now={clock}
                   busy={busy || !!active}
                   onUpload={openUpload}
-                  onSample={() => void demo()}
                   onGeneralSample={() => void demo("general")}
                   onOpen={(p, next, selectedExam) => {
                     setPacketId(p.id);
@@ -1734,12 +1629,7 @@ export default function Workspace() {
 
                 <span>Practice grounded in your course.</span>
 
-                <button
-                  className="text-button"
-                  onClick={() => goto("activity")}
-                >
-                  Generation settings <ArrowUpRight size={13} />
-                </button>
+                <span className="footer-storage">Stored on this device</span>
               </footer>
             </>
           )}
@@ -1788,7 +1678,7 @@ export default function Workspace() {
               Course name
               <input
                 disabled={busy}
-                placeholder="e.g. Linear algebra · eigenvalues"
+                placeholder="Name this course or topic"
                 value={packetName}
                 onChange={(e) => setPacketName(e.target.value)}
               />
@@ -1824,11 +1714,12 @@ export default function Workspace() {
               </small>
             </button>
 
-            <p className="upload-role-help">
-              Choose what each file is. A past instructor exam can inform
-              format; an AI-generated exam must be marked as an AI-generated
-              reference.
-            </p>
+            {files.length > 0 && (
+              <p className="upload-role-help">
+                Choose each document’s role. Past exams inform format;
+                AI-generated references do not.
+              </p>
+            )}
             <div className="upload-files">
               {files.map((f, i) => (
                 <div key={i}>
@@ -1842,6 +1733,7 @@ export default function Workspace() {
 
                   <select
                     aria-label={`Role for ${f.file.name}`}
+                    required
                     value={f.role}
                     onChange={(e) =>
                       setFiles(
@@ -1851,6 +1743,9 @@ export default function Workspace() {
                       )
                     }
                   >
+                    <option value="" disabled>
+                      Choose a role…
+                    </option>
                     {roles.map((r) => (
                       <option key={r} value={r}>
                         {roleName(r)}
@@ -1897,27 +1792,22 @@ export default function Workspace() {
             </section>
           )}
           <p className="muted small">
-            Only add materials you have permission to use. Label AI-generated
-            exams as generated reference. VERA supports subject-independent
-            practice, with bounded numerical and source checks. Legacy examples
-            cover linear algebra development scenarios; Physics II support comes
-            later.
+            Only add materials you have permission to use.
           </p>
 
           <div className="modal-actions">
-            <button
-              className="secondary"
-              disabled={busy}
-              onClick={() =>
-                uploadReview ? setUploadReview(false) : setUploadOpen(false)
-              }
-            >
-              {uploadReview ? "Back to files" : "Cancel"}
-            </button>
-
+            {uploadReview && (
+              <button
+                className="secondary"
+                disabled={busy}
+                onClick={() => setUploadReview(false)}
+              >
+                Back to files
+              </button>
+            )}
             <button
               className="primary"
-              disabled={!files.length || busy}
+              disabled={!files.length || files.some((f) => !f.role) || busy}
               onClick={() => {
                 if (!uploadReview) {
                   setError("");

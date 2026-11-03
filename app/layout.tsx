@@ -4,6 +4,7 @@ import "./globals.css";
 import "./studio.css";
 import "./experience.css";
 import "./review.css";
+import "./workspace.css";
 export const metadata: Metadata = {
   title: "VERA · Make practice feel real",
   description:

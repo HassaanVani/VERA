@@ -30,6 +30,7 @@ const check = (name, condition) => {
 };
 try {
   await page.goto(base);
+  await page.getByText("Explore a saved example", { exact: true }).click();
   await page.getByRole("button", { name: "Try evidence & decisions" }).click();
   await page
     .getByRole("heading", { name: "Question plan", exact: true })

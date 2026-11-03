@@ -25,10 +25,19 @@ const screenshot = async (name) => {
 try {
   const initialAttempts = (await snapshot()).attempts.length;
   await page.goto(base);
-  await page.getByRole("heading", { name: "Your course library." }).waitFor();
-  await page.getByRole("button", { name: "Open sample course" }).waitFor();
+  await page
+    .getByRole("heading", { name: "Your courses", exact: true })
+    .waitFor();
+  await page.getByRole("group", { name: "Filter courses" }).waitFor();
   await screenshot("overview-desktop");
-  await page.getByRole("button", { name: "Open sample course" }).click();
+  // Legacy assessments remain compatible without promoting their subject as the product default.
+  const legacy = await page.request
+    .post(`${base}/api/demo`, {
+      headers: { "x-vera-local": "1" },
+      data: { kind: "legacy" },
+    })
+    .then((r) => r.json());
+  await page.goto(`${base}/?course=${legacy.packetId}&view=blueprint`);
   await page
     .getByRole("heading", { name: "Question plan" })
     .waitFor({ timeout: 30000 });
@@ -323,7 +332,6 @@ try {
   if (forbidden.status() !== 400)
     throw new Error("Missing local-request header was accepted.");
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.getByRole("button", { name: "Toggle navigation" }).click();
   await page.getByRole("button", { name: "Library", exact: true }).click();
   await page
     .getByRole("textbox", { name: "Search courses" })
@@ -353,6 +361,15 @@ try {
   await page
     .locator('input[type="file"]')
     .setInputFiles("fixtures/probe-matrix.png");
+  if (
+    (await page
+      .getByRole("combobox", { name: "Role for probe-matrix.png" })
+      .inputValue()) !== ""
+  )
+    throw new Error("Document role was silently assigned.");
+  await page
+    .getByRole("combobox", { name: "Role for probe-matrix.png" })
+    .selectOption("lecture-notes");
   await page
     .getByRole("button", { name: "Review materials", exact: true })
     .click();

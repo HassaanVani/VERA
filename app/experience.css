@@ -28,78 +28,6 @@
   margin: 7px 0 0;
   color: #ead0ad;
 }
-.course-journey {
-  margin: 26px 0 0;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-}
-.course-journey ol {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  padding: 0;
-  margin: 0;
-  list-style: none;
-}
-.course-journey li + li {
-  border-left: 1px solid var(--line);
-}
-.course-journey button {
-  width: 100%;
-  min-height: 78px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: none;
-  border: 0;
-  padding: 15px 18px;
-  text-align: left;
-}
-.course-journey button:hover:not(:disabled) {
-  background: #142139;
-}
-.course-journey button[aria-current] {
-  background: #142139;
-  box-shadow: inset 0 -2px #6c9eff;
-}
-.course-journey button:disabled {
-  opacity: 1;
-  color: #8998b1;
-  cursor: default;
-}
-.journey-number {
-  flex-shrink: 0;
-  display: grid;
-  place-items: center;
-  width: 28px;
-  height: 28px;
-  border: 1px solid #42516b;
-  border-radius: 50%;
-  font-size: 12px;
-}
-.journey-number.complete {
-  color: #a1d7c9;
-  border-color: #35665c;
-  background: #142d2b;
-}
-.course-journey strong {
-  display: block;
-  font-size: 13px;
-  font-weight: 600;
-}
-.course-journey small {
-  display: block;
-  font-size: 11px;
-  margin-top: 5px;
-  color: #a4b3cd;
-}
-.journey-chevron {
-  margin-left: auto;
-  color: #9ba7bc;
-  flex-shrink: 0;
-}
-.course-journey li:last-child .journey-chevron {
-  display: none;
-}
 .packet-selector {
   margin-top: 0;
   padding: 18px 0;
@@ -678,16 +606,6 @@ dialog.modal.source-modal {
   white-space: pre-wrap;
 }
 @media (max-width: 1100px) {
-  .course-journey button {
-    padding: 13px 10px;
-    gap: 8px;
-  }
-  .journey-chevron {
-    display: none;
-  }
-  .course-journey strong {
-    font-size: 12px;
-  }
   .plan-editor {
     padding: 22px;
   }
@@ -704,25 +622,6 @@ dialog.modal.source-modal {
   }
   .connection-recovery > button {
     margin-left: 31px;
-  }
-  .course-journey ol {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .course-journey li:nth-child(3) {
-    border-left: 0;
-  }
-  .course-journey li:nth-child(n + 3) {
-    border-top: 1px solid var(--line);
-  }
-  .course-journey button {
-    padding: 13px;
-    min-height: 77px;
-  }
-  .course-journey strong {
-    font-size: 13px;
-  }
-  .course-journey small {
-    font-size: 11px;
   }
   .setup-guidance {
     padding: 19px;
