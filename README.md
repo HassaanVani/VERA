@@ -85,3 +85,5 @@ See [interface research and overhaul](docs/UI-OVERHAUL.md) for the design ration
 - Hackathon submission readiness is pending confirmation of the official pre-existing-code rules; the public event overview did not establish that policy.
 
 The builder's supplied textbook and JEFF-generated exam are not redistributed. The JEFF exam is excluded from instructor-format inference and held-out evaluation.
+
+Interaction principles and the research-to-implementation audit: [UX.md](UX.md) and [UX-RESEARCH.md](docs/UX-RESEARCH.md).

@@ -8,7 +8,6 @@ import {
   ArrowUpRight,
   Blocks,
   BookOpen,
-  Check,
   ChevronRight,
   CircleHelp,
   Clock3,
@@ -21,7 +20,6 @@ import {
   RotateCcw,
   Settings2,
   ShieldCheck,
-  Sparkles,
   Target,
   UploadCloud,
   X,
@@ -36,11 +34,15 @@ import type {
   Job,
   CheckedExam,
   Attempt,
-  Blueprint,
   Role,
 } from "@/lib/contracts";
 
 import { results } from "@/lib/domain";
+import usePlanDraft from "./usePlanDraft";
+import Dialog from "./Dialog";
+import CourseJourney from "./CourseJourney";
+import GenerationProgress from "./GenerationProgress";
+import ExamPlanEditor from "./ExamPlanEditor";
 
 import CourseLibrary from "./CourseLibrary";
 
@@ -242,18 +244,20 @@ export default function Workspace() {
     [packetId, setPacketId] = useState(""),
     [examId, setExamId] = useState(""),
     [busy, setBusy] = useState(false),
+    [connected, setConnected] = useState(true),
+    [clock, setClock] = useState(() => Date.now()),
     [error, setError] = useState(""),
     [uploadOpen, setUploadOpen] = useState(false),
     [source, setSource] = useState<{ url: string; name: string }>(),
     [menu, setMenu] = useState(false),
-    [showSolutions, setShowSolutions] = useState(false);
+    [showSolutions, setShowSolutions] = useState(false),
+    [startOpen, setStartOpen] = useState(false),
+    [uploadReview, setUploadReview] = useState(false);
 
   const [files, setFiles] = useState<{ file: File; role: Role }[]>([]),
-    [packetName, setPacketName] = useState(""),
-    [draft, setDraft] = useState<Blueprint>();
+    [packetName, setPacketName] = useState("");
 
   const watching = useRef<string>(""),
-    draftId = useRef(""),
     input = useRef<HTMLInputElement>(null);
 
   const [navigationReady, setNavigationReady] = useState(false);
@@ -323,7 +327,8 @@ export default function Workspace() {
     const d = (await request("workspace")) as WorkspaceData;
 
     setData(d);
-
+    setConnected(true);
+    setClock(Date.now());
     return d;
   }, []);
 
@@ -331,8 +336,8 @@ export default function Workspace() {
     let alive = true;
 
     const load = () => {
-      void refresh().catch((e) => {
-        if (alive) setError(e.message);
+      void refresh().catch(() => {
+        if (alive) setConnected(false);
       });
     };
 
@@ -347,56 +352,9 @@ export default function Workspace() {
     };
   }, [refresh]);
 
-  useEffect(() => {
-    if (!uploadOpen && !source) return;
-
-    const previous = document.activeElement as HTMLElement | null;
-
-    const modal = document.querySelector<HTMLElement>('[role="dialog"]');
-
-    const focusable = () => [
-      ...(modal?.querySelectorAll<HTMLElement>(
-        'button:not(:disabled), input, select, textarea, iframe, [tabindex="0"]',
-      ) || []),
-    ];
-
-    focusable()[0]?.focus();
-
-    const handler = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setUploadOpen(false);
-
-        setSource(undefined);
-      }
-
-      if (event.key === "Tab") {
-        const nodes = focusable(),
-          first = nodes[0],
-          last = nodes.at(-1);
-
-        if (event.shiftKey && document.activeElement === first) {
-          event.preventDefault();
-
-          last?.focus();
-        } else if (!event.shiftKey && document.activeElement === last) {
-          event.preventDefault();
-
-          first?.focus();
-        }
-      }
-    };
-
-    document.addEventListener("keydown", handler);
-
-    return () => {
-      document.removeEventListener("keydown", handler);
-
-      previous?.focus();
-    };
-  }, [uploadOpen, source]);
-
-  const packet =
-    data?.packets.find((p) => p.id === packetId) || data?.packets[0];
+  const packet = packetId
+    ? data?.packets.find((p) => p.id === packetId)
+    : data?.packets[0];
 
   const revision = data?.revisions.find((r) => r.packetId === packet?.id);
 
@@ -420,13 +378,12 @@ export default function Workspace() {
 
   const recentJob = data?.jobs.find((j) => j.packetId === packet?.id);
 
-  useEffect(() => {
-    if (revision && draftId.current !== revision.id) {
-      draftId.current = revision.id;
-
-      setDraft(structuredClone(revision.blueprint));
-    }
-  }, [revision]);
+  const {
+    draft,
+    notice: planNotice,
+    edit,
+    reset: resetPlan,
+  } = usePlanDraft(revision);
 
   useEffect(() => {
     const j = data?.jobs.find((j) => j.id === watching.current);
@@ -434,13 +391,14 @@ export default function Workspace() {
     if (j?.status === "complete") {
       watching.current = "";
 
-      if (j.kind === "analyze") setView("blueprint");
+      if (j.kind === "analyze")
+        setView((current) => (current === "blueprint" ? "blueprint" : current));
       else {
         setExamId(j.resultId || "");
 
         setShowSolutions(false);
 
-        setView("exam");
+        setView((current) => (current === "exam" ? "exam" : current));
       }
     }
 
@@ -528,7 +486,12 @@ export default function Workspace() {
         return;
       }
 
+      if (!attempt && !startOpen) {
+        setStartOpen(true);
+        return;
+      }
       await request("attempts", { examId: exam.id });
+      setStartOpen(false);
 
       setView("practice");
     });
@@ -545,7 +508,14 @@ export default function Workspace() {
     });
   };
 
-  const edit = (value: Blueprint) => setDraft(value);
+  const savePlan = (approve: boolean) =>
+    void act(async () => {
+      if (!revision || !draft) return;
+      await request(`revisions/${revision.id}`, { blueprint: draft, approve });
+      try {
+        localStorage.removeItem(`vera:plan:${revision.id}`);
+      } catch {}
+    });
 
   const dirty =
     draft &&
@@ -554,38 +524,9 @@ export default function Workspace() {
 
   const spent = data?.usage.buckets.reduce((n, b) => n + b.spent, 0) || 0;
 
-  const steps = [
-    "Materials",
-
-    "Analysis",
-
-    "Exam plan",
-
-    "Questions",
-
-    "Checks",
-
-    "Practice",
-
-    "Follow-up",
-  ];
-
-  const currentStep = !packet
-    ? 0
-    : !revision
-      ? 1
-      : !revision.approved || dirty
-        ? 2
-        : !exam
-          ? 3
-          : !exam.ready
-            ? 4
-            : !attempt?.submittedAt
-              ? 5
-              : 6;
-
   useEffect(() => {
     if (navigationReady) {
+      document.title = `${nav.find((item) => item.view === view)?.label || "Practice session"} · VERA`;
       window.scrollTo(0, 0);
 
       document.getElementById("main")?.focus({ preventScroll: true });
@@ -595,6 +536,7 @@ export default function Workspace() {
   function openUpload() {
     setError("");
 
+    setUploadReview(false);
     setUploadOpen(true);
   }
 
@@ -626,7 +568,7 @@ export default function Workspace() {
 
     if (invalid) {
       setError(
-        `${invalid.name} couldn�t be added. Choose a PDF, PNG, or JPEG under 10 MB.`,
+        `${invalid.name} couldn’t be added. Choose a PDF, PNG, or JPEG under 10 MB.`,
       );
 
       return;
@@ -649,6 +591,7 @@ export default function Workspace() {
 
     setError("");
 
+    setUploadReview(false);
     setFiles([
       ...files,
 
@@ -755,7 +698,8 @@ export default function Workspace() {
 
           <div className="topbar-right">
             <span className="connection">
-              <span className="status-dot" /> Saved on this device
+              <span className={`status-dot ${connected ? "" : "offline"}`} />{" "}
+              {connected ? "Local workspace" : "Workspace unavailable"}
             </span>
 
             <button
@@ -798,7 +742,7 @@ export default function Workspace() {
                 {view === "overview"
                   ? "Turn course materials into a practice exam—with the documents to solve it."
                   : view === "packet"
-                    ? "Add context to each source before VERA builds your exam plan."
+                    ? "Inspect the extracted pages, then build an exam plan from your evidence."
                     : view === "blueprint"
                       ? "Check the evidence and shape the exam before generating questions."
                       : view === "exam"
@@ -823,7 +767,25 @@ export default function Workspace() {
             )}
           </div>
 
-          {error && (
+          {!connected && (
+            <div className="connection-recovery" role="status">
+              <CircleAlert size={18} />
+              <div>
+                <strong>VERA isn’t responding.</strong>
+                <p>
+                  Keep this tab open. Reconnect or restart the local app to
+                  continue. We’ll retry automatically.
+                </p>
+              </div>
+              <button
+                className="secondary"
+                onClick={() => void refresh().catch(() => {})}
+              >
+                Try reconnecting
+              </button>
+            </div>
+          )}
+          {error && !uploadOpen && !startOpen && (
             <div className="error-banner" role="alert">
               <CircleAlert size={18} />
 
@@ -851,60 +813,29 @@ export default function Workspace() {
 
           {data && (
             <>
-              {view !== "overview" && view !== "activity" && (
-                <div className="workflow" aria-label="Assessment workflow">
-                  {steps.map((s, i) => (
-                    <div
-                      key={s}
-                      className={
-                        i < currentStep
-                          ? "done"
-                          : i === currentStep
-                            ? "current"
-                            : ""
-                      }
-                    >
-                      <span>
-                        {i < currentStep ? (
-                          <Check size={11} />
-                        ) : (
-                          String(i + 1).padStart(2, "0")
-                        )}
-                      </span>
-
-                      {s}
-
-                      {i < steps.length - 1 && <ChevronRight size={12} />}
-                    </div>
-                  ))}
-                </div>
-              )}
-
+              {view !== "overview" &&
+                view !== "activity" &&
+                view !== "practice" && (
+                  <CourseJourney
+                    view={view}
+                    hasPacket={!!packet}
+                    hasPlan={!!revision}
+                    approved={!!revision?.approved && !dirty}
+                    hasExam={!!exam}
+                    submitted={!!attempt?.submittedAt}
+                    onNavigate={goto}
+                  />
+                )}
               {active && (
-                <div className="job-banner" role="status">
-                  <LoaderCircle className="spin" size={18} />
-
-                  <div>
-                    <strong>{active.stage}</strong>
-
-                    <span>
-                      {packet?.fixture
-                        ? "Opening the saved example. No credits are used."
-                        : "Progress is saved locally. You can move between views."}
-                    </span>
-                  </div>
-
-                  <button
-                    className="text-button"
-                    onClick={() =>
-                      void act(async () => {
-                        await request(`jobs/${active.id}`, {});
-                      })
-                    }
-                  >
-                    Cancel job <X size={14} />
-                  </button>
-                </div>
+                <GenerationProgress
+                  job={active}
+                  fixture={!!packet?.fixture}
+                  onCancel={() =>
+                    void act(async () => {
+                      await request(`jobs/${active.id}`, {});
+                    })
+                  }
+                />
               )}
 
               {recentJob &&
@@ -957,8 +888,6 @@ export default function Workspace() {
                       setPacketId(e.target.value);
 
                       setExamId("");
-
-                      draftId.current = "";
                     }}
                   >
                     {data.packets.map((p) => (
@@ -981,13 +910,15 @@ export default function Workspace() {
                   packets={data.packets}
                   revisions={data.revisions}
                   exams={data.exams}
+                  attempts={data.attempts}
+                  now={clock}
                   busy={busy || !!active}
                   onUpload={openUpload}
                   onSample={() => void demo()}
-                  onOpen={(p, next) => {
+                  onOpen={(p, next, selectedExam) => {
                     setPacketId(p.id);
 
-                    setExamId("");
+                    setExamId(selectedExam || "");
 
                     goto(next);
                   }}
@@ -997,17 +928,72 @@ export default function Workspace() {
               {view === "packet" &&
                 (!packet ? (
                   <Empty title="Add materials to start a course">
-                    Upload focused course excerpts or load the saved
-                    demonstration.
+                    <p>
+                      Start with a focused set of notes, an instructor
+                      assessment, or a textbook excerpt.
+                    </p>
+                    <button className="primary" onClick={openUpload}>
+                      Add course materials <Plus size={16} />
+                    </button>
                   </Empty>
                 ) : (
                   <>
+                    {!packet.fixture &&
+                      (!data.meta.configured || !data.meta.workerOnline) && (
+                        <section
+                          className="setup-guidance"
+                          aria-labelledby="setup-heading"
+                        >
+                          <CircleHelp size={21} />
+                          <div>
+                            <h2 id="setup-heading">
+                              {!data.meta.configured
+                                ? "Your materials are saved. Connect Meta to build a plan."
+                                : "Your materials are saved. The background worker is offline."}
+                            </h2>
+                            <p>
+                              {!data.meta.configured
+                                ? "Live analysis sends the selected course sources to Meta. You can configure it now, or explore the complete workflow with the sample course."
+                                : "Restart VERA with npm run dev to continue. Your documents and exam plan are still available."}
+                            </p>
+                            <div>
+                              <button
+                                className="secondary"
+                                onClick={() => goto("activity")}
+                              >
+                                Open generation settings
+                              </button>
+                              <button
+                                className="text-button"
+                                onClick={() => void demo()}
+                              >
+                                Explore sample course <ArrowRight size={14} />
+                              </button>
+                            </div>
+                          </div>
+                        </section>
+                      )}
                     <div className="section-heading">
-                      <h2>Course evidence</h2>
+                      <div>
+                        <h2>Course evidence</h2>
+                        <p className="muted small">
+                          {packet.documents.length} sources ·{" "}
+                          {packet.documents.reduce(
+                            (sum, d) => sum + d.pages.length,
+                            0,
+                          )}{" "}
+                          pages. Inspect a page to check what VERA will read.
+                        </p>
+                      </div>
 
                       <button
                         className="primary"
-                        disabled={busy || !!active}
+                        disabled={
+                          busy ||
+                          !!active ||
+                          (!packet.fixture &&
+                            (!data.meta.configured || !data.meta.workerOnline))
+                        }
                         onClick={() => void analyze()}
                       >
                         Build exam plan <ArrowRight size={16} />
@@ -1060,15 +1046,28 @@ export default function Workspace() {
                       ))}
                     </div>
 
-                    <div className="info-strip">
-                      <ShieldCheck size={18} />
-
-                      <span>
-                        Documents provide evidence. Text inside them cannot
-                        change VERA’s rules. Generated reference material is
-                        excluded from course analysis.
-                      </span>
-                    </div>
+                    {!packet.documents.some(
+                      (document) =>
+                        document.role === "past-exam" ||
+                        document.role === "assignment",
+                    ) && (
+                      <p className="evidence-expectation">
+                        <CircleHelp size={16} /> No instructor assessment is
+                        included. The plan can use these materials for topics;
+                        exam format and difficulty will remain inferred.
+                      </p>
+                    )}
+                    <details className="source-policy">
+                      <summary>How VERA uses your materials</summary>
+                      <p>
+                        Document roles were set when you uploaded them. Course
+                        notes and textbook excerpts inform topics. Past
+                        instructor assessments can inform format. AI-generated
+                        references do not establish course scope or exam format.
+                        Uploaded text is treated as evidence, never as
+                        instructions.
+                      </p>
+                    </details>
                   </>
                 ))}
 
@@ -1084,317 +1083,57 @@ export default function Workspace() {
                     {active ? (
                       "Your editable exam plan will appear here when analysis is complete."
                     ) : (
-                      <button
-                        className="primary"
-                        disabled={!packet || busy}
-                        onClick={() => void analyze()}
-                      >
-                        Build exam plan <ArrowRight size={16} />
-                      </button>
+                      <>
+                        <p>
+                          {packet
+                            ? "Start with the materials view to check your sources and analysis settings."
+                            : "Add a course first. You’ll review its sources before building a plan."}
+                        </p>
+                        <button
+                          className="primary"
+                          onClick={() =>
+                            packet ? goto("packet") : openUpload()
+                          }
+                        >
+                          {packet
+                            ? "Review course materials"
+                            : "Add course materials"}{" "}
+                          <ArrowRight size={16} />
+                        </button>
+                      </>
                     )}
                   </Empty>
                 ) : (
                   <>
-                    <div className="blueprint-summary">
-                      <div className="panel">
-                        <Layers3 size={20} />
-
-                        <span>
-                          Questions<strong>{draft.slots.length}</strong>
-                        </span>
-                      </div>
-
-                      <div className="panel">
-                        <Target size={20} />
-
-                        <span>
-                          Total points<strong>{draft.totalPoints}</strong>
-                        </span>
-                      </div>
-
-                      <div className="panel">
-                        <Clock3 size={20} />
-
-                        <span>
-                          Time limit
-                          <strong>
-                            {draft.minutes} <small>min</small>
-                          </strong>
-                        </span>
-                      </div>
-
-                      <div className="panel">
-                        <ShieldCheck size={20} />
-
-                        <span>
-                          Approval
-                          <strong className="approval-text">
-                            {revision.approved && !dirty
-                              ? "Approved"
-                              : "Review needed"}
-                          </strong>
-                        </span>
-                      </div>
+                    <div className="plan-introduction">
+                      <span className="badge">
+                        {revision.approved && !dirty
+                          ? "Approved"
+                          : "Your review needed"}
+                      </span>
+                      <p>
+                        {revision.approved && !dirty
+                          ? "Your plan is approved. Generate an exam when you’re ready."
+                          : "Check that these topics match what you want to practice. Review the assumptions and open each question’s source evidence where needed."}
+                      </p>
                     </div>
-
                     <div className="blueprint-layout">
-                      <section className="panel blueprint-editor">
-                        <div className="section-heading">
-                          <h2>Question plan</h2>
-
-                          <span className="badge">Editable plan</span>
-                        </div>
-
-                        <label>
-                          Exam title
-                          <input
-                            value={draft.title}
-                            onChange={(e) =>
-                              edit({ ...draft, title: e.target.value })
-                            }
-                          />
-                        </label>
-
-                        <label>
-                          Instructions
-                          <textarea
-                            rows={3}
-                            value={draft.instructions}
-                            onChange={(e) =>
-                              edit({ ...draft, instructions: e.target.value })
-                            }
-                          />
-                        </label>
-
-                        <div className="slot-table-wrap">
-                          <table className="slot-table">
-                            <thead>
-                              <tr>
-                                <th># / Topic</th>
-
-                                <th>Format</th>
-
-                                <th>Pts</th>
-
-                                <th>Min</th>
-                              </tr>
-                            </thead>
-
-                            <tbody>
-                              {draft.slots.map((slot, i) => (
-                                <tr key={slot.number}>
-                                  <td>
-                                    <span className="slot-number">
-                                      {slot.number.toString().padStart(2, "0")}
-                                    </span>
-
-                                    <label
-                                      className="sr-only"
-                                      htmlFor={`topic-${i}`}
-                                    >
-                                      Topic for question {slot.number}
-                                    </label>
-
-                                    <input
-                                      id={`topic-${i}`}
-                                      value={slot.topic}
-                                      onChange={(e) =>
-                                        edit({
-                                          ...draft,
-
-                                          slots: draft.slots.map((s, n) =>
-                                            n === i
-                                              ? { ...s, topic: e.target.value }
-                                              : s,
-                                          ),
-                                        })
-                                      }
-                                    />
-
-                                    <small>{slot.pattern}</small>
-
-                                    <select
-                                      aria-label={`Question ${slot.number} difficulty`}
-                                      value={slot.difficulty}
-                                      onChange={(e) =>
-                                        edit({
-                                          ...draft,
-
-                                          slots: draft.slots.map((s, n) =>
-                                            n === i
-                                              ? {
-                                                  ...s,
-
-                                                  difficulty: e.target
-                                                    .value as typeof s.difficulty,
-                                                }
-                                              : s,
-                                          ),
-                                        })
-                                      }
-                                    >
-                                      <option value="routine">Routine</option>
-
-                                      <option value="transfer">Transfer</option>
-
-                                      <option value="synthesis">
-                                        Synthesis
-                                      </option>
-                                    </select>
-                                  </td>
-
-                                  <td>
-                                    <select
-                                      aria-label={`Question ${slot.number} format`}
-                                      value={slot.type}
-                                      onChange={(e) =>
-                                        edit({
-                                          ...draft,
-
-                                          slots: draft.slots.map((s, n) =>
-                                            n === i
-                                              ? {
-                                                  ...s,
-
-                                                  type: e.target
-                                                    .value as typeof s.type,
-                                                }
-                                              : s,
-                                          ),
-                                        })
-                                      }
-                                    >
-                                      <option value="multiple-choice">
-                                        Multiple choice
-                                      </option>
-
-                                      <option value="free-response">
-                                        Free response
-                                      </option>
-                                    </select>
-                                  </td>
-
-                                  <td>
-                                    <input
-                                      aria-label={`Question ${slot.number} points`}
-                                      type="number"
-                                      min={1}
-                                      max={100}
-                                      value={slot.points}
-                                      onChange={(e) => {
-                                        const slots = draft.slots.map((s, n) =>
-                                          n === i
-                                            ? {
-                                                ...s,
-
-                                                points: Number(e.target.value),
-                                              }
-                                            : s,
-                                        );
-
-                                        edit({
-                                          ...draft,
-
-                                          slots,
-
-                                          totalPoints: slots.reduce(
-                                            (n, s) => n + s.points,
-
-                                            0,
-                                          ),
-                                        });
-                                      }}
-                                    />
-                                  </td>
-
-                                  <td>
-                                    <input
-                                      aria-label={`Question ${slot.number} minutes`}
-                                      type="number"
-                                      min={1}
-                                      max={120}
-                                      value={slot.minutes}
-                                      onChange={(e) => {
-                                        const slots = draft.slots.map((s, n) =>
-                                          n === i
-                                            ? {
-                                                ...s,
-
-                                                minutes: Number(e.target.value),
-                                              }
-                                            : s,
-                                        );
-
-                                        edit({
-                                          ...draft,
-
-                                          slots,
-
-                                          minutes: slots.reduce(
-                                            (n, s) => n + s.minutes,
-
-                                            0,
-                                          ),
-                                        });
-                                      }}
-                                    />
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-
-                        <div className="blueprint-actions">
-                          <button
-                            className="secondary"
-                            disabled={busy || !!active}
-                            onClick={() =>
-                              void act(async () => {
-                                await request(`revisions/${revision.id}`, {
-                                  blueprint: draft,
-
-                                  approve: false,
-                                });
-                              })
-                            }
-                          >
-                            Save changes
-                          </button>
-
-                          {!revision.approved || dirty ? (
-                            <button
-                              className="primary"
-                              disabled={busy || !!active}
-                              onClick={() =>
-                                void act(async () => {
-                                  await request(`revisions/${revision.id}`, {
-                                    blueprint: draft,
-
-                                    approve: true,
-                                  });
-                                })
-                              }
-                            >
-                              <Check size={16} /> Approve exam plan
-                            </button>
-                          ) : (
-                            <button
-                              className="primary"
-                              disabled={busy || !!active}
-                              onClick={() => void generate()}
-                            >
-                              Generate practice exam <Sparkles size={16} />
-                            </button>
-                          )}
-                        </div>
-
-                        <p className="muted small">
-                          Any edit requires a new approval. This plan describes
-                          practice alignment, not a prediction of your next
-                          exam.
-                        </p>
-                      </section>
+                      {packet && (
+                        <ExamPlanEditor
+                          key={revision.id}
+                          draft={draft}
+                          packet={packet}
+                          approved={revision.approved}
+                          dirty={!!dirty}
+                          busy={busy || !!active}
+                          notice={planNotice}
+                          onEdit={edit}
+                          onSave={savePlan}
+                          onGenerate={() => void generate()}
+                          onReset={resetPlan}
+                          onSource={openSource}
+                        />
+                      )}
 
                       <aside>
                         <section className="panel evidence-panel">
@@ -1431,16 +1170,6 @@ export default function Workspace() {
                             </div>
                           ))}
                         </section>
-
-                        <section className="panel uncertainty-panel">
-                          <h3>
-                            <CircleHelp size={17} /> What remains uncertain
-                          </h3>
-
-                          {draft.uncertainties.map((u, i) => (
-                            <p key={i}>{u}</p>
-                          ))}
-                        </section>
                       </aside>
                     </div>
                   </>
@@ -1455,9 +1184,27 @@ export default function Workspace() {
                         : "Your practice exam will appear here"
                     }
                   >
-                    {active
-                      ? active.stage
-                      : "Review and approve an exam plan to generate questions and their exhibits."}
+                    {active ? (
+                      active.stage
+                    ) : (
+                      <>
+                        <p>
+                          Review and approve an exam plan to generate questions
+                          and their exhibits.
+                        </p>
+                        <button
+                          className="primary"
+                          onClick={() =>
+                            goto(revision ? "blueprint" : "packet")
+                          }
+                        >
+                          {revision
+                            ? "Review exam plan"
+                            : "Review course materials"}{" "}
+                          <ArrowRight size={16} />
+                        </button>
+                      </>
+                    )}
                   </Empty>
                 ) : (
                   <>
@@ -1536,7 +1283,9 @@ export default function Workspace() {
                           {attempt?.submittedAt
                             ? "View results"
                             : attempt
-                              ? "Resume practice"
+                              ? attempt.endsAt <= clock
+                                ? "Review ended attempt"
+                                : "Resume practice"
                               : "Start practice"}
 
                           <ArrowRight size={16} />
@@ -1692,6 +1441,7 @@ export default function Workspace() {
                     attempt={attempt}
                     exam={exam}
                     update={request}
+                    onExit={() => goto("exam")}
                     onSubmit={() => {
                       void refresh().then(() => setView("results"));
                     }}
@@ -1712,11 +1462,35 @@ export default function Workspace() {
                         className="primary"
                         onClick={() => void practice()}
                       >
-                        {attempt ? "Resume practice" : "Start practice"}{" "}
+                        {attempt
+                          ? attempt.endsAt <= clock
+                            ? "Review ended attempt"
+                            : "Resume practice"
+                          : "Start practice"}{" "}
                         <ArrowRight size={16} />
                       </button>
                     ) : (
-                      "Generate a checked assessment to start practice."
+                      <>
+                        <p>
+                          Complete a checked practice exam to see your results
+                          here.
+                        </p>
+                        <button
+                          className="primary"
+                          onClick={() =>
+                            goto(
+                              exam ? "exam" : revision ? "blueprint" : "packet",
+                            )
+                          }
+                        >
+                          {exam
+                            ? "Review checking report"
+                            : revision
+                              ? "Review exam plan"
+                              : "Review course materials"}{" "}
+                          <ArrowRight size={16} />
+                        </button>
+                      </>
                     )}
                   </Empty>
                 ) : (
@@ -1724,6 +1498,11 @@ export default function Workspace() {
                     <div className="results-top">
                       <div className="panel score-card">
                         <span className="eyebrow">PRACTICE SCORE</span>
+                        {ungraded > 0 && (
+                          <p className="score-context">
+                            Score so far · written answers pending
+                          </p>
+                        )}
 
                         {ungraded > 0 && (
                           <span className="badge amber score-pending">
@@ -1740,12 +1519,26 @@ export default function Workspace() {
                             0,
                           )}
 
-                          <small> / {exam.exam.totalPoints}</small>
+                          <small>
+                            {" "}
+                            /{" "}
+                            {ungraded > 0
+                              ? exam.exam.questions
+                                  .filter(
+                                    (q) =>
+                                      q.type === "multiple-choice" ||
+                                      attempt.selfScores[q.number] !==
+                                        undefined,
+                                  )
+                                  .reduce((sum, q) => sum + q.points, 0)
+                              : exam.exam.totalPoints}
+                          </small>
                         </strong>
 
                         <p>
-                          Multiple choice is scored automatically. You score
-                          written answers.
+                          {ungraded > 0
+                            ? "Only scored questions are included above. Your full exam total appears after you score the written answers."
+                            : "Includes your self-reported written scores and automatically scored multiple choice."}
                         </p>
                       </div>
 
@@ -1782,10 +1575,26 @@ export default function Workspace() {
                           </button>
 
                           {ungraded > 0 && (
-                            <p className="follow-up-hint">
-                              Score all written answers to unlock focused
-                              practice.
-                            </p>
+                            <button
+                              className="text-button grade-next"
+                              onClick={() => {
+                                const next = exam.exam.questions.find(
+                                  (q) =>
+                                    q.type === "free-response" &&
+                                    attempt.selfScores[q.number] === undefined,
+                                );
+                                const target = document.getElementById(
+                                  `score-question-${next?.number}`,
+                                );
+                                target?.scrollIntoView({
+                                  block: "center",
+                                  behavior: "smooth",
+                                });
+                                target?.focus({ preventScroll: true });
+                              }}
+                            >
+                              Score next written answer <ArrowRight size={14} />
+                            </button>
                           )}
                         </div>
                       </div>
@@ -1829,7 +1638,7 @@ export default function Workspace() {
                             <strong>
                               {r.selfReported &&
                               attempt.selfScores[r.number] === undefined
-                                ? "�"
+                                ? "Pending"
                                 : r.earned}{" "}
                               / {r.possible}
                             </strong>
@@ -1843,12 +1652,39 @@ export default function Workspace() {
                             <span className="eyebrow">YOUR RESPONSE</span>
 
                             <p>
-                              {attempt.responses[q.number] ||
-                                "No response recorded"}
+                              {q.type === "multiple-choice" &&
+                              attempt.responses[q.number] ? (
+                                <>
+                                  <strong>
+                                    {attempt.responses[q.number]}.{" "}
+                                  </strong>
+                                  <MathText
+                                    text={
+                                      q.options[
+                                        attempt.responses[q.number].charCodeAt(
+                                          0,
+                                        ) - 65
+                                      ] || ""
+                                    }
+                                  />
+                                </>
+                              ) : (
+                                <MathText
+                                  text={
+                                    attempt.responses[q.number] ||
+                                    "No response recorded"
+                                  }
+                                />
+                              )}
                             </p>
                           </div>
 
-                          <details>
+                          <details
+                            open={
+                              r.selfReported &&
+                              attempt.selfScores[q.number] === undefined
+                            }
+                          >
                             <summary>Solution & marking guide</summary>
 
                             <div className="solution">
@@ -1868,6 +1704,8 @@ export default function Workspace() {
                             <label className="self-score">
                               Points earned
                               <select
+                                id={`score-question-${q.number}`}
+                                disabled={busy}
                                 value={attempt.selfScores[q.number] ?? ""}
                                 onChange={(e) =>
                                   void act(async () => {
@@ -2130,39 +1968,47 @@ export default function Workspace() {
       </div>
 
       {uploadOpen && (
-        <div className="modal-backdrop">
-          <section
-            className="modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="upload-title"
-          >
-            <div className="section-heading">
-              <h2 id="upload-title">Add course materials</h2>
+        <Dialog
+          titleId="upload-title"
+          onDismiss={() => setUploadOpen(false)}
+          locked={busy}
+          className="upload-dialog"
+        >
+          <div className="section-heading">
+            <h2 id="upload-title">Add course materials</h2>
 
-              <button
-                className="icon-button"
-                aria-label="Close upload"
-                onClick={() => setUploadOpen(false)}
-              >
-                <X size={20} />
-              </button>
-            </div>
+            <button
+              className="icon-button"
+              aria-label="Close upload"
+              disabled={busy}
+              onClick={() => setUploadOpen(false)}
+            >
+              <X size={20} />
+            </button>
+          </div>
 
-            {error && (
-              <p className="inline-error" role="alert">
-                {error}
-              </p>
-            )}
-
-            <p className="muted">
-              Add focused excerpts. PDFs and images stay in your local workspace
-              and are sent to Meta only when you request analysis.
+          {error && (
+            <p className="inline-error" role="alert">
+              {error}
             </p>
+          )}
 
+          <p className="muted">
+            Add focused excerpts. PDFs and images stay in your local workspace
+            and are sent to Meta when you request analysis or generation.
+          </p>
+
+          <div className="upload-step-label" role="status">
+            Step{" "}
+            {uploadReview
+              ? "2 of 2 · Check your materials"
+              : "1 of 2 · Choose sources"}
+          </div>
+          <div hidden={uploadReview} className="upload-selection">
             <label>
               Course name
               <input
+                disabled={busy}
                 placeholder="e.g. Linear algebra · eigenvalues"
                 value={packetName}
                 onChange={(e) => setPacketName(e.target.value)}
@@ -2199,6 +2045,11 @@ export default function Workspace() {
               </small>
             </button>
 
+            <p className="upload-role-help">
+              Choose what each file is. A past instructor exam can inform
+              format; an AI-generated exam must be marked as an AI-generated
+              reference.
+            </p>
             <div className="upload-files">
               {files.map((f, i) => (
                 <div key={i}>
@@ -2238,85 +2089,186 @@ export default function Workspace() {
                 </div>
               ))}
             </div>
+          </div>
+          {uploadReview && (
+            <section className="upload-review">
+              <h3>{packetName.trim() || files[0]?.file.name}</h3>
+              <p>
+                {files.length} {files.length === 1 ? "document" : "documents"} ·{" "}
+                {(
+                  files.reduce((sum, item) => sum + item.file.size, 0) /
+                  1024 /
+                  1024
+                ).toFixed(1)}{" "}
+                MB
+              </p>
+              <dl>
+                {files.map((item, i) => (
+                  <div key={i}>
+                    <dt>{item.file.name}</dt>
+                    <dd>{roleName(item.role)}</dd>
+                  </div>
+                ))}
+              </dl>
+              <p className="upload-next">
+                Next: VERA extracts the pages so you can inspect them. Saving
+                uses no model credits. You decide when to send sources for
+                analysis.
+              </p>
+            </section>
+          )}
+          <p className="muted small">
+            Only add materials you have permission to use. Label AI-generated
+            exams as generated reference. VERA currently checks linear algebra
+            development scenarios; Physics II support comes later.
+          </p>
 
-            <p className="muted small">
-              Only add materials you have permission to use. Label AI-generated
-              exams as generated reference. VERA currently checks linear algebra
-              development scenarios; Physics II support comes later.
-            </p>
+          <div className="modal-actions">
+            <button
+              className="secondary"
+              disabled={busy}
+              onClick={() =>
+                uploadReview ? setUploadReview(false) : setUploadOpen(false)
+              }
+            >
+              {uploadReview ? "Back to files" : "Cancel"}
+            </button>
 
-            <div className="modal-actions">
-              <button
-                className="secondary"
-                onClick={() => setUploadOpen(false)}
-              >
-                Cancel
-              </button>
-
-              <button
-                className="primary"
-                disabled={!files.length || busy}
-                onClick={() =>
-                  void act(async () => {
-                    const form = new FormData();
-
-                    form.set("name", packetName || files[0].file.name);
-
-                    form.set("roles", JSON.stringify(files.map((f) => f.role)));
-
-                    files.forEach((f) => form.append("files", f.file));
-
-                    const p = await request("packets", form);
-
-                    setPacketId(p.id);
-
-                    setExamId("");
-
-                    setFiles([]);
-
-                    setPacketName("");
-
-                    setUploadOpen(false);
-
-                    setView("packet");
-                  })
+            <button
+              className="primary"
+              disabled={!files.length || busy}
+              onClick={() => {
+                if (!uploadReview) {
+                  setError("");
+                  setUploadReview(true);
+                  return;
                 }
-              >
-                {busy ? (
-                  <LoaderCircle size={16} className="spin" />
-                ) : (
-                  <Plus size={16} />
-                )}{" "}
-                Save materials
-              </button>
+                void act(async () => {
+                  const form = new FormData();
+
+                  form.set("name", packetName || files[0].file.name);
+
+                  form.set("roles", JSON.stringify(files.map((f) => f.role)));
+
+                  files.forEach((f) => form.append("files", f.file));
+
+                  const p = await request("packets", form);
+
+                  setPacketId(p.id);
+
+                  setExamId("");
+
+                  setFiles([]);
+
+                  setPacketName("");
+
+                  setUploadOpen(false);
+
+                  setView("packet");
+                });
+              }}
+            >
+              {busy ? (
+                <LoaderCircle size={16} className="spin" />
+              ) : (
+                <Plus size={16} />
+              )}{" "}
+              {busy
+                ? "Extracting pages…"
+                : uploadReview
+                  ? "Save materials"
+                  : "Review materials"}
+            </button>
+          </div>
+        </Dialog>
+      )}
+
+      {startOpen && exam && (
+        <Dialog
+          titleId="start-practice-title"
+          onDismiss={() => setStartOpen(false)}
+          locked={busy}
+          className="start-practice-dialog"
+        >
+          <span className="eyebrow">BEFORE THE TIMER STARTS</span>
+          <h2 id="start-practice-title">Ready to start practice?</h2>
+          <p>{exam.exam.title}</p>
+          {error && (
+            <p className="inline-error" role="alert">
+              {error}
+            </p>
+          )}
+          <dl className="start-practice-facts">
+            <div>
+              <dt>Time limit</dt>
+              <dd>{exam.exam.minutes} minutes</dd>
             </div>
-          </section>
-        </div>
+            <div>
+              <dt>Questions</dt>
+              <dd>{exam.exam.questions.length}</dd>
+            </div>
+            <div>
+              <dt>Total</dt>
+              <dd>{exam.exam.totalPoints} points</dd>
+            </div>
+          </dl>
+          <ul className="start-practice-notes">
+            <li>Exhibits stay available while you work.</li>
+            <li>
+              Answers save automatically. The timer continues if you leave or
+              refresh.
+            </li>
+            <li>
+              Multiple choice is scored automatically. You’ll score written work
+              using the marking guide after finishing.
+            </li>
+          </ul>
+          {showSolutions && (
+            <p className="source-warning">
+              You opened the solutions. Keep that in mind when interpreting your
+              score.
+            </p>
+          )}
+          <div className="modal-actions">
+            <button
+              className="secondary"
+              disabled={busy}
+              onClick={() => setStartOpen(false)}
+            >
+              Keep previewing
+            </button>
+            <button
+              className="primary"
+              disabled={busy}
+              onClick={() => void practice()}
+            >
+              {busy ? "Starting…" : "Start timed practice"}{" "}
+              <ArrowRight size={16} />
+            </button>
+          </div>
+        </Dialog>
       )}
 
       {source && (
-        <div className="modal-backdrop">
-          <section
-            className="modal source-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Source page"
-          >
-            <div className="section-heading">
-              <h2>{source.name}</h2>
+        <Dialog
+          label="Source page"
+          onDismiss={() => setSource(undefined)}
+          className="source-modal"
+        >
+          <div className="section-heading">
+            <h2>{source.name}</h2>
 
-              <button
-                className="icon-button"
-                aria-label="Close source"
-                onClick={() => setSource(undefined)}
-              >
-                <X size={20} />
-              </button>
-            </div>
+            <button
+              className="icon-button"
+              aria-label="Close source"
+              onClick={() => setSource(undefined)}
+            >
+              <X size={20} />
+            </button>
+          </div>
 
-            <iframe src={source.url} title={source.name} />
-          </section>
-        </div>
+          <iframe src={source.url} title={source.name} />
+        </Dialog>
       )}
     </div>
   );

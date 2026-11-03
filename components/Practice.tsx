@@ -1,102 +1,135 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { Clock3, ArrowRight, CheckCircle2 } from "lucide-react";
+import {
+  Clock3,
+  ArrowLeft,
+  ArrowRight,
+  CheckCircle2,
+  Flag,
+  RotateCcw,
+} from "lucide-react";
 import type { Attempt, CheckedExam } from "@/lib/contracts";
 import MathText from "./MathText";
 import Exhibits from "./Exhibits";
+import Dialog from "./Dialog";
+import useAttemptResponses from "./useAttemptResponses";
+
 export default function Practice({
   attempt,
   exam,
   onSubmit,
+  onExit,
   update,
 }: {
   attempt: Attempt;
   exam: CheckedExam;
   onSubmit: () => void;
+  onExit: () => void;
   update: (path: string, body: unknown) => Promise<unknown>;
 }) {
-  const [responses, setResponses] = useState(attempt.responses),
-    [index, setIndex] = useState(0),
-    [now, setNow] = useState(() => Date.now()),
-    [pending, setPending] = useState(0),
-    [error, setError] = useState(""),
-    [submitting, setSubmitting] = useState(false),
-    [mobilePane, setMobilePane] = useState("questions"),
-    [confirmFinish, setConfirmFinish] = useState(false);
-  const finishButton = useRef<HTMLButtonElement>(null);
-  const keepWorking = useRef<HTMLButtonElement>(null);
-  const answered = Object.values(responses).filter((v) => v.trim()).length;
-  useEffect(() => {
-    if (!confirmFinish) return;
-    const previous = document.activeElement as HTMLElement | null;
-    keepWorking.current?.focus();
-    const handle = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setConfirmFinish(false);
-      if (
-        event.key === "Tab" &&
-        event.shiftKey &&
-        document.activeElement === keepWorking.current
-      ) {
-        event.preventDefault();
-        finishButton.current?.focus();
-      } else if (
-        event.key === "Tab" &&
-        !event.shiftKey &&
-        document.activeElement === finishButton.current
-      ) {
-        event.preventDefault();
-        keepWorking.current?.focus();
-      }
-    };
-    document.addEventListener("keydown", handle);
-    return () => {
-      document.removeEventListener("keydown", handle);
-      previous?.focus();
-    };
-  }, [confirmFinish]);
-  const chain = useRef(Promise.resolve()),
-    finishing = useRef(false),
-    submitRef = useRef<() => void>(() => {});
+  const navigationKey = `vera:practice-nav:${attempt.id}`;
+  const [{ index, flags }, setNavigation] = useState<{
+    index: number;
+    flags: number[];
+  }>(() => {
+    try {
+      const cached = JSON.parse(
+        sessionStorage.getItem(navigationKey) || "null",
+      );
+      return {
+        index:
+          cached &&
+          Number.isInteger(cached.index) &&
+          cached.index >= 0 &&
+          cached.index < exam.exam.questions.length
+            ? cached.index
+            : 0,
+        flags: Array.isArray(cached?.flags)
+          ? cached.flags.filter(
+              (n: unknown) =>
+                Number.isInteger(n) &&
+                exam.exam.questions.some((q) => q.number === n),
+            )
+          : [],
+      };
+    } catch {
+      return { index: 0, flags: [] };
+    }
+  });
+  const [now, setNow] = useState(() => Date.now()),
+    [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false),
+    [mobilePane, setMobilePane] = useState("questions");
+  const [confirmFinish, setConfirmFinish] = useState(false);
+  const {
+    responses,
+    status,
+    error: saveError,
+    answer,
+    flush,
+    waitForSave,
+  } = useAttemptResponses(attempt, update);
+  const finishing = useRef(false),
+    submitRef = useRef<() => void>(() => {}),
+    heading = useRef<HTMLHeadingElement>(null);
   const q = exam.exam.questions[index],
     seconds = Math.max(0, Math.ceil((attempt.endsAt - now) / 1000));
-  function answer(value: string) {
-    if (finishing.current || seconds <= 0) return;
-    const next = { ...responses, [q.number]: value };
-    setResponses(next);
-    setPending((p) => p + 1);
-    chain.current = chain.current
-      .catch(() => {})
-      .then(async () => {
-        try {
-          await update(`attempts/${attempt.id}`, { responses: next });
-          setError("");
-        } catch (e) {
-          setError(
-            e instanceof Error
-              ? e.message
-              : "Response could not be saved. Re-enter it to retry.",
-          );
-          throw e;
-        } finally {
-          setPending((p) => p - 1);
-        }
-      });
-    void chain.current.catch(() => {});
+  const answered = exam.exam.questions.filter((question) =>
+    responses[question.number]?.trim(),
+  ).length;
+  function chooseQuestion(next: number) {
+    const trigger = document.activeElement;
+    const leavingReview = confirmFinish;
+    setNavigation({ index: next, flags });
+    setMobilePane("questions");
+    setConfirmFinish(false);
+    try {
+      sessionStorage.setItem(
+        navigationKey,
+        JSON.stringify({ index: next, flags }),
+      );
+    } catch {}
+    requestAnimationFrame(() => {
+      const focused = document.activeElement;
+      // A student may already have moved into the answer before this frame.
+      if (focused?.matches("input, textarea, select")) return;
+      if (focused !== trigger && focused !== document.body && !leavingReview)
+        return;
+      heading.current?.focus({ preventScroll: true });
+      heading.current?.scrollIntoView({ block: "center", behavior: "smooth" });
+    });
+  }
+  function toggleFlag() {
+    const next = flags.includes(q.number)
+      ? flags.filter((n) => n !== q.number)
+      : [...flags, q.number];
+    setNavigation({ index, flags: next });
+    try {
+      sessionStorage.setItem(
+        navigationKey,
+        JSON.stringify({ index, flags: next }),
+      );
+    } catch {}
   }
   async function submit() {
     if (finishing.current) return;
     finishing.current = true;
     setSubmitting(true);
+    setError("");
     try {
-      await chain.current.catch(() => {});
-      if (Date.now() < attempt.endsAt)
-        await update(`attempts/${attempt.id}`, { responses });
+      if (Date.now() < attempt.endsAt) await flush();
+      else await waitForSave();
       await update(`attempts/${attempt.id}`, { submit: true });
       onSubmit();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Submission failed. Retry.");
+    } catch (cause) {
+      setError(
+        cause instanceof Error
+          ? cause.message
+          : "Your attempt could not be submitted. Try again.",
+      );
       finishing.current = false;
       setSubmitting(false);
+      setConfirmFinish(false);
     }
   }
   useEffect(() => {
@@ -105,12 +138,18 @@ export default function Practice({
     };
   });
   useEffect(() => {
-    const t = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(t);
+    const timer = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(timer);
   }, []);
   useEffect(() => {
     if (!seconds) submitRef.current();
   }, [seconds]);
+  const saveLabel =
+    status === "error"
+      ? "Answers not saved"
+      : status === "saving" || status === "unsaved"
+        ? "Saving answers…"
+        : "Responses saved locally";
   return (
     <>
       <div className="practice-bar">
@@ -127,7 +166,7 @@ export default function Practice({
           <button
             className="secondary"
             onClick={() => setConfirmFinish(true)}
-            disabled={submitting || pending > 0}
+            disabled={submitting}
           >
             Finish attempt
           </button>
@@ -136,7 +175,7 @@ export default function Practice({
             role="timer"
             aria-label="Time remaining"
           >
-            <Clock3 size={18} />{" "}
+            <Clock3 size={18} />
             {Math.floor(seconds / 60)
               .toString()
               .padStart(2, "0")}
@@ -146,10 +185,16 @@ export default function Practice({
       </div>
       <div className="practice-progress">
         <span>
-          {answered} of {exam.exam.questions.length} answered
+          {answered} of {exam.exam.questions.length} answered{" "}
+          {flags.length > 0 && `· ${flags.length} flagged`}
         </span>
-        <span>Answers save automatically</span>
+        <span role="status">{saveLabel}</span>
       </div>
+      <p className="sr-only" role="status">
+        {seconds <= 60 && seconds > 0
+          ? "One minute or less remains. Finish your answers and review your attempt."
+          : ""}
+      </p>
       <div
         className="study-pane-switch"
         role="group"
@@ -174,30 +219,47 @@ export default function Practice({
       >
         <div className="practice-questions">
           <nav className="question-dots" aria-label="Choose question">
-            {exam.exam.questions.map((n, i) => (
+            {exam.exam.questions.map((question, i) => (
               <button
-                key={n.number}
+                key={question.number}
                 className={
-                  i === index ? "active" : responses[n.number] ? "answered" : ""
+                  i === index
+                    ? "active"
+                    : responses[question.number]?.trim()
+                      ? "answered"
+                      : ""
                 }
-                onClick={() => {
-                  setIndex(i);
-                  setMobilePane("questions");
-                }}
+                onClick={() => chooseQuestion(i)}
                 aria-current={index === i ? "step" : undefined}
-                aria-label={`Question ${n.number}${responses[n.number] ? ", answered" : ""}`}
+                aria-label={`Question ${question.number}${responses[question.number]?.trim() ? ", answered" : ""}${flags.includes(question.number) ? ", flagged" : ""}`}
               >
-                {n.number}
-                {responses[n.number] && (
-                  <CheckCircle2
-                    className="answer-indicator"
-                    size={11}
+                {question.number}
+                {flags.includes(question.number) ? (
+                  <Flag
+                    className="flag-indicator"
+                    size={12}
                     aria-hidden="true"
                   />
+                ) : (
+                  responses[question.number]?.trim() && (
+                    <CheckCircle2
+                      className="answer-indicator"
+                      size={11}
+                      aria-hidden="true"
+                    />
+                  )
                 )}
               </button>
             ))}
           </nav>
+          <div className="question-nav-legend">
+            <span>
+              <CheckCircle2 size={12} /> Answered
+            </span>
+            <span>
+              <Flag size={12} /> Flagged for review
+            </span>
+          </div>
           <article className="panel question-card">
             <div className="question-meta">
               <span>
@@ -205,12 +267,34 @@ export default function Practice({
               </span>
               <span>{q.points} points</span>
             </div>
-            <span className="badge">{q.topic}</span>
-            <h3>
+            <div className="question-topic">
+              <span className="badge">{q.topic}</span>
+              <button
+                className="text-button flag-button"
+                aria-pressed={flags.includes(q.number)}
+                onClick={toggleFlag}
+              >
+                <Flag size={14} />
+                {flags.includes(q.number)
+                  ? "Flagged for review"
+                  : "Flag for review"}
+              </button>
+            </div>
+            <h3 ref={heading} tabIndex={-1}>
               <MathText text={q.question} />
             </h3>
             <p className="muted small">
-              Use exhibits: {q.exhibitIds.join(", ")}
+              Use exhibits:{" "}
+              {q.exhibitIds
+                .map(
+                  (id) =>
+                    ({
+                      calibration: "Calibration",
+                      vectors: "Measurements",
+                      diagram: "Diagram",
+                    })[id],
+                )
+                .join(", ")}
             </p>
             {q.type === "multiple-choice" ? (
               <fieldset className="options">
@@ -231,7 +315,9 @@ export default function Practice({
                       checked={
                         responses[q.number] === String.fromCharCode(65 + i)
                       }
-                      onChange={() => answer(String.fromCharCode(65 + i))}
+                      onChange={() =>
+                        answer(q.number, String.fromCharCode(65 + i))
+                      }
                     />
                     <span className="option-letter">
                       {String.fromCharCode(65 + i)}
@@ -245,25 +331,55 @@ export default function Practice({
                 Your reasoning
                 <textarea
                   value={responses[q.number] || ""}
+                  maxLength={20000}
                   disabled={submitting || !seconds}
-                  onChange={(e) => answer(e.target.value)}
+                  onChange={(event) => answer(q.number, event.target.value)}
                   placeholder="Show your working and explain your answer…"
                   rows={9}
                 />
               </label>
             )}
+            {(saveError || error) && (
+              <div className="answer-save-error" role="alert">
+                <strong>
+                  {error
+                    ? "Your attempt is still open."
+                    : "Your latest answers haven’t reached VERA."}
+                </strong>
+                <p>
+                  {error || saveError} Keep this tab open and retry. Your text
+                  is still here.
+                </p>
+                <button
+                  className="secondary"
+                  disabled={submitting || !seconds}
+                  onClick={() => {
+                    void flush().catch(() => {});
+                  }}
+                >
+                  <RotateCcw size={14} /> Retry saving
+                </button>
+              </div>
+            )}
             <div className="question-footer">
-              <span className="muted small" role="status">
-                {pending ? "Saving…" : "Responses saved locally"}
-              </span>
+              <button
+                className="secondary"
+                disabled={index === 0}
+                onClick={() => chooseQuestion(index - 1)}
+              >
+                <ArrowLeft size={15} /> Previous
+              </button>
               {index < exam.exam.questions.length - 1 ? (
-                <button className="primary" onClick={() => setIndex(index + 1)}>
+                <button
+                  className="primary"
+                  onClick={() => chooseQuestion(index + 1)}
+                >
                   Next question <ArrowRight size={16} />
                 </button>
               ) : (
                 <button
                   className="primary"
-                  disabled={submitting || pending > 0}
+                  disabled={submitting}
                   onClick={() => setConfirmFinish(true)}
                 >
                   {submitting ? "Submitting…" : "Finish practice"}{" "}
@@ -271,61 +387,82 @@ export default function Practice({
                 </button>
               )}
             </div>
-            {error && (
-              <p className="inline-error" role="alert">
-                {error}
-              </p>
-            )}
           </article>
-          <p className="muted small">
-            The timer continues across refreshes. Answers lock when time
-            expires.
-          </p>
+          <div className="practice-exit">
+            <p className="muted small">
+              The timer keeps running if you leave. Return from the course
+              library to resume.
+            </p>
+            <button
+              className="text-button"
+              disabled={submitting}
+              onClick={() => {
+                void flush()
+                  .then(onExit)
+                  .catch(() => {});
+              }}
+            >
+              Save & leave practice <ArrowRight size={14} />
+            </button>
+          </div>
         </div>
         <Exhibits scenario={exam.scenario} />
       </div>
       {confirmFinish && (
-        <div className="modal-backdrop">
-          <section
-            className="modal finish-dialog"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="finish-title"
-          >
-            <span className="eyebrow">REVIEW BEFORE YOU FINISH</span>
-            <h2 id="finish-title">Finish this attempt?</h2>
-            <p>
-              You answered {answered} of {exam.exam.questions.length} questions.{" "}
-              {exam.exam.questions.length - answered > 0
-                ? `${exam.exam.questions.length - answered} unanswered questions will receive no points.`
-                : "Your responses are ready to review."}
-            </p>
-            <p className="muted">
-              Your answers will lock. Next, you can read the solutions and score
-              your written work. The timer keeps running until you finish.
-            </p>
-            <div className="modal-actions">
-              <button
-                ref={keepWorking}
-                className="secondary"
-                onClick={() => setConfirmFinish(false)}
-              >
-                Keep working
+        <Dialog
+          titleId="finish-title"
+          onDismiss={() => setConfirmFinish(false)}
+          locked={submitting}
+          className="finish-dialog"
+        >
+          <span className="eyebrow">REVIEW BEFORE YOU FINISH</span>
+          <h2 id="finish-title">Finish this attempt?</h2>
+          <p>
+            You answered {answered} of {exam.exam.questions.length} questions.{" "}
+            {exam.exam.questions.length - answered > 0
+              ? `${exam.exam.questions.length - answered} unanswered questions will receive no points.`
+              : "All questions have a response."}
+          </p>
+          <div className="attempt-review-list">
+            {exam.exam.questions.map((question, i) => (
+              <button key={question.number} onClick={() => chooseQuestion(i)}>
+                <span>
+                  Question {question.number}
+                  <small>{question.topic}</small>
+                </span>
+                <span>
+                  {flags.includes(question.number) && <Flag size={13} />}
+                  {responses[question.number]?.trim()
+                    ? "Answered"
+                    : "Unanswered"}
+                  <ArrowRight size={14} />
+                </span>
               </button>
-              <button
-                ref={finishButton}
-                className="primary"
-                disabled={submitting}
-                onClick={() => {
-                  setConfirmFinish(false);
-                  void submit();
-                }}
-              >
-                Finish & view results <ArrowRight size={16} />
-              </button>
-            </div>
-          </section>
-        </div>
+            ))}
+          </div>
+          <p className="muted">
+            Select any question to return to it. Finishing locks your answers
+            and opens the solutions. The timer keeps running until you finish.
+          </p>
+          <div className="modal-actions">
+            <button
+              className="secondary"
+              autoFocus
+              onClick={() => setConfirmFinish(false)}
+            >
+              Keep working
+            </button>
+            <button
+              className="primary"
+              disabled={submitting}
+              onClick={() => {
+                void submit();
+              }}
+            >
+              Finish & view results <ArrowRight size={16} />
+            </button>
+          </div>
+        </Dialog>
       )}
     </>
   );

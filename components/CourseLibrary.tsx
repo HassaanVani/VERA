@@ -11,7 +11,7 @@ import {
   Search,
   X,
 } from "lucide-react";
-import type { Packet, Revision, CheckedExam } from "@/lib/contracts";
+import type { Packet, Revision, CheckedExam, Attempt } from "@/lib/contracts";
 import { demoScenario } from "@/lib/demo-client";
 import { TransformationDiagram } from "./Exhibits";
 
@@ -19,16 +19,24 @@ type Props = {
   packets: Packet[];
   revisions: Revision[];
   exams: CheckedExam[];
+  attempts: Attempt[];
+  now: number;
   busy: boolean;
   onUpload: () => void;
   onSample: () => void;
-  onOpen: (packet: Packet, next: "packet" | "blueprint" | "exam") => void;
+  onOpen: (
+    packet: Packet,
+    next: "packet" | "blueprint" | "exam" | "practice" | "results",
+    examId?: string,
+  ) => void;
 };
 
 export default function CourseLibrary({
   packets,
   revisions,
   exams,
+  attempts,
+  now,
   busy,
   onUpload,
   onSample,
@@ -48,9 +56,45 @@ export default function CourseLibrary({
       ),
     [packets, query, filter],
   );
+  const openAttempts = attempts.filter(
+    (attempt) =>
+      !attempt.submittedAt &&
+      exams.some(
+        (exam) =>
+          exam.id === attempt.examId &&
+          packets.some((packet) => packet.id === exam.packetId),
+      ),
+  );
+  const resume =
+    openAttempts.find((attempt) => attempt.endsAt > now) || openAttempts[0];
+  const expired = !!resume && resume.endsAt <= now;
+  const resumeExam = exams.find((exam) => exam.id === resume?.examId);
+  const resumePacket = packets.find(
+    (packet) => packet.id === resumeExam?.packetId,
+  );
   return (
     <div className="library-layout">
       <section className="library-main" aria-label="Course library">
+        {resume && resumeExam && resumePacket && (
+          <div className="resume-course">
+            <div>
+              <span className="eyebrow">PICK UP WHERE YOU LEFT OFF</span>
+              <h2>{resumePacket.name}</h2>
+              <p>
+                {expired
+                  ? "Your time limit has ended. Open the attempt to review the answers you saved."
+                  : "Your practice attempt is open. The timer continues while you’re away."}
+              </p>
+            </div>
+            <button
+              className="primary"
+              onClick={() => onOpen(resumePacket, "practice", resumeExam.id)}
+            >
+              {expired ? "Review ended attempt" : "Resume practice"}{" "}
+              <ArrowRight size={16} />
+            </button>
+          </div>
+        )}
         <div className="library-toolbar">
           <div className="filter-tabs" aria-label="Filter courses" role="group">
             {(
@@ -96,6 +140,9 @@ export default function CourseLibrary({
             )}
           </label>
         </div>
+        <p className="sr-only" role="status">
+          {visible.length} matching courses
+        </p>
         <div className="library-list">
           {!packets.length ? (
             <div className="library-empty">
@@ -103,7 +150,7 @@ export default function CourseLibrary({
                 <BookOpen size={32} strokeWidth={1.3} />
                 <span>01</span>
               </div>
-              <h2>Your first course goes here.</h2>
+              <h2>Start with one topic you want to practice.</h2>
               <p>
                 Add your notes, a past exam, or a review sheet.
                 <br />
@@ -142,23 +189,50 @@ export default function CourseLibrary({
                   (n, d) => n + d.pages.length,
                   0,
                 );
-                const exam = exams.find((e) => e.packetId === p.id),
+                const courseAttempts = attempts.filter(
+                  (a) =>
+                    !a.submittedAt &&
+                    exams.some((e) => e.id === a.examId && e.packetId === p.id),
+                );
+                const openAttempt =
+                  courseAttempts.find((a) => a.endsAt > now) ||
+                  courseAttempts[0];
+                const exam =
+                    exams.find((e) => e.id === openAttempt?.examId) ||
+                    exams.find((e) => e.packetId === p.id),
                   revision = revisions.find((r) => r.packetId === p.id);
-                const next = exam ? "exam" : revision ? "blueprint" : "packet";
-                const status = exam
-                  ? exam.ready
-                    ? "Practice exam ready"
-                    : "Review checking report"
-                  : revision
-                    ? revision.approved
-                      ? "Ready to generate"
-                      : "Review exam plan"
-                    : "Ready to analyze";
+                const completed = attempts.find(
+                  (a) => a.examId === exam?.id && a.submittedAt,
+                );
+                const next = openAttempt
+                  ? "practice"
+                  : completed
+                    ? "results"
+                    : exam
+                      ? "exam"
+                      : revision
+                        ? "blueprint"
+                        : "packet";
+                const status = openAttempt
+                  ? openAttempt.endsAt <= now
+                    ? "Time is up · review attempt"
+                    : "Resume practice"
+                  : completed
+                    ? "Review results"
+                    : exam
+                      ? exam.ready
+                        ? "Practice exam ready"
+                        : "Review checking report"
+                      : revision
+                        ? revision.approved
+                          ? "Ready to generate"
+                          : "Review exam plan"
+                        : "Ready to analyze";
                 return (
                   <button
                     key={p.id}
                     className="course-row"
-                    onClick={() => onOpen(p, next)}
+                    onClick={() => onOpen(p, next, exam?.id)}
                   >
                     <span
                       className={`course-cover cover-${i % 3}`}
