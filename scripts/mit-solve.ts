@@ -16,6 +16,7 @@ const protocolDir =
   profile === "initial" ? "fixtures/mit-ocw" : `fixtures/mit-ocw/${profile}`;
 const protocolBytes = await readFile(`${protocolDir}/protocol.json`, "utf8");
 const protocol = JSON.parse(protocolBytes);
+process.env.VERA_BUDGET_DIR ||= ".vera";
 process.env.VERA_DATA_DIR = ".vera/evaluations/mit-ocw";
 process.env.VERA_BUDGET_BUCKET = "development";
 const frozen = JSON.parse(

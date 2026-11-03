@@ -58,6 +58,7 @@ const protocol = JSON.parse(protocolBytes) as {
   sources: EvaluationSource[];
 };
 // Deliberately separate evaluation records/usage from interactive user courses.
+process.env.VERA_BUDGET_DIR ||= ".vera";
 process.env.VERA_DATA_DIR = ".vera/evaluations/mit-ocw";
 process.env.VERA_BUDGET_BUCKET = "development";
 const root = path.resolve(process.env.VERA_DATA_DIR, protocol.id);
@@ -317,7 +318,7 @@ type Result = {
   latencyMs: number;
   error?: string;
   artifact?: {
-    scenario: Scenario;
+    scenario?: Scenario;
     exam: Exam;
     issues: Issue[];
     ready: boolean;

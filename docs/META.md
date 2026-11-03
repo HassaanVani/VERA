@@ -32,7 +32,7 @@ Each call has a 90-second deadline; a complete job has an 8-minute deadline. HTT
 
 ## Current validation status
 
-Provider request shapes, schema rejection, missing credentials, Standard-mode enforcement, usage accounting, transport interruption, and truncated output are exercised with mocked transport tests. Actual account access, mathematical image understanding, model selection, latency, and quality require `npm run probe` and the live evaluation. The build environment did not expose a key, so those results remain pending.
+Provider request shapes, schema rejection, missing credentials, Standard-mode enforcement, usage accounting, transport interruption, and truncated output are exercised with mocked transport tests. Actual account access, mathematical image understanding, model selection, latency, and quality require `npm run probe` and the live evaluation. The initial October 28 environment did not expose a key; the November 3 live and cross-subject results below supersede that pending state.
 
 ## November 3 live validation
 
@@ -41,3 +41,12 @@ The text/JSON and mathematical-image probes passed on the user's account. A real
 Meta's [reasoning documentation](https://dev.meta.ai/docs/reasoning) explains that reasoning tokens share the output-token allowance. The frozen follow-up comparison completed all six exams; independent arithmetic and the limitations are recorded in [MIT-EVALUATION.md](MIT-EVALUATION.md). Passing a probe or numerical checks is not a full correctness guarantee.
 
 Workers and CLI evaluation/probe commands use @next/env to load .env and .env.local with Next.js precedence. Credentials remain server-side and ignored by Git. .env.example contains no credential.
+
+
+## Cross-subject execution and shared accounting
+
+New live analysis uses required schema-version-2 provenance and supports subject-appropriate choice, numeric, short-answer, worked-response and essay items. The adapter remains vendor-independent at the application boundary; source material remains untrusted evidence. Generation attaches uncertain mathematical page images; source pages carrying explicit rights-exclusion notices are omitted from future model input. Model feedback checks saved-answer excerpts, criterion indices and permitted source references before publication, and never changes scores.
+
+App and evaluation records can live in separate SQLite databases, but reservations now use one budget.sqlite selected by VERA_BUDGET_DIR. Historical app and MIT-evaluation usage rows are imported by ID. A persistent additional-campaign limit prevents restarting a process or choosing another output batch from resetting the USD 20 allowance. A two-process reservation race is tested. The active campaign recorded USD 2.672849 additional usage; complete attribution and verification limits are in [OCW-EVALUATION.md](OCW-EVALUATION.md).
+
+Public workspace responses omit raw upstream diagnostics as well as answer-bearing data. Private diagnostics and full stage artifacts remain in ignored local records. Do not deploy this loopback-only prototype as a public service without a separate account/access-control design.

@@ -1,2 +1,8 @@
 # Preserve the exact bytes used by frozen evaluation protocol hashes.
+*.ts text eol=lf
+*.tsx text eol=lf
+*.mjs text eol=lf
+*.py text eol=lf
+*.css text eol=lf
 fixtures/mit-ocw/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+fixtures/ocw-cross-subject/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
