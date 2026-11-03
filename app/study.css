@@ -1,0 +1,479 @@
+/* Black surfaces; blue identifies actions and the current destination. */
+.topbar {
+  max-width: 1320px;
+  height: auto;
+  margin: 0 auto;
+  padding: 28px 56px 8px;
+  border: 0;
+  background: transparent;
+  justify-content: space-between;
+}
+.workspace-settings {
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font-size: 12px;
+  padding: 12px 0 12px 20px;
+  min-height: 44px;
+}
+.workspace-settings:hover {
+  color: var(--text);
+}
+.brand {
+  font-size: 21px;
+}
+.brand-mark {
+  color: #a9bce2;
+}
+.page-title {
+  margin: 0 0 32px;
+}
+.page-title .eyebrow:empty {
+  display: none;
+}
+.page-title h1,
+.view-overview .page-title h1 {
+  font-size: clamp(27px, 3vw, 36px);
+  font-weight: 450;
+  line-height: 1.35;
+}
+.page-title p {
+  color: var(--muted);
+}
+.course-return {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 0;
+  min-height: 34px;
+  margin-bottom: 8px;
+}
+.course-context {
+  color: var(--faint);
+  font-size: 11px;
+  letter-spacing: 0;
+  margin-left: 20px;
+  font-weight: 400;
+}
+.course-row:hover {
+  background: #0e1420;
+}
+.course-spine {
+  background: #3c465a;
+}
+.course-row:hover .course-spine {
+  background: var(--blue);
+}
+.course-date,
+.course-metadata {
+  color: var(--muted);
+}
+.course-next,
+.course-arrow {
+  color: #bdc7da;
+}
+.library-empty {
+  padding-top: 58px;
+}
+.primary {
+  background: #315ed1;
+  border-color: #547bdf;
+}
+.primary:hover:not(:disabled) {
+  background: #3c68d7;
+}
+.secondary {
+  background: #111722;
+  border-color: #364157;
+}
+input,
+select,
+textarea {
+  background: #090e17;
+  border-color: #374155;
+}
+.upload-dialog {
+  background: #0d1119;
+  border-color: #3b4559;
+}
+.dropzone {
+  background: #101722;
+  border-color: #56627a;
+}
+.resume-course {
+  background: #101722;
+  border-color: var(--line);
+}
+.view-packet main,
+.view-blueprint main {
+  max-width: 1080px;
+}
+.course-journey {
+  border: 0;
+  border-radius: 0;
+  margin: 0 0 32px;
+}
+.course-journey ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 26px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.course-journey li {
+  border: 0;
+}
+.course-journey button {
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: none;
+  padding: 10px 0;
+  min-height: 42px;
+  color: var(--muted);
+}
+.course-journey strong {
+  font-size: 12px;
+  font-weight: 500;
+}
+.course-journey button[aria-current] {
+  border-bottom-color: var(--blue);
+  color: var(--text);
+}
+.materials-workbench {
+  width: 100%;
+}
+.materials-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.materials-heading h2 {
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0;
+}
+.materials-heading > span {
+  font-size: 12px;
+  color: var(--muted);
+}
+.material-file {
+  padding: 20px 0;
+  border-bottom: 1px solid var(--line);
+}
+.material-file-main {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) auto;
+  gap: 17px;
+  align-items: center;
+}
+.material-file-main > svg {
+  color: var(--muted);
+}
+.material-file h3 {
+  font-size: 15px;
+  font-weight: 500;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.material-file-main p {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 5px 0 0;
+}
+.material-file-main .text-button {
+  color: var(--blue-light);
+  min-height: 44px;
+}
+.material-note,
+.material-warning {
+  font-size: 12px;
+  line-height: 1.8;
+  color: var(--muted);
+  margin: 12px 0 0;
+}
+.material-warning {
+  color: #dec39b;
+}
+.material-details {
+  margin: 12px 0 0 39px;
+}
+.material-details summary {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: fit-content;
+  cursor: pointer;
+  padding: 7px 0;
+  color: var(--muted);
+  font-size: 11px;
+}
+.material-details label {
+  max-width: 280px;
+  margin-top: 15px;
+}
+.material-details select {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+}
+.material-details p {
+  color: var(--muted);
+  font-size: 12px;
+  margin: 12px 0 0;
+}
+.materials-next {
+  padding: 32px 0 20px;
+}
+.materials-next h2 {
+  font-size: 22px;
+  font-weight: 450;
+  margin-bottom: 12px;
+}
+.materials-next > p {
+  max-width: 610px;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.9;
+}
+.materials-next .primary {
+  margin-top: 10px;
+}
+.materials-next .setup-guidance {
+  display: block;
+  padding: 14px 0;
+  background: none;
+  border: 0;
+  border-left: 2px solid #5d6c88;
+  padding-left: 16px;
+}
+.materials-next .setup-guidance button {
+  display: block;
+  padding: 8px 0;
+}
+.materials-next .material-sharing {
+  font-size: 11px;
+  max-width: 480px;
+  margin-top: 12px;
+}
+.source-policy {
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+}
+.source-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 15px;
+}
+.source-pagination label {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  white-space: nowrap;
+}
+.source-pagination select {
+  margin: 0;
+}
+.blueprint-layout {
+  display: block;
+}
+.plan-editor.panel {
+  background: none;
+  border: 0;
+  padding: 0;
+}
+.plan-editor > .section-heading {
+  margin-bottom: 22px;
+}
+.plan-editor .section-heading h2 {
+  font-size: 18px;
+  font-weight: 500;
+}
+.plan-editor .section-heading p {
+  font-size: 13px;
+}
+.plan-assumptions {
+  background: none;
+  border: 0;
+  border-left: 2px solid #897452;
+  padding: 8px 18px;
+  margin: 0 0 26px;
+  border-radius: 0;
+}
+.plan-assumptions summary {
+  color: #d4c19f;
+}
+.plan-assumptions li {
+  color: #c9bdac;
+}
+.plan-proposal {
+  padding-bottom: 18px;
+}
+.plan-proposal h3 {
+  font-size: 22px;
+  font-weight: 450;
+  margin: 0 0 8px;
+}
+.plan-proposal p {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 0;
+}
+.plan-proposal small {
+  font-size: 10px;
+  color: var(--faint);
+  display: block;
+  margin-top: 7px;
+}
+.plan-identity {
+  border-bottom: 1px solid var(--line);
+  padding: 0 0 18px;
+}
+.plan-identity > summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  cursor: pointer;
+  color: var(--muted);
+  padding: 10px 0;
+}
+.plan-identity[open] > label:first-of-type {
+  margin-top: 15px;
+}
+.plan-slots {
+  margin: 0;
+}
+.plan-slots > li {
+  padding: 0;
+}
+.plan-question > summary {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 22px 0;
+  cursor: pointer;
+  list-style: none;
+}
+.plan-question > summary::-webkit-details-marker {
+  display: none;
+}
+.proposal-number {
+  color: var(--faint);
+  font-size: 11px;
+  align-self: flex-start;
+  padding-top: 3px;
+}
+.proposal-topic {
+  flex: 1;
+  min-width: 0;
+}
+.proposal-topic strong {
+  font-size: 16px;
+  font-weight: 500;
+  display: block;
+  overflow-wrap: anywhere;
+}
+.proposal-topic > span {
+  display: block;
+  margin-top: 7px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.plan-question > summary > svg {
+  color: var(--muted);
+  flex-shrink: 0;
+}
+.plan-question[open] > summary > svg {
+  transform: rotate(180deg);
+}
+.plan-question-fields {
+  padding: 4px 0 24px 32px;
+}
+.plan-commit {
+  background: none;
+  border: 0;
+  padding: 24px 0 0;
+  margin-top: 0;
+}
+.plan-commit p {
+  max-width: 360px;
+}
+.plan-disclaimer {
+  margin-top: 18px;
+}
+.plan-evidence {
+  border-top: 1px solid var(--line);
+  padding: 20px 0 0;
+  margin-top: 32px;
+}
+.plan-evidence > summary {
+  width: fit-content;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 13px;
+}
+.plan-evidence .evidence-panel {
+  padding: 16px 0;
+}
+.plan-evidence .observation {
+  max-width: 650px;
+}
+.source-modal {
+  background: var(--panel);
+}
+@media (max-width: 760px) {
+  .topbar {
+    padding: 18px 24px 0;
+  }
+  main {
+    padding-top: 24px;
+  }
+  .page-title {
+    margin-bottom: 25px;
+  }
+  .material-file-main {
+    grid-template-columns: 20px minmax(0, 1fr);
+    gap: 12px;
+  }
+  .material-file-main .text-button {
+    grid-column: 2;
+    justify-self: start;
+    padding-left: 0;
+  }
+  .material-details {
+    margin-left: 32px;
+  }
+  .materials-next h2 {
+    font-size: 20px;
+  }
+  .materials-next .primary {
+    width: 100%;
+  }
+  .plan-question-fields {
+    padding-left: 0;
+  }
+  .plan-question > summary {
+    gap: 12px;
+  }
+  .proposal-topic strong {
+    font-size: 15px;
+  }
+  .source-pagination {
+    gap: 8px;
+  }
+  .source-pagination .text-button {
+    font-size: 11px;
+  }
+  .course-journey ol {
+    gap: 20px;
+  }
+  .course-journey strong {
+    font-size: 11px;
+  }
+}

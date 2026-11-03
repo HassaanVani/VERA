@@ -88,60 +88,60 @@ export default function CourseLibrary({
             </button>
           </div>
         )}
-        <div className="library-toolbar">
-          <div className="filter-tabs" aria-label="Filter courses" role="group">
-            {(
-              [
-                ["yours", "Your courses"],
-                ["samples", "Saved examples"],
-              ] as const
-            ).map(([value, label]) => (
-              <button
-                key={value}
-                aria-pressed={filter === value}
-                onClick={() => setFilter(value)}
-              >
-                {label}
-                <span>
-                  {
-                    packets.filter((p) =>
-                      value === "samples" ? p.fixture : !p.fixture,
-                    ).length
-                  }
-                </span>
-              </button>
-            ))}
+        {packets.length > 0 && (
+          <div className="library-toolbar">
+            <div
+              className="filter-tabs"
+              aria-label="Filter courses"
+              role="group"
+            >
+              {(
+                [
+                  ["yours", "Your courses"],
+                  ["samples", "Saved examples"],
+                ] as const
+              ).map(([value, label]) => (
+                <button
+                  key={value}
+                  aria-pressed={filter === value}
+                  onClick={() => setFilter(value)}
+                >
+                  {label}
+                  <span>
+                    {
+                      packets.filter((p) =>
+                        value === "samples" ? p.fixture : !p.fixture,
+                      ).length
+                    }
+                  </span>
+                </button>
+              ))}
+            </div>
+            <label className="course-search">
+              <Search size={16} />
+              <span className="sr-only">Search courses</span>
+              <input
+                placeholder="Find a course…"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+              />
+              {query && (
+                <button
+                  aria-label="Clear course search"
+                  onClick={() => setQuery("")}
+                >
+                  <X size={14} />
+                </button>
+              )}
+            </label>
           </div>
-          <label className="course-search">
-            <Search size={16} />
-            <span className="sr-only">Search courses</span>
-            <input
-              placeholder="Find a course…"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-            />
-            {query && (
-              <button
-                aria-label="Clear course search"
-                onClick={() => setQuery("")}
-              >
-                <X size={14} />
-              </button>
-            )}
-          </label>
-        </div>
+        )}
         <p className="sr-only" role="status">
           {visible.length} matching courses
         </p>
         <div className="library-list">
           {!packets.some((p) => !p.fixture) && filter === "yours" && !query ? (
             <div className="library-empty">
-              <div className="empty-folio" aria-hidden="true">
-                <span />
-                <span />
-                <span />
-              </div>
-              <span className="eyebrow">A FRESH PAGE</span>
               <h2>What are you studying?</h2>
               <p>
                 Add notes, a past exam, or a reading.
@@ -216,7 +216,7 @@ export default function CourseLibrary({
                         ? revision.approved
                           ? "Ready to generate"
                           : "Review exam plan"
-                        : "Ready to analyze";
+                        : "Open materials";
                 return (
                   <button
                     key={p.id}

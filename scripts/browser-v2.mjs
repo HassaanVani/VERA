@@ -29,13 +29,24 @@ const check = (name, condition) => {
   checks.push(name);
 };
 try {
+  if (!(await snapshot()).meta.testWorkspace)
+    throw new Error(
+      "Browser checks require an isolated credential-disabled VERA_TEST_WORKSPACE=1 server.",
+    );
   await page.goto(base);
   await page.getByText("Explore a saved example", { exact: true }).click();
   await page.getByRole("button", { name: "Try evidence & decisions" }).click();
   await page
     .getByRole("heading", { name: "Question plan", exact: true })
     .waitFor();
+  await page.getByText("Title and subject", { exact: true }).click();
   await page.getByLabel("Subject", { exact: true }).waitFor();
+  await page
+    .locator(".plan-question")
+    .first()
+    .locator("summary")
+    .first()
+    .click();
   await page
     .getByRole("button", { name: "Source evidence & difficulty" })
     .count();
@@ -291,8 +302,9 @@ try {
     .first()
     .click();
   await page
-    .getByRole("heading", { name: "Material readiness", exact: true })
+    .getByRole("heading", { name: "Your files", exact: true })
     .waitFor();
+  await page.getByText("Document details", { exact: true }).click();
   await page
     .getByRole("combobox", {
       name: "Role for VERA original evidence and learning notes",

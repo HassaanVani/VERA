@@ -35,8 +35,16 @@ export default function ExamPlanEditor({
   const summary = useRef<HTMLDivElement>(null);
   function commit(approve: boolean) {
     setValidate(true);
-    if (planProblems(draft, packet).length) {
+    const problems = planProblems(draft, packet);
+    if (problems.length) {
       requestAnimationFrame(() => {
+        for (const problem of problems) {
+          let parent = document.getElementById(problem.id)?.parentElement;
+          while (parent) {
+            if (parent instanceof HTMLDetailsElement) parent.open = true;
+            parent = parent.parentElement;
+          }
+        }
         summary.current?.focus();
         summary.current?.scrollIntoView({
           block: "center",
@@ -69,8 +77,9 @@ export default function ExamPlanEditor({
         <div>
           <h2 id="plan-heading">Question plan</h2>
           <p className="muted">
-            Review the topics first. Adjust the format, marks, and timing where
-            needed.
+            {packet.fixture
+              ? "A saved example, ready for you to adjust."
+              : "Suggested from your files. Open a topic to make changes."}
           </p>
         </div>
       </div>
@@ -102,7 +111,14 @@ export default function ExamPlanEditor({
                   href={`#${e.id}`}
                   onClick={(event) => {
                     event.preventDefault();
-                    document.getElementById(e.id)?.focus();
+                    const field = document.getElementById(e.id);
+                    let parent = field?.parentElement;
+                    while (parent) {
+                      if (parent instanceof HTMLDetailsElement)
+                        parent.open = true;
+                      parent = parent.parentElement;
+                    }
+                    field?.focus();
                   }}
                 >
                   {e.message}
@@ -113,217 +129,259 @@ export default function ExamPlanEditor({
         </div>
       )}
       <fieldset disabled={busy} className="plan-fields">
-        <label htmlFor="plan-subject">Subject</label>
-        <input
-          id="plan-subject"
-          value={draft.domain}
-          maxLength={120}
-          onChange={(event) =>
-            onEdit({
-              ...draft,
-              settingsBasis: "student-selected",
-              domain: event.target.value,
-            })
-          }
-        />
-        <p className="muted small">
-          Plan settings:{" "}
-          {(
-            draft.settingsBasis || "basis not recorded for this legacy plan"
-          ).replaceAll("-", " ")}
-          . Source links show the evidence; inferred settings need your review.
-        </p>
-        <div className="plan-balance">
-          <span>{draft.slots.length} questions</span>
-          <span>{draft.totalPoints} points</span>
-          <span>{draft.minutes} minutes</span>
-          <span>{new Set(draft.slots.map((s) => s.type)).size} formats</span>
-        </div>
-        <label htmlFor="plan-title">Exam title</label>
-        <input
-          id="plan-title"
-          value={draft.title}
-          maxLength={160}
-          aria-invalid={!!errorFor("plan-title")}
-          aria-describedby={
-            errorFor("plan-title") ? "plan-title-error" : undefined
-          }
-          onChange={(e) =>
-            onEdit({
-              ...draft,
-              settingsBasis: "student-selected",
-              title: e.target.value,
-            })
-          }
-        />
-        {errorFor("plan-title") && (
-          <p className="inline-error" id="plan-title-error">
-            {errorFor("plan-title")!.message}
+        <div className="plan-proposal">
+          <h3>{draft.title}</h3>
+          <p>
+            {draft.slots.length} questions · {draft.totalPoints} points ·{" "}
+            {draft.minutes} minutes
           </p>
-        )}
-        <details className="plan-instructions">
+          <small>
+            {(draft.settingsBasis || "legacy basis unrecorded").replaceAll(
+              "-",
+              " ",
+            )}
+          </small>
+        </div>
+        <details className="plan-identity">
           <summary>
-            Exam instructions <ChevronDown size={14} />
+            Title and subject <ChevronDown size={14} />
           </summary>
-          <label>
-            Instructions
-            <textarea
-              rows={3}
-              value={draft.instructions}
-              onChange={(e) =>
-                onEdit({ ...draft, instructions: e.target.value })
-              }
-            />
-          </label>
+          <label htmlFor="plan-subject">Subject</label>
+          <input
+            id="plan-subject"
+            value={draft.domain}
+            maxLength={120}
+            onChange={(event) =>
+              onEdit({
+                ...draft,
+                settingsBasis: "student-selected",
+                domain: event.target.value,
+              })
+            }
+          />
+          <label htmlFor="plan-title">Exam title</label>
+          <input
+            id="plan-title"
+            value={draft.title}
+            maxLength={160}
+            aria-invalid={!!errorFor("plan-title")}
+            aria-describedby={
+              errorFor("plan-title") ? "plan-title-error" : undefined
+            }
+            onChange={(e) =>
+              onEdit({
+                ...draft,
+                settingsBasis: "student-selected",
+                title: e.target.value,
+              })
+            }
+          />
+          {errorFor("plan-title") && (
+            <p className="inline-error" id="plan-title-error">
+              {errorFor("plan-title")!.message}
+            </p>
+          )}
+          <details className="plan-instructions">
+            <summary>
+              Exam instructions <ChevronDown size={14} />
+            </summary>
+            <label>
+              Instructions
+              <textarea
+                rows={3}
+                value={draft.instructions}
+                onChange={(e) =>
+                  onEdit({ ...draft, instructions: e.target.value })
+                }
+              />
+            </label>
+          </details>
         </details>
         <ol className="plan-slots">
           {draft.slots.map((slot, index) => (
             <li key={slot.number}>
-              <div className="plan-slot-heading">
-                <span className="slot-number">
-                  {String(slot.number).padStart(2, "0")}
-                </span>
-                <span className="badge">
-                  {(slot.basis || "legacy basis unrecorded").replaceAll(
-                    "-",
-                    " ",
-                  )}
-                </span>
-                <label htmlFor={`plan-${index}-topic`}>
-                  Topic for question {slot.number}
-                </label>
-              </div>
-              <input
-                id={`plan-${index}-topic`}
-                value={slot.topic}
-                aria-invalid={!!errorFor(`plan-${index}-topic`)}
-                onChange={(e) => updateSlot(index, { topic: e.target.value })}
-              />
-              <div className="plan-slot-settings">
-                <label>
-                  Format
-                  <select
-                    aria-label={`Question ${slot.number} format`}
-                    value={slot.type}
-                    onChange={(e) =>
-                      updateSlot(index, {
-                        type: e.target.value as typeof slot.type,
-                      })
-                    }
-                  >
-                    <option value="multiple-choice">Multiple choice</option>
-                    {draft.schemaVersion === 2 && (
-                      <>
-                        <option value="numeric">Numeric answer</option>
-                        <option value="short-answer">Short answer</option>
-                        <option value="worked-response">Worked response</option>
-                        <option value="essay">Essay</option>
-                      </>
-                    )}
-                    {draft.schemaVersion !== 2 && (
-                      <option value="free-response">
-                        Written response (legacy)
-                      </option>
-                    )}
-                  </select>
-                </label>
-                <label>
-                  Points
-                  <input
-                    id={`plan-${index}-points`}
-                    aria-label={`Question ${slot.number} points`}
-                    type="number"
-                    min={1}
-                    max={100}
-                    value={slot.points || ""}
-                    aria-invalid={!!errorFor(`plan-${index}-points`)}
-                    onChange={(e) =>
-                      updateSlot(index, { points: Number(e.target.value) })
-                    }
-                  />
-                </label>
-                <label>
-                  Minutes
-                  <input
-                    id={`plan-${index}-minutes`}
-                    aria-label={`Question ${slot.number} minutes`}
-                    type="number"
-                    min={1}
-                    max={120}
-                    value={slot.minutes || ""}
-                    aria-invalid={!!errorFor(`plan-${index}-minutes`)}
-                    onChange={(e) =>
-                      updateSlot(index, { minutes: Number(e.target.value) })
-                    }
-                  />
-                </label>
-              </div>
-              {(slot.type === "numeric" || slot.type === "multiple-choice") && (
-                <p className="muted small">
-                  Key-based, all-or-nothing scoring. Choose a worked response if
-                  you want to self-score method and partial credit.
-                </p>
-              )}
-              {errors
-                .filter((e) => e.id.startsWith(`plan-${index}-`))
-                .map((e) => (
-                  <p className="inline-error" key={e.id}>
-                    {e.message}
-                  </p>
-                ))}
-              <details className="plan-slot-context">
+              <details className="plan-question">
                 <summary>
-                  Source evidence & difficulty <ChevronDown size={14} />
+                  <span className="proposal-number">
+                    {String(slot.number).padStart(2, "0")}
+                  </span>
+                  <span className="proposal-topic">
+                    <strong>{slot.topic || "Add a topic"}</strong>
+                    <span>
+                      {
+                        {
+                          "multiple-choice": "Multiple choice",
+                          numeric: "Numeric answer",
+                          "short-answer": "Short answer",
+                          "worked-response": "Worked response",
+                          essay: "Essay",
+                          "free-response": "Written response",
+                        }[slot.type]
+                      }{" "}
+                      · {slot.points} points · {slot.minutes} min
+                    </span>
+                  </span>
+                  <ChevronDown size={15} />
                 </summary>
-                <label>
-                  Learning objective
+                <div className="plan-question-fields">
+                  <div className="plan-slot-heading">
+                    <span className="slot-number">
+                      {String(slot.number).padStart(2, "0")}
+                    </span>
+                    <span className="badge">
+                      {(slot.basis || "legacy basis unrecorded").replaceAll(
+                        "-",
+                        " ",
+                      )}
+                    </span>
+                    <label htmlFor={`plan-${index}-topic`}>
+                      Topic for question {slot.number}
+                    </label>
+                  </div>
                   <input
-                    value={slot.objective || ""}
-                    onChange={(event) =>
-                      updateSlot(index, { objective: event.target.value })
-                    }
-                  />
-                </label>
-                <label>
-                  Section
-                  <input
-                    value={slot.section || ""}
-                    onChange={(event) =>
-                      updateSlot(index, { section: event.target.value })
-                    }
-                  />
-                </label>
-                <p>{slot.pattern}</p>
-                <label>
-                  Difficulty
-                  <select
-                    aria-label={`Question ${slot.number} difficulty`}
-                    value={slot.difficulty}
+                    id={`plan-${index}-topic`}
+                    value={slot.topic}
+                    aria-invalid={!!errorFor(`plan-${index}-topic`)}
                     onChange={(e) =>
-                      updateSlot(index, {
-                        difficulty: e.target.value as typeof slot.difficulty,
-                      })
+                      updateSlot(index, { topic: e.target.value })
                     }
-                  >
-                    <option value="routine">Routine · apply a method</option>
-                    <option value="transfer">
-                      Transfer · use it in a new context
-                    </option>
-                    <option value="synthesis">Synthesis · combine ideas</option>
-                  </select>
-                </label>
-                <div className="plan-source-links">
-                  {slot.evidence.map((ref, i) => (
-                    <button
-                      key={i}
-                      className="source-link"
-                      onClick={() => onSource(ref.documentId, ref.page)}
-                    >
-                      {packet.documents.find((d) => d.id === ref.documentId)
-                        ?.name || "Source"}{" "}
-                      · p. {ref.page}
-                    </button>
-                  ))}
+                  />
+                  <div className="plan-slot-settings">
+                    <label>
+                      Format
+                      <select
+                        aria-label={`Question ${slot.number} format`}
+                        value={slot.type}
+                        onChange={(e) =>
+                          updateSlot(index, {
+                            type: e.target.value as typeof slot.type,
+                          })
+                        }
+                      >
+                        <option value="multiple-choice">Multiple choice</option>
+                        {draft.schemaVersion === 2 && (
+                          <>
+                            <option value="numeric">Numeric answer</option>
+                            <option value="short-answer">Short answer</option>
+                            <option value="worked-response">
+                              Worked response
+                            </option>
+                            <option value="essay">Essay</option>
+                          </>
+                        )}
+                        {draft.schemaVersion !== 2 && (
+                          <option value="free-response">
+                            Written response (legacy)
+                          </option>
+                        )}
+                      </select>
+                    </label>
+                    <label>
+                      Points
+                      <input
+                        id={`plan-${index}-points`}
+                        aria-label={`Question ${slot.number} points`}
+                        type="number"
+                        min={1}
+                        max={100}
+                        value={slot.points || ""}
+                        aria-invalid={!!errorFor(`plan-${index}-points`)}
+                        onChange={(e) =>
+                          updateSlot(index, { points: Number(e.target.value) })
+                        }
+                      />
+                    </label>
+                    <label>
+                      Minutes
+                      <input
+                        id={`plan-${index}-minutes`}
+                        aria-label={`Question ${slot.number} minutes`}
+                        type="number"
+                        min={1}
+                        max={120}
+                        value={slot.minutes || ""}
+                        aria-invalid={!!errorFor(`plan-${index}-minutes`)}
+                        onChange={(e) =>
+                          updateSlot(index, { minutes: Number(e.target.value) })
+                        }
+                      />
+                    </label>
+                  </div>
+                  {(slot.type === "numeric" ||
+                    slot.type === "multiple-choice") && (
+                    <p className="muted small">
+                      Key-based, all-or-nothing scoring. Choose a worked
+                      response if you want to self-score method and partial
+                      credit.
+                    </p>
+                  )}
+                  {errors
+                    .filter((e) => e.id.startsWith(`plan-${index}-`))
+                    .map((e) => (
+                      <p className="inline-error" key={e.id}>
+                        {e.message}
+                      </p>
+                    ))}
+                  <details className="plan-slot-context">
+                    <summary>
+                      Source evidence & difficulty <ChevronDown size={14} />
+                    </summary>
+                    <label>
+                      Learning objective
+                      <input
+                        value={slot.objective || ""}
+                        onChange={(event) =>
+                          updateSlot(index, { objective: event.target.value })
+                        }
+                      />
+                    </label>
+                    <label>
+                      Section
+                      <input
+                        value={slot.section || ""}
+                        onChange={(event) =>
+                          updateSlot(index, { section: event.target.value })
+                        }
+                      />
+                    </label>
+                    <p>{slot.pattern}</p>
+                    <label>
+                      Difficulty
+                      <select
+                        aria-label={`Question ${slot.number} difficulty`}
+                        value={slot.difficulty}
+                        onChange={(e) =>
+                          updateSlot(index, {
+                            difficulty: e.target
+                              .value as typeof slot.difficulty,
+                          })
+                        }
+                      >
+                        <option value="routine">
+                          Routine · apply a method
+                        </option>
+                        <option value="transfer">
+                          Transfer · use it in a new context
+                        </option>
+                        <option value="synthesis">
+                          Synthesis · combine ideas
+                        </option>
+                      </select>
+                    </label>
+                    <div className="plan-source-links">
+                      {slot.evidence.map((ref, i) => (
+                        <button
+                          key={i}
+                          className="source-link"
+                          onClick={() => onSource(ref.documentId, ref.page)}
+                        >
+                          {packet.documents.find((d) => d.id === ref.documentId)
+                            ?.name || "Source"}{" "}
+                          · p. {ref.page}
+                        </button>
+                      ))}
+                    </div>
+                  </details>
                 </div>
               </details>
             </li>
@@ -332,10 +390,6 @@ export default function ExamPlanEditor({
       </fieldset>
       <div className="plan-commit" id="plan-totals" tabIndex={-1}>
         <div>
-          <strong>
-            {draft.slots.length} questions <span>·</span> {draft.totalPoints}{" "}
-            points <span>·</span> {draft.minutes} minutes
-          </strong>
           <p role="status">
             {notice ||
               (dirty

@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { readFile } from "node:fs/promises";
+import nodePath from "node:path";
 import { z } from "zod";
 import { Role } from "@/lib/contracts";
 import type {
@@ -33,6 +34,7 @@ import { generalDemoPacket } from "@/lib/general-demo";
 import { publicExam } from "@/lib/assessment-access";
 import { orderedRevisions } from "@/lib/revisions";
 import { persistFeedback } from "@/lib/feedback";
+import { visibleCourses } from "@/lib/course-archive";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
@@ -57,9 +59,15 @@ export async function GET(
   try {
     guard(req);
     const { path } = await ctx.params;
-    if (path[0] === "workspace")
+    if (path[0] === "workspace") {
+      const packets = visibleCourses();
+      const packetIds = new Set(packets.map((p) => p.id));
+      const exams = list<CheckedExam>("exam").filter((e) =>
+        packetIds.has(e.packetId),
+      );
+      const examIds = new Set(exams.map((e) => e.id));
       return json({
-        packets: list<Packet>("packet").map((p) => ({
+        packets: packets.map((p) => ({
           ...p,
           documents: p.documents.map((d) => ({
             ...d,
@@ -70,15 +78,19 @@ export async function GET(
             })),
           })),
         })),
-        revisions: orderedRevisions(list<Revision>("revision")),
-        jobs: list<Job>("job").map((j) => ({
-          ...j,
-          error: j.error
-            ? "This operation failed. Retry after checking configuration and the source packet; the private diagnostic is retained locally."
-            : undefined,
-        })),
-        exams: list<CheckedExam>("exam").map(publicExam),
-        attempts: list<Attempt>("attempt"),
+        revisions: orderedRevisions(
+          list<Revision>("revision").filter((r) => packetIds.has(r.packetId)),
+        ),
+        jobs: list<Job>("job")
+          .filter((j) => packetIds.has(j.packetId))
+          .map((j) => ({
+            ...j,
+            error: j.error
+              ? "This operation failed. Retry after checking configuration and the source packet; the private diagnostic is retained locally."
+              : undefined,
+          })),
+        exams: exams.map(publicExam),
+        attempts: list<Attempt>("attempt").filter((a) => examIds.has(a.examId)),
         usage: (() => {
           const summary = usageSummary();
           return {
@@ -100,12 +112,19 @@ export async function GET(
           };
         })(),
         meta: {
+          testWorkspace:
+            process.env.VERA_TEST_WORKSPACE === "1" &&
+            !process.env.MODEL_API_KEY &&
+            nodePath.resolve(
+              /* turbopackIgnore: true */ process.env.VERA_DATA_DIR || ".vera",
+            ) !== nodePath.resolve(".vera"),
           configured: !!process.env.MODEL_API_KEY,
           model: modelConfig().model,
           workerOnline: workerOnline(),
           capabilityTested: !!get("probe", modelConfig().model),
         },
       });
+    }
     if (path[0] === "attempts" && path[2] === "solutions") {
       const attempt = get<Attempt>("attempt", path[1]);
       if (!attempt?.submittedAt)

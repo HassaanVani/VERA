@@ -10,7 +10,7 @@ const page = await browser.newPage({ viewport: { width: 1440, height: 1100 } });
 const errors = [];
 page.on("pageerror", (e) => errors.push(e.message));
 await mkdir("output/browser", { recursive: true });
-const base = process.env.VERA_TEST_URL || "http://127.0.0.1:3000";
+const base = process.env.VERA_TEST_URL || "http://127.0.0.1:3001";
 const snapshot = () =>
   page.request.get(`${base}/api/workspace`).then((r) => r.json());
 const screenshot = async (name) => {
@@ -23,12 +23,19 @@ const screenshot = async (name) => {
   });
 };
 try {
-  const initialAttempts = (await snapshot()).attempts.length;
+  const initial = await snapshot();
+  if (!initial.meta.testWorkspace)
+    throw new Error(
+      "Browser checks require an isolated credential-disabled VERA_TEST_WORKSPACE=1 server.",
+    );
+  const initialAttempts = initial.attempts.length;
   await page.goto(base);
   await page
     .getByRole("heading", { name: "Your courses", exact: true })
     .waitFor();
-  await page.getByRole("group", { name: "Filter courses" }).waitFor();
+  await page
+    .getByRole("button", { name: "Add course materials", exact: true })
+    .waitFor();
   await screenshot("overview-desktop");
   // Legacy assessments remain compatible without promoting their subject as the product default.
   const legacy = await page.request
@@ -41,6 +48,7 @@ try {
   await page
     .getByRole("heading", { name: "Question plan" })
     .waitFor({ timeout: 30000 });
+  await page.getByText("Title and subject", { exact: true }).click();
   // Required fields are recoverable and drafts survive an accidental refresh.
   const originalTitle = await page
     .getByLabel("Exam title", { exact: true })
@@ -76,6 +84,12 @@ try {
     .click();
   await page.getByRole("button", { name: "Approve exam plan" }).click();
   await page.getByRole("button", { name: "Generate practice exam" }).waitFor();
+  await page
+    .locator(".plan-question")
+    .first()
+    .locator("summary")
+    .first()
+    .click();
   await page.getByLabel("Question 1 points", { exact: true }).fill("0");
   if (
     await page.getByRole("button", { name: "Generate practice exam" }).count()
@@ -90,6 +104,8 @@ try {
     await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)
   )
     throw new Error("Mobile plan overflows.");
+  if (!(await page.locator(".plan-identity").evaluate((e) => e.open)))
+    await page.getByText("Title and subject", { exact: true }).click();
   const titleWidth = await page
     .getByLabel("Exam title", { exact: true })
     .evaluate((el) => el.getBoundingClientRect().width);
@@ -320,12 +336,22 @@ try {
   await page.getByRole("button", { name: "Approve exam plan" }).click();
   await page.getByRole("button", { name: "Generate practice exam" }).click();
   await page
+    .locator(".exam-header")
     .getByRole("heading", { name: /^Targeted follow-up/ })
     .waitFor({ timeout: 30000 });
   const after = await snapshot();
+  const approvedFollowUp = after.revisions.find(
+    (r) =>
+      r.approved &&
+      (r.parentRevisionId === proposed.id || r.id === proposed.id),
+  );
+  const followUp = after.exams.find(
+    (e) => e.revisionId === approvedFollowUp?.id,
+  );
   if (
-    after.exams[0].exam.questions.length !== 3 ||
-    after.exams[0].scenario.matrix[0][0] === exam.scenario.matrix[0][0]
+    !followUp ||
+    followUp.exam.questions.length !== 3 ||
+    followUp.scenario.matrix[0][0] === exam.scenario.matrix[0][0]
   )
     throw new Error("Follow-up did not create a fresh focused scenario.");
   const forbidden = await page.request.post(`${base}/api/demo`, { data: {} });
@@ -390,20 +416,21 @@ try {
     .getByRole("button", { name: "Save materials", exact: true })
     .click();
   await page
-    .getByRole("heading", { name: "Course evidence", exact: true })
+    .getByRole("heading", { name: "Your files", exact: true })
     .waitFor();
-  await page.getByRole("button", { name: "p. 1", exact: true }).click();
+  await page.getByRole("button", { name: "View pages" }).click();
   await page.getByRole("dialog", { name: "Source page" }).waitFor();
   await page.keyboard.press("Escape");
   await page
-    .getByRole("heading", {
-      name: "Your materials are saved. Connect Meta to build a plan.",
-      exact: true,
+    .getByRole("status")
+    .filter({
+      hasText:
+        "Your files are saved. Connect Meta in settings to create a plan.",
     })
     .waitFor();
   if (
     await page
-      .getByRole("button", { name: "Build exam plan", exact: true })
+      .getByRole("button", { name: "Create practice plan", exact: true })
       .isEnabled()
   )
     throw new Error(
@@ -417,7 +444,9 @@ try {
   await page
     .getByRole("button", { name: "Try reconnecting", exact: true })
     .click();
-  await page.getByText("Local workspace", { exact: true }).waitFor();
+  await page
+    .getByText("VERA isn’t responding.", { exact: true })
+    .waitFor({ state: "hidden" });
   if (errors.length)
     throw new Error(`Browser exceptions: ${errors.join("; ")}`);
   await writeFile(

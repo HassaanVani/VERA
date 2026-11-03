@@ -5,18 +5,18 @@
   font-display: swap;
 }
 :root {
-  --bg: #09152e;
-  --sidebar: #0b1833;
-  --panel: #101f3c;
-  --panel-light: #15294b;
-  --line: #293e62;
-  --blue: #698fff;
-  --blue-light: #b4ceff;
-  --cyan: #93cddd;
-  --text: #edf2fc;
-  --muted: #b1bfd8;
-  --faint: #9aaccb;
-  --radius: 7px;
+  --bg: #07090e;
+  --sidebar: #07090e;
+  --panel: #0d1119;
+  --panel-light: #111826;
+  --line: #252d3d;
+  --blue: #5686ff;
+  --blue-light: #a9c2ff;
+  --cyan: #94b9c8;
+  --text: #e9edf5;
+  --muted: #a9b3c6;
+  --faint: #929eb4;
+  --radius: 6px;
   color-scheme: dark;
 }
 * {

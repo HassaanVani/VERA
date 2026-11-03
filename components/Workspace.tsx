@@ -6,17 +6,12 @@ import {
   ArrowDownToLine,
   ArrowRight,
   ArrowUpRight,
-  BookOpen,
-  ChevronRight,
-  CircleHelp,
   Clock3,
   FileText,
-  FolderOpen,
   Layers3,
   LoaderCircle,
   Plus,
   RotateCcw,
-  Settings2,
   ShieldCheck,
   Target,
   UploadCloud,
@@ -37,6 +32,7 @@ import ExamPlanEditor from "./ExamPlanEditor";
 
 import CourseLibrary from "./CourseLibrary";
 import Brand from "./Brand";
+import CourseMaterials from "./CourseMaterials";
 
 import Exhibits from "./Exhibits";
 
@@ -202,7 +198,12 @@ export default function Workspace() {
     [clock, setClock] = useState(() => Date.now()),
     [error, setError] = useState(""),
     [uploadOpen, setUploadOpen] = useState(false),
-    [source, setSource] = useState<{ url: string; name: string }>(),
+    [source, setSource] = useState<{
+      url: string;
+      name: string;
+      documentId: string;
+      page: number;
+    }>(),
     [startOpen, setStartOpen] = useState(false),
     [uploadReview, setUploadReview] = useState(false),
     [practiceMode, setPracticeMode] = useState<"timed" | "untimed">("timed");
@@ -466,6 +467,8 @@ export default function Workspace() {
 
     setSource({
       name: `${doc?.name || "Source"} · page ${page}`,
+      documentId,
+      page,
 
       url: `/api/source/${documentId}?packet=${packet.id}&page=${page}`,
     });
@@ -588,51 +591,61 @@ export default function Workspace() {
           >
             <Brand />
           </button>
-          <div className="header-location">
-            <span className="header-divider" aria-hidden="true" />
-            {view === "overview" ? (
-              "Your study space"
-            ) : view === "activity" ? (
-              "Settings & activity"
-            ) : (
-              <>
-                <span>Library</span>
-                <ChevronRight size={13} />
-                <span>{packet?.name || "Choose a course"}</span>
-              </>
-            )}
-          </div>
-          <div className="topbar-right">
-            <span className="connection">
-              <span className={`status-dot ${connected ? "" : "offline"}`} />{" "}
-              {connected ? "Local workspace" : "Workspace unavailable"}
-            </span>
-
-            <button
-              className="icon-button"
-              title="Generation settings and activity"
-              aria-label="Generation settings and activity"
-              onClick={() => goto("activity")}
-            >
-              <Settings2 size={18} />
-            </button>
-          </div>
+          <button
+            className="workspace-settings"
+            aria-label="Generation settings and activity"
+            onClick={() => goto("activity")}
+          >
+            Settings
+          </button>
         </header>
 
         <main id="main" tabIndex={-1}>
+          {data &&
+            packetId &&
+            !packet &&
+            view !== "overview" &&
+            view !== "activity" && (
+              <div className="connection-recovery" role="status">
+                <p>
+                  This course is unavailable or archived. Return to your courses
+                  to choose another.
+                </p>
+                <button
+                  className="text-button"
+                  onClick={() => goto("overview")}
+                >
+                  Your courses
+                </button>
+              </div>
+            )}
           <div className="page-title">
             <div>
               <div className="eyebrow">
-                {view === "overview"
-                  ? "YOUR WORK, IN ONE PLACE"
-                  : packet?.name || "YOUR STUDY WORKSPACE"}
+                {view === "overview" ? (
+                  ""
+                ) : view === "activity" ? (
+                  ""
+                ) : (
+                  <>
+                    <button
+                      className="course-return"
+                      onClick={() => goto("overview")}
+                    >
+                      ← Your courses
+                    </button>
+                    {view !== "packet" && packet && (
+                      <span className="course-context">{packet.name}</span>
+                    )}
+                  </>
+                )}
               </div>
 
               <h1>
                 {view === "overview"
                   ? "Your courses"
                   : view === "packet"
-                    ? "Course materials"
+                    ? packet?.name || "Course materials"
                     : view === "blueprint"
                       ? "Review your exam plan"
                       : view === "exam"
@@ -648,7 +661,7 @@ export default function Workspace() {
                 {view === "overview"
                   ? "Pick up where you left off, or bring something new to practice."
                   : view === "packet"
-                    ? "Inspect the extracted pages, then build an exam plan from your evidence."
+                    ? "Start with your files. Then decide what to practice."
                     : view === "blueprint"
                       ? "Check the evidence and shape the exam before generating questions."
                       : view === "exam"
@@ -776,38 +789,6 @@ export default function Workspace() {
                   </div>
                 )}
 
-              {packet && view !== "overview" && view !== "activity" && (
-                <div className="packet-selector">
-                  <FolderOpen size={16} />
-
-                  <label className="sr-only" htmlFor="selected-packet">
-                    Selected course
-                  </label>
-
-                  <select
-                    id="selected-packet"
-                    value={packet.id}
-                    onChange={(e) => {
-                      setPacketId(e.target.value);
-
-                      setExamId("");
-                    }}
-                  >
-                    {data.packets.map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.name}
-                      </option>
-                    ))}
-                  </select>
-
-                  {packet.fixture && (
-                    <span className="badge amber">
-                      Saved example · no live generation
-                    </span>
-                  )}
-                </div>
-              )}
-
               {view === "overview" && (
                 <CourseLibrary
                   packets={data.packets}
@@ -840,187 +821,25 @@ export default function Workspace() {
                     </button>
                   </Empty>
                 ) : (
-                  <>
-                    {!packet.fixture &&
-                      (!data.meta.configured || !data.meta.workerOnline) && (
-                        <section
-                          className="setup-guidance"
-                          aria-labelledby="setup-heading"
-                        >
-                          <CircleHelp size={21} />
-                          <div>
-                            <h2 id="setup-heading">
-                              {!data.meta.configured
-                                ? "Your materials are saved. Connect Meta to build a plan."
-                                : "Your materials are saved. The background worker is offline."}
-                            </h2>
-                            <p>
-                              {!data.meta.configured
-                                ? "Live analysis sends the selected course sources to Meta. You can configure it now, or explore the complete workflow with the sample course."
-                                : "Restart VERA with npm run dev to continue. Your documents and exam plan are still available."}
-                            </p>
-                            <div>
-                              <button
-                                className="secondary"
-                                onClick={() => goto("activity")}
-                              >
-                                Open generation settings
-                              </button>
-                              <button
-                                className="text-button"
-                                onClick={() => void demo()}
-                              >
-                                Explore sample course <ArrowRight size={14} />
-                              </button>
-                            </div>
-                          </div>
-                        </section>
-                      )}
-                    <div className="section-heading">
-                      <div>
-                        <h2>Course evidence</h2>
-                        <p className="muted small">
-                          {packet.documents.length} sources ·{" "}
-                          {packet.documents.reduce(
-                            (sum, d) => sum + d.pages.length,
-                            0,
-                          )}{" "}
-                          pages. Inspect a page to check what VERA will read.
-                        </p>
-                      </div>
-
-                      <button
-                        className="primary"
-                        disabled={
-                          busy ||
-                          !!active ||
-                          (!packet.fixture &&
-                            (!data.meta.configured || !data.meta.workerOnline))
-                        }
-                        onClick={() => void analyze()}
-                      >
-                        Build exam plan <ArrowRight size={16} />
-                      </button>
-                    </div>
-
-                    <div className="material-readiness panel">
-                      <h3>Material readiness</h3>
-                      <p>
-                        {packet.documents.reduce(
-                          (n, d) =>
-                            n +
-                            d.pages.filter(
-                              (p) =>
-                                p.text.trim().length > 80 && !p.needsVision,
-                            ).length,
-                          0,
-                        )}{" "}
-                        pages with readable extracted text ·{" "}
-                        {packet.documents.reduce(
-                          (n, d) =>
-                            n + d.pages.filter((p) => p.needsVision).length,
-                          0,
-                        )}{" "}
-                        pages need visual inspection
-                      </p>
-                      <p>
-                        Check the page previews and document roles below. Role
-                        changes invalidate plan approval.
-                      </p>
-                    </div>
-                    <div className="source-grid">
-                      {packet.documents.map((d) => (
-                        <article className="panel source-card" key={d.id}>
-                          <div className="source-card-top">
-                            <span className="quick-icon">
-                              <FileText size={21} />
-                            </span>
-
-                            <label className="source-role">
-                              Document role
-                              <select
-                                aria-label={`Role for ${d.name}`}
-                                value={d.role}
-                                disabled={busy || !!active}
-                                onChange={(event) =>
-                                  void act(async () => {
-                                    await request(
-                                      `packets/${packet.id}/roles`,
-                                      {
-                                        documentId: d.id,
-                                        role: event.target.value,
-                                      },
-                                    );
-                                  })
-                                }
-                              >
-                                {roles.map((role) => (
-                                  <option key={role} value={role}>
-                                    {roleName(role)}
-                                  </option>
-                                ))}
-                              </select>
-                            </label>
-                          </div>
-
-                          <h3>{d.name}</h3>
-
-                          <p>
-                            {d.pages.length} page
-                            {d.pages.length !== 1 ? "s" : ""} ·{" "}
-                            {d.pages.filter((p) => p.duplicateOf).length}{" "}
-                            duplicate pages
-                          </p>
-
-                          {d.warnings.map((w) => (
-                            <p className="source-warning" key={w}>
-                              <CircleAlert size={13} /> {w}
-                            </p>
-                          ))}
-
-                          <div className="page-links">
-                            {d.pages.map((p) => (
-                              <button
-                                key={p.number}
-                                onClick={() => openSource(d.id, p.number)}
-                                title={
-                                  p.duplicateOf
-                                    ? "Duplicate evidence retained for provenance"
-                                    : "Inspect original page"
-                                }
-                              >
-                                p. {p.number}
-                                {p.duplicateOf ? " ↔" : ""}
-                              </button>
-                            ))}
-                          </div>
-                        </article>
-                      ))}
-                    </div>
-
-                    {!packet.documents.some(
-                      (document) =>
-                        document.role === "past-exam" ||
-                        document.role === "assignment",
-                    ) && (
-                      <p className="evidence-expectation">
-                        <CircleHelp size={16} /> No instructor assessment is
-                        included. The plan can use these materials for topics;
-                        exam format and difficulty will remain inferred.
-                      </p>
-                    )}
-                    <details className="source-policy">
-                      <summary>How VERA uses your materials</summary>
-                      <p>
-                        Document roles were set when you uploaded them. Course
-                        notes and textbook excerpts inform topics. Past
-                        instructor assessments can inform format. AI-generated
-                        references do not establish course scope or exam format.
-                        Uploaded text is treated as evidence, never as
-                        instructions.
-                      </p>
-                    </details>
-                  </>
+                  <CourseMaterials
+                    packet={packet}
+                    busy={busy || !!active}
+                    configured={data.meta.configured}
+                    workerOnline={data.meta.workerOnline}
+                    hasPlan={!!revision}
+                    onAnalyze={() => void analyze()}
+                    onReview={() => goto("blueprint")}
+                    onSettings={() => goto("activity")}
+                    onSource={openSource}
+                    onRole={(documentId, role) =>
+                      void act(async () => {
+                        await request(`packets/${packet.id}/roles`, {
+                          documentId,
+                          role,
+                        });
+                      })
+                    }
+                  />
                 ))}
 
               {view === "blueprint" &&
@@ -1057,18 +876,6 @@ export default function Workspace() {
                   </Empty>
                 ) : (
                   <>
-                    <div className="plan-introduction">
-                      <span className="badge">
-                        {revision.approved && !dirty
-                          ? "Approved"
-                          : "Your review needed"}
-                      </span>
-                      <p>
-                        {revision.approved && !dirty
-                          ? "Your plan is approved. Generate an exam when you’re ready."
-                          : "Check that these topics match what you want to practice. Review the assumptions and open each question’s source evidence where needed."}
-                      </p>
-                    </div>
                     {!!revision.changes?.length && (
                       <section className="panel revision-changes">
                         <h3>Changes since the previous plan</h3>
@@ -1097,12 +904,9 @@ export default function Workspace() {
                         />
                       )}
 
-                      <aside>
-                        <section className="panel evidence-panel">
-                          <h3>
-                            <BookOpen size={17} /> What the evidence says
-                          </h3>
-
+                      <details className="plan-evidence">
+                        <summary>Why these topics?</summary>
+                        <section className="evidence-panel">
                           {draft.observations.map((o, i) => (
                             <div className="observation" key={i}>
                               <span
@@ -1132,7 +936,7 @@ export default function Workspace() {
                             </div>
                           ))}
                         </section>
-                      </aside>
+                      </details>
                     </div>
                   </>
                 ))}
@@ -1968,6 +1772,60 @@ export default function Workspace() {
           </div>
 
           <iframe src={source.url} title={source.name} />
+          <div className="source-pagination">
+            <button
+              className="text-button"
+              disabled={
+                packet?.documents.find((d) => d.id === source.documentId)
+                  ?.pages[0]?.number === source.page
+              }
+              onClick={() => {
+                const pages =
+                  packet?.documents.find((d) => d.id === source.documentId)
+                    ?.pages || [];
+                const i = pages.findIndex((p) => p.number === source.page);
+                if (i > 0) openSource(source.documentId, pages[i - 1].number);
+              }}
+            >
+              Previous page
+            </button>
+            <label>
+              Page
+              <select
+                aria-label="Source page number"
+                value={source.page}
+                onChange={(e) =>
+                  openSource(source.documentId, Number(e.target.value))
+                }
+              >
+                {packet?.documents
+                  .find((d) => d.id === source.documentId)
+                  ?.pages.map((p) => (
+                    <option key={p.number} value={p.number}>
+                      {p.number}
+                    </option>
+                  ))}
+              </select>
+            </label>
+            <button
+              className="text-button"
+              disabled={
+                packet?.documents
+                  .find((d) => d.id === source.documentId)
+                  ?.pages.at(-1)?.number === source.page
+              }
+              onClick={() => {
+                const pages =
+                  packet?.documents.find((d) => d.id === source.documentId)
+                    ?.pages || [];
+                const i = pages.findIndex((p) => p.number === source.page);
+                if (i >= 0 && i < pages.length - 1)
+                  openSource(source.documentId, pages[i + 1].number);
+              }}
+            >
+              Next page
+            </button>
+          </div>
         </Dialog>
       )}
     </div>

@@ -10,9 +10,9 @@ The student's immediate questions are: What do I do next? What are you basing th
 
 ## Interaction rules
 
-- Use one global header and one course-local study path. The VERA wordmark returns to the library; generation settings remain in the header. Avoid a second generic page sidebar or duplicate upload actions.
+- Use a quiet, unboxed brand/settings header and course-local links only for destinations that are available. The VERA wordmark returns to the library; generation settings remain in the header. Avoid a second generic page sidebar or duplicate upload actions.
 - Open the library on the student's courses. Saved examples require an explicit collection or disclosure choice. Uploads start with a blank course name and unassigned document roles; require role selection before review.
-- Use midnight-blue workspace surfaces, restrained blue actions and a single geometric brand mark. Light source/exhibit sheets remain readable within that workspace.
+- Use midnight-black workspace surfaces with restrained blue accents and the approved geometric brand mark. Avoid blue panel fills, framed header islands, decorative connection dots and redundant course selectors. Light source/exhibit sheets remain readable within that workspace. Show uploaded files and one next action before advanced document controls. Present proposed plan topics before their editing fields; validation must open the relevant editor and preserve focus while the student corrects it.
 - Organize navigation around Materials → Exam plan → Practice exam → Review & improve. Model calls, numerical checking, and repair are operations within those tasks.
 - Make reachable study steps clickable. Explain prerequisites in empty states and beside unavailable actions. Never quietly select another course when a URL names a missing course.
 - Keep topic, format, points, and minutes visible in the plan. Put evidence detail, difficulty explanations, and instructions behind clearly named disclosures. Never hide checking failures or uncertainty behind a success badge.

@@ -1,5 +1,4 @@
 "use client";
-import { Check } from "lucide-react";
 
 const steps = [
   { view: "packet", label: "Materials" },
@@ -11,7 +10,6 @@ export default function CourseJourney({
   view,
   hasPacket,
   hasPlan,
-  approved,
   hasExam,
   submitted,
   onNavigate,
@@ -24,55 +22,28 @@ export default function CourseJourney({
   submitted: boolean;
   onNavigate: (view: (typeof steps)[number]["view"]) => void;
 }) {
-  const complete = [hasPacket, approved, submitted, false];
   const available = [true, hasPacket, hasPlan, hasExam];
+  if (!hasPlan && view === "packet") return null;
   return (
     <nav className="course-journey" aria-label="Study steps">
       <ol>
-        {steps.map((step, index) => (
-          <li key={step.view}>
-            <button
-              disabled={!available[index]}
-              aria-current={view === step.view ? "step" : undefined}
-              onClick={() => onNavigate(step.view)}
-            >
-              <span
-                className={`journey-number ${complete[index] ? "complete" : ""}`}
-                aria-hidden="true"
+        {steps.map((step, index) =>
+          available[index] &&
+          (index !== 2 || hasExam || view === "exam") &&
+          (index !== 3 || submitted || view === "results") ? (
+            <li key={step.view}>
+              <button
+                disabled={!available[index]}
+                aria-current={view === step.view ? "step" : undefined}
+                onClick={() => onNavigate(step.view)}
               >
-                {complete[index] ? (
-                  <Check size={13} />
-                ) : (
-                  String(index + 1).padStart(2, "0")
-                )}
-              </span>
-              <span>
-                <strong>{step.label}</strong>
-                <small>
-                  {index === 0
-                    ? hasPacket
-                      ? "Sources added"
-                      : "Add your sources"
-                    : index === 1
-                      ? approved
-                        ? "Approved"
-                        : hasPlan
-                          ? "Review needed"
-                          : "Build a plan"
-                      : index === 2
-                        ? hasExam
-                          ? submitted
-                            ? "Attempt complete"
-                            : "Exam available"
-                          : "Generate questions"
-                        : submitted
-                          ? "Review your work"
-                          : "After practice"}
-                </small>
-              </span>
-            </button>
-          </li>
-        ))}
+                <span>
+                  <strong>{step.label}</strong>
+                </span>
+              </button>
+            </li>
+          ) : null,
+        )}
       </ol>
     </nav>
   );

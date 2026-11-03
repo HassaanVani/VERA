@@ -101,4 +101,16 @@ The reproducible development/final comparison covers linear algebra, microeconom
 
 See [OCW-EVALUATION.md](docs/OCW-EVALUATION.md) for preparation, freezing, paid-run commands, verification coverage and interpretation. Reproduction consumes budget and requires new batch IDs. The first additional campaign is capped at USD 20 inside the existing USD 90 development allocation; the USD 30 reserve remains locked.
 
-The original demo narrative is in [DEMO.md](docs/DEMO.md), and API/checking boundaries are in [ASSESSMENT-V2.md](docs/ASSESSMENT-V2.md). Run `scripts/browser-check.mjs` and `scripts/browser-v2.mjs` against an isolated credential-disabled production server for browser regression checks.
+The original demo narrative is in [DEMO.md](docs/DEMO.md), and API/checking boundaries are in [ASSESSMENT-V2.md](docs/ASSESSMENT-V2.md). Browser runners (`scripts/browser-check.mjs`, `scripts/browser-v2.mjs`, `scripts/browser-cleanup.mjs`) require a credential-disabled server with `VERA_TEST_WORKSPACE=1` and a `VERA_DATA_DIR` different from the normal `.vera` directory. Set a separate `VERA_BUDGET_DIR`, use port 3001 and point `VERA_TEST_URL` there. They refuse the normal workspace before creating records.
+
+## Remove old development data from the library
+
+Old saved examples and byte-matched browser smoke-test uploads can be archived reversibly. Preview the exact candidates first:
+
+```text
+node --experimental-sqlite --import tsx scripts/archive-development.ts
+node --experimental-sqlite --import tsx scripts/archive-development.ts --apply
+node --experimental-sqlite --import tsx scripts/archive-development.ts --restore <course-id>
+```
+
+Archiving writes visibility metadata and a private manifest under the data directory. It preserves the source records, uploads, attempts, verification history and spending. The command only selects known authored demonstration names or the exact browser-test name/file bytes; unrelated real courses stay visible. Existing links to archived courses show an unavailable-course message rather than selecting a different course.

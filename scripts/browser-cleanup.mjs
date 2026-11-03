@@ -31,10 +31,14 @@ try {
   const snapshot = await page.request
     .get(`${base}/api/workspace`)
     .then((r) => r.json());
-  if (snapshot.meta.configured)
-    throw new Error("Run cleanup tests with credentials explicitly disabled.");
+  if (!snapshot.meta.testWorkspace)
+    throw new Error(
+      "Browser checks require an isolated credential-disabled VERA_TEST_WORKSPACE=1 server.",
+    );
   await page.goto(base);
-  await page.getByRole("group", { name: "Filter courses" }).waitFor();
+  await page
+    .getByRole("button", { name: "Add course materials", exact: true })
+    .waitFor();
   check(
     "one upload entry point",
     (await page
@@ -70,13 +74,11 @@ try {
       .count()) === 1,
   );
   await name.fill("My course draft");
-  await page
-    .locator('input[type="file"]')
-    .setInputFiles({
-      name: "lecture-page.png",
-      mimeType: "image/png",
-      buffer: await readFile("fixtures/probe-matrix.png"),
-    });
+  await page.locator('input[type="file"]').setInputFiles({
+    name: "lecture-page.png",
+    mimeType: "image/png",
+    buffer: await readFile("fixtures/probe-matrix.png"),
+  });
   const role = page.getByRole("combobox", {
     name: "Role for lecture-page.png",
   });
@@ -126,15 +128,71 @@ try {
       .getByRole("button", { name: /New course|Add course materials/ })
       .count()) === 0,
   );
+  check(
+    "question editor starts collapsed",
+    !(await page
+      .locator(".plan-question")
+      .first()
+      .evaluate((e) => e.open)),
+  );
+  check(
+    "proposal explains its source instead of unexplained defaults",
+    (await page.locator(".plan-editor").innerText()).includes(
+      "A saved example",
+    ),
+  );
+  await page.getByText("Title and subject", { exact: true }).click();
   const title = page.getByLabel("Exam title", { exact: true });
-  await title.fill("My retained plan edits");
+  await title.fill("");
+  await page
+    .getByRole("button", { name: "Approve exam plan", exact: true })
+    .click();
+  await page
+    .getByRole("alert")
+    .getByText("Check these details before continuing", { exact: true })
+    .waitFor();
+  await title.pressSequentially("My retained plan edits", { delay: 10 });
+  check(
+    "correcting validation does not collapse an active editor",
+    (await title.isVisible()) &&
+      (await title.inputValue()) === "My retained plan edits",
+  );
   await page
     .getByRole("navigation", { name: "Study steps" })
     .getByRole("button", { name: /^Materials/ })
     .click();
   await page
-    .getByRole("heading", { name: "Material readiness", exact: true })
+    .getByRole("heading", { name: "Your files", exact: true })
     .waitFor();
+  check(
+    "materials have one next action",
+    (await page.locator(".materials-workbench .primary").count()) === 1,
+  );
+  check(
+    "document settings start collapsed",
+    !(await page
+      .locator(".material-details")
+      .first()
+      .evaluate((e) => e.open)),
+  );
+  await page.getByRole("button", { name: "View pages" }).click();
+  await page.getByRole("dialog", { name: "Source page" }).waitFor();
+  check(
+    "source location is explicit",
+    (await page
+      .getByRole("combobox", { name: "Source page number" })
+      .inputValue()) === "1",
+  );
+  check(
+    "one-page source has honest traversal boundaries",
+    (await page
+      .getByRole("button", { name: "Previous page", exact: true })
+      .isDisabled()) &&
+      (await page
+        .getByRole("button", { name: "Next page", exact: true })
+        .isDisabled()),
+  );
+  await page.keyboard.press("Escape");
   await page
     .getByRole("navigation", { name: "Study steps" })
     .getByRole("button", { name: /^Exam plan/ })
@@ -152,11 +210,11 @@ try {
       )),
     );
     check(
-      `all study steps visible at ${width}px`,
+      `only available study destinations shown at ${width}px`,
       (await page
         .getByRole("navigation", { name: "Study steps" })
         .getByRole("button")
-        .count()) === 4,
+        .count()) === 2,
     );
   }
   await shot("plan-desktop");
