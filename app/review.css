@@ -1,11 +1,11 @@
 .without-material {
   grid-template-columns: minmax(0, 1fr) !important;
-  max-width: 960px;
+  max-width: none;
 }
 .review-workspace {
   display: grid;
   gap: 24px;
-  max-width: 1200px;
+  max-width: none;
 }
 .review-question-nav {
   display: flex;

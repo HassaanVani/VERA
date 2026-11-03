@@ -1,9 +1,9 @@
 /* Black surfaces; blue identifies actions and the current destination. */
 .topbar {
-  max-width: 1320px;
+  max-width: none;
   height: auto;
   margin: 0 auto;
-  padding: 28px 56px 8px;
+  padding: 28px var(--workspace-gutter) 8px;
   border: 0;
   background: transparent;
   justify-content: space-between;
@@ -105,10 +105,6 @@ textarea {
 .resume-course {
   background: #101722;
   border-color: var(--line);
-}
-.view-packet main,
-.view-blueprint main {
-  max-width: 1080px;
 }
 .course-journey {
   border: 0;
