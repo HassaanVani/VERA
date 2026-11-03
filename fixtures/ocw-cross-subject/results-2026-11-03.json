@@ -1,0 +1,1392 @@
+{
+  "version": 1,
+  "date": "2026-11-03",
+  "method": "Exploratory OCW development followed by a frozen cross-subject candidate; no fine-tuning",
+  "candidateSha256": "30a94be8bcb2142594f2d95c2ab3dac11bfc4b0bd2dc4d1436b9e38724c0dff2",
+  "candidateFilesMatch": {
+    "lib/contracts.ts": true,
+    "lib/prompts.ts": true,
+    "lib/pipeline.ts": true,
+    "lib/domain.ts": true,
+    "lib/verification.ts": true,
+    "lib/provider.ts": true,
+    "lib/feedback.ts": true,
+    "lib/source-policy.ts": true,
+    "lib/store.ts": true,
+    "lib/ocw-benchmark.ts": true,
+    "scripts/ocw-evaluate.ts": true
+  },
+  "cohorts": [
+    {
+      "batch": "development-2026-11-03",
+      "phase": "development",
+      "attempts": 16,
+      "aggregates": [
+        {
+          "candidate": "direct-meta",
+          "attempts": 8,
+          "softwareChecksPassed": 5,
+          "meanLatencyMsFailuresIncluded": 31937.5,
+          "accountedGenerationCost": 0.20544625
+        },
+        {
+          "candidate": "vera",
+          "attempts": 8,
+          "softwareChecksPassed": 6,
+          "meanLatencyMsFailuresIncluded": 160208,
+          "accountedGenerationCost": 1.0014065
+        }
+      ],
+      "perCourse": {
+        "linear-algebra": {
+          "direct-meta": {
+            "passed": 1,
+            "attempts": 2
+          },
+          "vera": {
+            "passed": 1,
+            "attempts": 2
+          }
+        },
+        "microeconomics": {
+          "direct-meta": {
+            "passed": 1,
+            "attempts": 2
+          },
+          "vera": {
+            "passed": 2,
+            "attempts": 2
+          }
+        },
+        "psychology": {
+          "direct-meta": {
+            "passed": 1,
+            "attempts": 2
+          },
+          "vera": {
+            "passed": 2,
+            "attempts": 2
+          }
+        },
+        "history": {
+          "direct-meta": {
+            "passed": 2,
+            "attempts": 2
+          },
+          "vera": {
+            "passed": 1,
+            "attempts": 2
+          }
+        }
+      },
+      "records": [
+        {
+          "course": "microeconomics",
+          "candidate": "direct-meta",
+          "repeat": 1,
+          "latencyMs": 27938,
+          "accountedCost": 0.02440525,
+          "softwareChecksPassed": true,
+          "error": null,
+          "repairAttempts": 0,
+          "issueCodes": [],
+          "metrics": {
+            "questions": 3,
+            "numericalClaims": 1,
+            "numericalClaimsPassed": 1,
+            "unsupportedChecks": 3,
+            "sourceLocationsPassed": 0,
+            "questionsWithCheckableNumerics": 1,
+            "originalityWarnings": 0,
+            "blockingChecks": 0
+          }
+        },
+        {
+          "course": "linear-algebra",
+          "candidate": "direct-meta",
+          "repeat": 1,
+          "latencyMs": 40012,
+          "accountedCost": 0.03963,
+          "softwareChecksPassed": false,
+          "error": null,
+          "repairAttempts": 0,
+          "issueCodes": [
+            "NUMERICAL_CLAIM"
+          ],
+          "metrics": {
+            "questions": 3,
+            "numericalClaims": 2,
+            "numericalClaimsPassed": 2,
+            "unsupportedChecks": 3,
+            "sourceLocationsPassed": 2,
+            "questionsWithCheckableNumerics": 2,
+            "originalityWarnings": 0,
+            "blockingChecks": 1
+          }
+        },
+        {
+          "course": "microeconomics",
+          "candidate": "vera",
+          "repeat": 1,
+          "latencyMs": 161839,
+          "accountedCost": 0.133484,
+          "softwareChecksPassed": true,
+          "error": null,
+          "repairAttempts": 2,
+          "issueCodes": [],
+          "metrics": {
+            "questions": 3,
+            "numericalClaims": 4,
+            "numericalClaimsPassed": 4,
+            "unsupportedChecks": 3,
+            "sourceLocationsPassed": 0,
+            "questionsWithCheckableNumerics": 2,
+            "originalityWarnings": 0,
+            "blockingChecks": 0
+          }
+        },
+        {
+          "course": "linear-algebra",
+          "candidate": "vera",
+          "repeat": 1,
+          "latencyMs": 210156,
+          "accountedCost": 0.17634100000000003,
+          "softwareChecksPassed": false,
+          "error": null,
+          "repairAttempts": 2,
+          "issueCodes": [
+            "NUMERIC_KEY",
+            "REVIEW_LIMIT"
+          ],
+          "metrics": {
+            "questions": 3,
+            "numericalClaims": 3,
+            "numericalClaimsPassed": 3,
+            "unsupportedChecks": 3,
+            "sourceLocationsPassed": 2,
+            "questionsWithCheckableNumerics": 3,
+            "originalityWarnings": 0,
+            "blockingChecks": 1
+          }
+        },
+        {
+          "course": "microeconomics",
+          "candidate": "vera",
+          "repeat": 2,
+          "latencyMs": 94001,
+          "accountedCost": 0.076989,
+          "softwareChecksPassed": true,
+          "error": null,
+          "repairAttempts": 0,
+          "issueCodes": [],
+          "metrics": {
+            "questions": 3,
+            "numericalClaims": 1,
+            "numericalClaimsPassed": 1,
+            "unsupportedChecks": 3,
+            "sourceLocationsPassed": 3,
+            "questionsWithCheckableNumerics": 1,
+            "originalityWarnings": 0,
+            "blockingChecks": 0
+          }
+        },
+        {
+          "course": "microeconomics",
+          "candidate": "direct-meta",
+          "repeat": 2,
+          "latencyMs": 32763,
+          "accountedCost": 0.02601175,
+          "softwareChecksPassed": false,
+          "error": null,
+          "repairAttempts": 0,
+          "issueCodes": [
+            "NUMERICAL_CLAIM"
+          ],
+          "metrics": {
+            "questions": 3,
+            "numericalClaims": 3,
+            "numericalClaimsPassed": 2,
+            "unsupportedChecks": 3,
+            "sourceLocationsPassed": 3,
+            "questionsWithCheckableNumerics": 2,
+            "originalityWarnings": 0,
+            "blockingChecks": 1
+          }
+        },
+        {
+          "course": "linear-algebra",
+          "candidate": "vera",
+          "repeat": 2,
+          "latencyMs": 86635,
+          "accountedCost": 0.08959924999999999,
+          "softwareChecksPassed": true,
+          "error": null,
+          "repairAttempts": 0,
+          "issueCodes": [],
+          "metrics": {
+            "questions": 3,
+            "numericalClaims": 2,
+            "numericalClaimsPassed": 2,
+            "unsupportedChecks": 3,
+            "sourceLocationsPassed": 0,
+            "questionsWithCheckableNumerics": 2,
+            "originalityWarnings": 0,
+            "blockingChecks": 0
+          }
+        },
+        {
+          "course": "linear-algebra",
+          "candidate": "direct-meta",
+          "repeat": 2,
+          "latencyMs": 30417,
+          "accountedCost": 0.03466175,
+          "softwareChecksPassed": true,
+          "error": null,
+          "repairAttempts": 0,
+          "issueCodes": [],
+          "metrics": {
+            "questions": 3,
+            "numericalClaims": 1,
+            "numericalClaimsPassed": 1,
+            "unsupportedChecks": 3,
+            "sourceLocationsPassed": 0,
+            "questionsWithCheckableNumerics": 1,
+            "originalityWarnings": 0,
+            "blockingChecks": 0
+          }
+        },
+        {
+          "course": "psychology",
+          "candidate": "direct-meta",
+          "repeat": 1,
+          "latencyMs": 29617,
+          "accountedCost": 0.0195355,
+          "softwareChecksPassed": true,
+          "error": null,
+          "repairAttempts": 0,
+          "issueCodes": [],
+          "metrics": {
+            "questions": 3,
+            "numericalClaims": 0,
+            "numericalClaimsPassed": 0,
+            "unsupportedChecks": 3,
+            "sourceLocationsPassed": 0,
+            "questionsWithCheckableNumerics": 0,
+            "originalityWarnings": 0,
+            "blockingChecks": 0
+          }
+        },
+        {
+          "course": "history",
+          "candidate": "direct-meta",
+          "repeat": 1,
+          "latencyMs": 35259,
+          "accountedCost": 0.021883,
+          "softwareChecksPassed": true,
+          "error": null,
+          "repairAttempts": 0,
+          "issueCodes": [],
+          "metrics": {
+            "questions": 3,
+            "numericalClaims": 0,
+            "numericalClaimsPassed": 0,
+            "unsupportedChecks": 3,
+            "sourceLocationsPassed": 3,
+            "questionsWithCheckableNumerics": 0,
+            "originalityWarnings": 0,
+            "blockingChecks": 0
+          }
+        },
+        {
+          "course": "psychology",
+          "candidate": "vera",
+          "repeat": 1,
+          "latencyMs": 64060,
+          "accountedCost": 0.045790000000000004,
+          "softwareChecksPassed": true,
+          "error": null,
+          "repairAttempts": 0,
+          "issueCodes": [],
+          "metrics": {
+            "questions": 3,
+            "numericalClaims": 0,
+            "numericalClaimsPassed": 0,
+            "unsupportedChecks": 3,
+            "sourceLocationsPassed": 0,
+            "questionsWithCheckableNumerics": 0,
+            "originalityWarnings": 0,
+            "blockingChecks": 0
+          }
+        },
+        {
+          "course": "psychology",
+          "candidate": "vera",
+          "repeat": 2,
+          "latencyMs": 78574,
+          "accountedCost": 0.05177425,
+          "softwareChecksPassed": true,
+          "error": null,
+          "repairAttempts": 0,
+          "issueCodes": [],
+          "metrics": {
+            "questions": 3,
+            "numericalClaims": 0,
+            "numericalClaimsPassed": 0,
+            "unsupportedChecks": 3,
+            "sourceLocationsPassed": 0,
+            "questionsWithCheckableNumerics": 0,
+            "originalityWarnings": 0,
+            "blockingChecks": 0
+          }
+        },
+        {
+          "course": "psychology",
+          "candidate": "direct-meta",
+          "repeat": 2,
+          "latencyMs": 25335,
+          "accountedCost": 0.0181415,
+          "softwareChecksPassed": false,
+          "error": null,
+          "repairAttempts": 0,
+          "issueCodes": [
+            "NUMERICAL_CLAIM"
+          ],
+          "metrics": {
+            "questions": 3,
+            "numericalClaims": 0,
+            "numericalClaimsPassed": 0,
+            "unsupportedChecks": 3,
+            "sourceLocationsPassed": 1,
+            "questionsWithCheckableNumerics": 0,
+            "originalityWarnings": 0,
+            "blockingChecks": 1
+          }
+        },
+        {
+          "course": "history",
+          "candidate": "vera",
+          "repeat": 1,
+          "latencyMs": 290030,
+          "accountedCost": 0.20757475,
+          "softwareChecksPassed": true,
+          "error": null,
+          "repairAttempts": 2,
+          "issueCodes": [],
+          "metrics": {
+            "questions": 3,
+            "numericalClaims": 6,
+            "numericalClaimsPassed": 0,
+            "unsupportedChecks": 9,
+            "sourceLocationsPassed": 0,
+            "questionsWithCheckableNumerics": 0,
+            "originalityWarnings": 0,
+            "blockingChecks": 0
+          }
+        },
+        {
+          "course": "history",
+          "candidate": "vera",
+          "repeat": 2,
+          "latencyMs": 296369,
+          "accountedCost": 0.21985425,
+          "softwareChecksPassed": false,
+          "error": null,
+          "repairAttempts": 2,
+          "issueCodes": [
+            "NO_EVIDENCE",
+            "NO_EVIDENCE",
+            "NO_EVIDENCE",
+            "NUMERICAL_CLAIM",
+            "NUMERICAL_CLAIM",
+            "NUMERICAL_CLAIM",
+            "NUMERICAL_CLAIM",
+            "NUMERICAL_CLAIM",
+            "NUMERICAL_CLAIM",
+            "NUMERICAL_CLAIM",
+            "NUMERICAL_CLAIM",
+            "NUMERICAL_CLAIM",
+            "SOLUTION_REVIEW",
+            "SOLUTION_REVIEW",
+            "SOLUTION_REVIEW"
+          ],
+          "metrics": {
+            "questions": 3,
+            "numericalClaims": 7,
+            "numericalClaimsPassed": 0,
+            "unsupportedChecks": 10,
+            "sourceLocationsPassed": 0,
+            "questionsWithCheckableNumerics": 0,
+            "originalityWarnings": 0,
+            "blockingChecks": 15
+          }
+        },
+        {
+          "course": "history",
+          "candidate": "direct-meta",
+          "repeat": 2,
+          "latencyMs": 34159,
+          "accountedCost": 0.0211775,
+          "softwareChecksPassed": true,
+          "error": null,
+          "repairAttempts": 0,
+          "issueCodes": [],
+          "metrics": {
+            "questions": 3,
+            "numericalClaims": 0,
+            "numericalClaimsPassed": 0,
+            "unsupportedChecks": 3,
+            "sourceLocationsPassed": 0,
+            "questionsWithCheckableNumerics": 0,
+            "originalityWarnings": 0,
+            "blockingChecks": 0
+          }
+        }
+      ],
+      "independentAudit": {
+        "method": "Independent Python AST and exact Fraction arithmetic",
+        "checkedClaims": 17,
+        "passedClaims": 16,
+        "failedClaims": 1,
+        "unsupportedClaims": 13,
+        "limitation": "Checks structured mathematical claims, not their relevance, prose reasoning, difficulty, factual entailment or essay quality."
+      },
+      "accountedCostIncludingAlignmentByJobId": 1.25056725,
+      "callsIncludingRetriesAndAlignment": 68,
+      "provisionalAlignment": [
+        {
+          "course": "linear-algebra",
+          "basis": "provisional-model-judgment",
+          "referenceLexicalOverlap": [
+            {
+              "candidate": "direct-meta",
+              "repeat": 1,
+              "maxEightWordOverlap": 0
+            },
+            {
+              "candidate": "vera",
+              "repeat": 1,
+              "maxEightWordOverlap": 0
+            },
+            {
+              "candidate": "vera",
+              "repeat": 2,
+              "maxEightWordOverlap": 0
+            },
+            {
+              "candidate": "direct-meta",
+              "repeat": 2,
+              "maxEightWordOverlap": 0
+            }
+          ],
+          "referenceHasKey": true
+        },
+        {
+          "course": "microeconomics",
+          "basis": "provisional-model-judgment",
+          "referenceLexicalOverlap": [
+            {
+              "candidate": "direct-meta",
+              "repeat": 1,
+              "maxEightWordOverlap": 0
+            },
+            {
+              "candidate": "vera",
+              "repeat": 1,
+              "maxEightWordOverlap": 0
+            },
+            {
+              "candidate": "vera",
+              "repeat": 2,
+              "maxEightWordOverlap": 0
+            },
+            {
+              "candidate": "direct-meta",
+              "repeat": 2,
+              "maxEightWordOverlap": 0
+            }
+          ],
+          "referenceHasKey": true
+        },
+        {
+          "course": "psychology",
+          "basis": "provisional-model-judgment",
+          "referenceLexicalOverlap": [
+            {
+              "candidate": "direct-meta",
+              "repeat": 1,
+              "maxEightWordOverlap": 0
+            },
+            {
+              "candidate": "vera",
+              "repeat": 1,
+              "maxEightWordOverlap": 0
+            },
+            {
+              "candidate": "vera",
+              "repeat": 2,
+              "maxEightWordOverlap": 0
+            },
+            {
+              "candidate": "direct-meta",
+              "repeat": 2,
+              "maxEightWordOverlap": 0
+            }
+          ],
+          "referenceHasKey": true
+        },
+        {
+          "course": "history",
+          "basis": "provisional-model-judgment",
+          "referenceLexicalOverlap": [
+            {
+              "candidate": "direct-meta",
+              "repeat": 1,
+              "maxEightWordOverlap": 0
+            },
+            {
+              "candidate": "vera",
+              "repeat": 1,
+              "maxEightWordOverlap": 0
+            },
+            {
+              "candidate": "vera",
+              "repeat": 2,
+              "maxEightWordOverlap": 0
+            },
+            {
+              "candidate": "direct-meta",
+              "repeat": 2,
+              "maxEightWordOverlap": 0
+            }
+          ],
+          "referenceHasKey": false
+        }
+      ],
+      "limitations": [
+        "Selected course excerpts, not representative of all subjects or full MIT exams.",
+        "History uses writing assignments without an official answer key.",
+        "Topic/format/reasoning alignment judged by a model is provisional, not independent ground truth.",
+        "Public-source pretraining contamination cannot be ruled out.",
+        "The prior linear algebra development target was already inspected in an earlier evaluation.",
+        "Cross-semester notes do not support chronological exam-prediction claims.",
+        "Failures stay in denominators. No learning gains or difficulty equivalence are established."
+      ]
+    },
+    {
+      "batch": "final-2026-11-03",
+      "phase": "evaluation",
+      "attempts": 24,
+      "aggregates": [
+        {
+          "candidate": "direct-meta",
+          "attempts": 12,
+          "softwareChecksPassed": 10,
+          "meanLatencyMsFailuresIncluded": 29929.5,
+          "accountedGenerationCost": 0.30193975
+        },
+        {
+          "candidate": "vera",
+          "attempts": 12,
+          "softwareChecksPassed": 12,
+          "meanLatencyMsFailuresIncluded": 96503,
+          "accountedGenerationCost": 0.98833575
+        }
+      ],
+      "perCourse": {
+        "linear-algebra": {
+          "direct-meta": {
+            "passed": 3,
+            "attempts": 3
+          },
+          "vera": {
+            "passed": 3,
+            "attempts": 3
+          }
+        },
+        "microeconomics": {
+          "direct-meta": {
+            "passed": 1,
+            "attempts": 3
+          },
+          "vera": {
+            "passed": 3,
+            "attempts": 3
+          }
+        },
+        "psychology": {
+          "direct-meta": {
+            "passed": 3,
+            "attempts": 3
+          },
+          "vera": {
+            "passed": 3,
+            "attempts": 3
+          }
+        },
+        "history": {
+          "direct-meta": {
+            "passed": 3,
+            "attempts": 3
+          },
+          "vera": {
+            "passed": 3,
+            "attempts": 3
+          }
+        }
+      },
+      "records": [
+        {
+          "course": "linear-algebra",
+          "candidate": "direct-meta",
+          "repeat": 1,
+          "latencyMs": 29439,
+          "accountedCost": 0.03263225,
+          "softwareChecksPassed": true,
+          "error": null,
+          "repairAttempts": 0,
+          "issueCodes": [],
+          "metrics": {
+            "questions": 3,
+            "numericalClaims": 1,
+            "numericalClaimsPassed": 1,
+            "unsupportedChecks": 3,
+            "sourceLocationsPassed": 0,
+            "questionsWithCheckableNumerics": 1,
+            "originalityWarnings": 0,
+            "blockingChecks": 0
+          }
+        },
+        {
+          "course": "microeconomics",
+          "candidate": "direct-meta",
+          "repeat": 1,
+          "latencyMs": 34819,
+          "accountedCost": 0.0327345,
+          "softwareChecksPassed": false,
+          "error": null,
+          "repairAttempts": 0,
+          "issueCodes": [
+            "NUMERICAL_CLAIM"
+          ],
+          "metrics": {
+            "questions": 3,
+            "numericalClaims": 3,
+            "numericalClaimsPassed": 3,
+            "unsupportedChecks": 3,
+            "sourceLocationsPassed": 0,
+            "questionsWithCheckableNumerics": 2,
+            "originalityWarnings": 0,
+            "blockingChecks": 1
+          }
+        },
+        {
+          "course": "linear-algebra",
+          "candidate": "vera",
+          "repeat": 1,
+          "latencyMs": 66268,
+          "accountedCost": 0.080285,
+          "softwareChecksPassed": true,
+          "error": null,
+          "repairAttempts": 0,
+          "issueCodes": [],
+          "metrics": {
+            "questions": 3,
+            "numericalClaims": 1,
+            "numericalClaimsPassed": 1,
+            "unsupportedChecks": 3,
+            "sourceLocationsPassed": 0,
+            "questionsWithCheckableNumerics": 1,
+            "originalityWarnings": 0,
+            "blockingChecks": 0
+          }
+        },
+        {
+          "course": "microeconomics",
+          "candidate": "vera",
+          "repeat": 1,
+          "latencyMs": 112103,
+          "accountedCost": 0.11451475,
+          "softwareChecksPassed": true,
+          "error": null,
+          "repairAttempts": 1,
+          "issueCodes": [],
+          "metrics": {
+            "questions": 3,
+            "numericalClaims": 2,
+            "numericalClaimsPassed": 2,
+            "unsupportedChecks": 3,
+            "sourceLocationsPassed": 0,
+            "questionsWithCheckableNumerics": 2,
+            "originalityWarnings": 0,
+            "blockingChecks": 0
+          }
+        },
+        {
+          "course": "linear-algebra",
+          "candidate": "vera",
+          "repeat": 2,
+          "latencyMs": 71864,
+          "accountedCost": 0.08183850000000001,
+          "softwareChecksPassed": true,
+          "error": null,
+          "repairAttempts": 0,
+          "issueCodes": [],
+          "metrics": {
+            "questions": 3,
+            "numericalClaims": 1,
+            "numericalClaimsPassed": 1,
+            "unsupportedChecks": 3,
+            "sourceLocationsPassed": 0,
+            "questionsWithCheckableNumerics": 1,
+            "originalityWarnings": 0,
+            "blockingChecks": 0
+          }
+        },
+        {
+          "course": "linear-algebra",
+          "candidate": "direct-meta",
+          "repeat": 2,
+          "latencyMs": 25343,
+          "accountedCost": 0.031557,
+          "softwareChecksPassed": true,
+          "error": null,
+          "repairAttempts": 0,
+          "issueCodes": [],
+          "metrics": {
+            "questions": 3,
+            "numericalClaims": 4,
+            "numericalClaimsPassed": 4,
+            "unsupportedChecks": 3,
+            "sourceLocationsPassed": 0,
+            "questionsWithCheckableNumerics": 3,
+            "originalityWarnings": 0,
+            "blockingChecks": 0
+          }
+        },
+        {
+          "course": "linear-algebra",
+          "candidate": "direct-meta",
+          "repeat": 3,
+          "latencyMs": 27195,
+          "accountedCost": 0.03166325,
+          "softwareChecksPassed": true,
+          "error": null,
+          "repairAttempts": 0,
+          "issueCodes": [],
+          "metrics": {
+            "questions": 3,
+            "numericalClaims": 1,
+            "numericalClaimsPassed": 1,
+            "unsupportedChecks": 3,
+            "sourceLocationsPassed": 0,
+            "questionsWithCheckableNumerics": 1,
+            "originalityWarnings": 0,
+            "blockingChecks": 0
+          }
+        },
+        {
+          "course": "microeconomics",
+          "candidate": "vera",
+          "repeat": 2,
+          "latencyMs": 75866,
+          "accountedCost": 0.07839175,
+          "softwareChecksPassed": true,
+          "error": null,
+          "repairAttempts": 0,
+          "issueCodes": [],
+          "metrics": {
+            "questions": 3,
+            "numericalClaims": 1,
+            "numericalClaimsPassed": 1,
+            "unsupportedChecks": 3,
+            "sourceLocationsPassed": 0,
+            "questionsWithCheckableNumerics": 1,
+            "originalityWarnings": 0,
+            "blockingChecks": 0
+          }
+        },
+        {
+          "course": "microeconomics",
+          "candidate": "direct-meta",
+          "repeat": 2,
+          "latencyMs": 30878,
+          "accountedCost": 0.0307115,
+          "softwareChecksPassed": false,
+          "error": null,
+          "repairAttempts": 0,
+          "issueCodes": [
+            "NUMERICAL_CLAIM"
+          ],
+          "metrics": {
+            "questions": 3,
+            "numericalClaims": 4,
+            "numericalClaimsPassed": 4,
+            "unsupportedChecks": 3,
+            "sourceLocationsPassed": 0,
+            "questionsWithCheckableNumerics": 2,
+            "originalityWarnings": 0,
+            "blockingChecks": 1
+          }
+        },
+        {
+          "course": "microeconomics",
+          "candidate": "direct-meta",
+          "repeat": 3,
+          "latencyMs": 35030,
+          "accountedCost": 0.0335505,
+          "softwareChecksPassed": true,
+          "error": null,
+          "repairAttempts": 0,
+          "issueCodes": [],
+          "metrics": {
+            "questions": 3,
+            "numericalClaims": 1,
+            "numericalClaimsPassed": 1,
+            "unsupportedChecks": 3,
+            "sourceLocationsPassed": 0,
+            "questionsWithCheckableNumerics": 1,
+            "originalityWarnings": 0,
+            "blockingChecks": 0
+          }
+        },
+        {
+          "course": "linear-algebra",
+          "candidate": "vera",
+          "repeat": 3,
+          "latencyMs": 119533,
+          "accountedCost": 0.11942724999999998,
+          "softwareChecksPassed": true,
+          "error": null,
+          "repairAttempts": 1,
+          "issueCodes": [],
+          "metrics": {
+            "questions": 3,
+            "numericalClaims": 3,
+            "numericalClaimsPassed": 3,
+            "unsupportedChecks": 3,
+            "sourceLocationsPassed": 0,
+            "questionsWithCheckableNumerics": 2,
+            "originalityWarnings": 0,
+            "blockingChecks": 0
+          }
+        },
+        {
+          "course": "microeconomics",
+          "candidate": "vera",
+          "repeat": 3,
+          "latencyMs": 123207,
+          "accountedCost": 0.1148265,
+          "softwareChecksPassed": true,
+          "error": null,
+          "repairAttempts": 1,
+          "issueCodes": [],
+          "metrics": {
+            "questions": 3,
+            "numericalClaims": 6,
+            "numericalClaimsPassed": 4,
+            "unsupportedChecks": 5,
+            "sourceLocationsPassed": 0,
+            "questionsWithCheckableNumerics": 2,
+            "originalityWarnings": 0,
+            "blockingChecks": 0
+          }
+        },
+        {
+          "course": "psychology",
+          "candidate": "direct-meta",
+          "repeat": 1,
+          "latencyMs": 20718,
+          "accountedCost": 0.01439125,
+          "softwareChecksPassed": true,
+          "error": null,
+          "repairAttempts": 0,
+          "issueCodes": [],
+          "metrics": {
+            "questions": 3,
+            "numericalClaims": 0,
+            "numericalClaimsPassed": 0,
+            "unsupportedChecks": 3,
+            "sourceLocationsPassed": 0,
+            "questionsWithCheckableNumerics": 0,
+            "originalityWarnings": 0,
+            "blockingChecks": 0
+          }
+        },
+        {
+          "course": "history",
+          "candidate": "direct-meta",
+          "repeat": 1,
+          "latencyMs": 34037,
+          "accountedCost": 0.018952,
+          "softwareChecksPassed": true,
+          "error": null,
+          "repairAttempts": 0,
+          "issueCodes": [],
+          "metrics": {
+            "questions": 3,
+            "numericalClaims": 0,
+            "numericalClaimsPassed": 0,
+            "unsupportedChecks": 3,
+            "sourceLocationsPassed": 1,
+            "questionsWithCheckableNumerics": 0,
+            "originalityWarnings": 0,
+            "blockingChecks": 0
+          }
+        },
+        {
+          "course": "psychology",
+          "candidate": "vera",
+          "repeat": 1,
+          "latencyMs": 68488,
+          "accountedCost": 0.0456885,
+          "softwareChecksPassed": true,
+          "error": null,
+          "repairAttempts": 0,
+          "issueCodes": [],
+          "metrics": {
+            "questions": 3,
+            "numericalClaims": 0,
+            "numericalClaimsPassed": 0,
+            "unsupportedChecks": 3,
+            "sourceLocationsPassed": 0,
+            "questionsWithCheckableNumerics": 0,
+            "originalityWarnings": 0,
+            "blockingChecks": 0
+          }
+        },
+        {
+          "course": "history",
+          "candidate": "vera",
+          "repeat": 1,
+          "latencyMs": 82405,
+          "accountedCost": 0.050666749999999997,
+          "softwareChecksPassed": true,
+          "error": null,
+          "repairAttempts": 0,
+          "issueCodes": [],
+          "metrics": {
+            "questions": 3,
+            "numericalClaims": 0,
+            "numericalClaimsPassed": 0,
+            "unsupportedChecks": 3,
+            "sourceLocationsPassed": 0,
+            "questionsWithCheckableNumerics": 0,
+            "originalityWarnings": 0,
+            "blockingChecks": 0
+          }
+        },
+        {
+          "course": "psychology",
+          "candidate": "vera",
+          "repeat": 2,
+          "latencyMs": 97039,
+          "accountedCost": 0.07175175,
+          "softwareChecksPassed": true,
+          "error": null,
+          "repairAttempts": 1,
+          "issueCodes": [],
+          "metrics": {
+            "questions": 3,
+            "numericalClaims": 0,
+            "numericalClaimsPassed": 0,
+            "unsupportedChecks": 3,
+            "sourceLocationsPassed": 0,
+            "questionsWithCheckableNumerics": 0,
+            "originalityWarnings": 0,
+            "blockingChecks": 0
+          }
+        },
+        {
+          "course": "psychology",
+          "candidate": "direct-meta",
+          "repeat": 2,
+          "latencyMs": 24542,
+          "accountedCost": 0.015849,
+          "softwareChecksPassed": true,
+          "error": null,
+          "repairAttempts": 0,
+          "issueCodes": [],
+          "metrics": {
+            "questions": 3,
+            "numericalClaims": 0,
+            "numericalClaimsPassed": 0,
+            "unsupportedChecks": 3,
+            "sourceLocationsPassed": 0,
+            "questionsWithCheckableNumerics": 0,
+            "originalityWarnings": 0,
+            "blockingChecks": 0
+          }
+        },
+        {
+          "course": "psychology",
+          "candidate": "direct-meta",
+          "repeat": 3,
+          "latencyMs": 24147,
+          "accountedCost": 0.016155,
+          "softwareChecksPassed": true,
+          "error": null,
+          "repairAttempts": 0,
+          "issueCodes": [],
+          "metrics": {
+            "questions": 3,
+            "numericalClaims": 0,
+            "numericalClaimsPassed": 0,
+            "unsupportedChecks": 3,
+            "sourceLocationsPassed": 0,
+            "questionsWithCheckableNumerics": 0,
+            "originalityWarnings": 0,
+            "blockingChecks": 0
+          }
+        },
+        {
+          "course": "history",
+          "candidate": "vera",
+          "repeat": 2,
+          "latencyMs": 137890,
+          "accountedCost": 0.08787175,
+          "softwareChecksPassed": true,
+          "error": null,
+          "repairAttempts": 1,
+          "issueCodes": [],
+          "metrics": {
+            "questions": 3,
+            "numericalClaims": 0,
+            "numericalClaimsPassed": 0,
+            "unsupportedChecks": 3,
+            "sourceLocationsPassed": 0,
+            "questionsWithCheckableNumerics": 0,
+            "originalityWarnings": 0,
+            "blockingChecks": 0
+          }
+        },
+        {
+          "course": "history",
+          "candidate": "direct-meta",
+          "repeat": 2,
+          "latencyMs": 37043,
+          "accountedCost": 0.022318,
+          "softwareChecksPassed": true,
+          "error": null,
+          "repairAttempts": 0,
+          "issueCodes": [],
+          "metrics": {
+            "questions": 3,
+            "numericalClaims": 0,
+            "numericalClaimsPassed": 0,
+            "unsupportedChecks": 3,
+            "sourceLocationsPassed": 0,
+            "questionsWithCheckableNumerics": 0,
+            "originalityWarnings": 0,
+            "blockingChecks": 0
+          }
+        },
+        {
+          "course": "psychology",
+          "candidate": "vera",
+          "repeat": 3,
+          "latencyMs": 67343,
+          "accountedCost": 0.047286,
+          "softwareChecksPassed": true,
+          "error": null,
+          "repairAttempts": 0,
+          "issueCodes": [],
+          "metrics": {
+            "questions": 3,
+            "numericalClaims": 0,
+            "numericalClaimsPassed": 0,
+            "unsupportedChecks": 3,
+            "sourceLocationsPassed": 0,
+            "questionsWithCheckableNumerics": 0,
+            "originalityWarnings": 0,
+            "blockingChecks": 0
+          }
+        },
+        {
+          "course": "history",
+          "candidate": "direct-meta",
+          "repeat": 3,
+          "latencyMs": 35963,
+          "accountedCost": 0.0214255,
+          "softwareChecksPassed": true,
+          "error": null,
+          "repairAttempts": 0,
+          "issueCodes": [],
+          "metrics": {
+            "questions": 3,
+            "numericalClaims": 1,
+            "numericalClaimsPassed": 1,
+            "unsupportedChecks": 3,
+            "sourceLocationsPassed": 0,
+            "questionsWithCheckableNumerics": 1,
+            "originalityWarnings": 0,
+            "blockingChecks": 0
+          }
+        },
+        {
+          "course": "history",
+          "candidate": "vera",
+          "repeat": 3,
+          "latencyMs": 136030,
+          "accountedCost": 0.09578724999999999,
+          "softwareChecksPassed": true,
+          "error": null,
+          "repairAttempts": 1,
+          "issueCodes": [],
+          "metrics": {
+            "questions": 3,
+            "numericalClaims": 0,
+            "numericalClaimsPassed": 0,
+            "unsupportedChecks": 3,
+            "sourceLocationsPassed": 0,
+            "questionsWithCheckableNumerics": 0,
+            "originalityWarnings": 0,
+            "blockingChecks": 0
+          }
+        }
+      ],
+      "independentAudit": {
+        "method": "Independent Python AST and exact Fraction arithmetic",
+        "checkedClaims": 27,
+        "passedClaims": 27,
+        "failedClaims": 0,
+        "unsupportedClaims": 2,
+        "limitation": "Checks structured mathematical claims, not their relevance, prose reasoning, difficulty, factual entailment or essay quality."
+      },
+      "accountedCostIncludingAlignmentByJobId": 1.33532375,
+      "callsIncludingRetriesAndAlignment": 82,
+      "provisionalAlignment": [
+        {
+          "course": "linear-algebra",
+          "basis": "provisional-model-judgment",
+          "referenceLexicalOverlap": [
+            {
+              "candidate": "direct-meta",
+              "repeat": 1,
+              "maxEightWordOverlap": 0
+            },
+            {
+              "candidate": "vera",
+              "repeat": 1,
+              "maxEightWordOverlap": 0
+            },
+            {
+              "candidate": "vera",
+              "repeat": 2,
+              "maxEightWordOverlap": 0
+            },
+            {
+              "candidate": "direct-meta",
+              "repeat": 2,
+              "maxEightWordOverlap": 0
+            },
+            {
+              "candidate": "direct-meta",
+              "repeat": 3,
+              "maxEightWordOverlap": 0
+            },
+            {
+              "candidate": "vera",
+              "repeat": 3,
+              "maxEightWordOverlap": 0
+            }
+          ],
+          "referenceHasKey": true
+        },
+        {
+          "course": "microeconomics",
+          "basis": "provisional-model-judgment",
+          "referenceLexicalOverlap": [
+            {
+              "candidate": "direct-meta",
+              "repeat": 1,
+              "maxEightWordOverlap": 0
+            },
+            {
+              "candidate": "vera",
+              "repeat": 1,
+              "maxEightWordOverlap": 0
+            },
+            {
+              "candidate": "vera",
+              "repeat": 2,
+              "maxEightWordOverlap": 0
+            },
+            {
+              "candidate": "direct-meta",
+              "repeat": 2,
+              "maxEightWordOverlap": 0
+            },
+            {
+              "candidate": "direct-meta",
+              "repeat": 3,
+              "maxEightWordOverlap": 0
+            },
+            {
+              "candidate": "vera",
+              "repeat": 3,
+              "maxEightWordOverlap": 0
+            }
+          ],
+          "referenceHasKey": true
+        },
+        {
+          "course": "psychology",
+          "basis": "provisional-model-judgment",
+          "referenceLexicalOverlap": [
+            {
+              "candidate": "direct-meta",
+              "repeat": 1,
+              "maxEightWordOverlap": 0
+            },
+            {
+              "candidate": "vera",
+              "repeat": 1,
+              "maxEightWordOverlap": 0
+            },
+            {
+              "candidate": "vera",
+              "repeat": 2,
+              "maxEightWordOverlap": 0
+            },
+            {
+              "candidate": "direct-meta",
+              "repeat": 2,
+              "maxEightWordOverlap": 0
+            },
+            {
+              "candidate": "direct-meta",
+              "repeat": 3,
+              "maxEightWordOverlap": 0
+            },
+            {
+              "candidate": "vera",
+              "repeat": 3,
+              "maxEightWordOverlap": 0
+            }
+          ],
+          "referenceHasKey": true
+        },
+        {
+          "course": "history",
+          "basis": "provisional-model-judgment",
+          "referenceLexicalOverlap": [
+            {
+              "candidate": "direct-meta",
+              "repeat": 1,
+              "maxEightWordOverlap": 0
+            },
+            {
+              "candidate": "vera",
+              "repeat": 1,
+              "maxEightWordOverlap": 0
+            },
+            {
+              "candidate": "vera",
+              "repeat": 2,
+              "maxEightWordOverlap": 0
+            },
+            {
+              "candidate": "direct-meta",
+              "repeat": 2,
+              "maxEightWordOverlap": 0
+            },
+            {
+              "candidate": "direct-meta",
+              "repeat": 3,
+              "maxEightWordOverlap": 0
+            },
+            {
+              "candidate": "vera",
+              "repeat": 3,
+              "maxEightWordOverlap": 0
+            }
+          ],
+          "referenceHasKey": false
+        }
+      ],
+      "limitations": [
+        "Selected course excerpts, not representative of all subjects or full MIT exams.",
+        "History uses writing assignments without an official answer key.",
+        "Topic/format/reasoning alignment judged by a model is provisional, not independent ground truth.",
+        "Public-source pretraining contamination cannot be ruled out.",
+        "The prior linear algebra development target was already inspected in an earlier evaluation.",
+        "Cross-semester notes do not support chronological exam-prediction claims.",
+        "Failures stay in denominators. No learning gains or difficulty equivalence are established."
+      ]
+    }
+  ],
+  "feedback": {
+    "cases": 48,
+    "scoringBoundariesPassed": 48,
+    "objectiveKeysChecked": 18,
+    "objectiveKeysPassed": 18,
+    "perCourse": [
+      {
+        "course": "linear-algebra",
+        "controls": 12,
+        "suggestionsPublished": 12,
+        "error": null,
+        "scoresUnchanged": true
+      },
+      {
+        "course": "microeconomics",
+        "controls": 12,
+        "suggestionsPublished": 12,
+        "error": null,
+        "scoresUnchanged": true
+      },
+      {
+        "course": "psychology",
+        "controls": 12,
+        "suggestionsPublished": 12,
+        "error": null,
+        "scoresUnchanged": true
+      },
+      {
+        "course": "history",
+        "controls": 12,
+        "suggestionsPublished": 12,
+        "error": null,
+        "scoresUnchanged": true
+      }
+    ],
+    "accountedCostByJobId": 0.078146,
+    "limitation": "Independent arithmetic and a literal source-word control; not expert validation of prose correctness, conceptual feedback or learning outcomes."
+  },
+  "supplementalReference": {
+    "kind": "post-hoc supplemental reference agreement, separate from generation benchmark",
+    "referenceAgreement": {
+      "matched": 3,
+      "denominator": 4
+    },
+    "nonQuarantinedAgreement": {
+      "matched": 3,
+      "denominator": 3
+    },
+    "quarantined": [
+      {
+        "number": 2,
+        "reason": "The official key highlights inferior random-position recall for experts; primary research reports a much smaller retained advantage. Subject-expert review is needed; this item is not counted as established accuracy.",
+        "research": "https://pubmed.ncbi.nlm.nih.gov/24213863/"
+      }
+    ],
+    "accountedCost": 0.00881199999999982,
+    "limitation": "Single small post-hoc model solve, not VERA generation quality, a full MIT grade, or a clean prospective factual benchmark."
+  },
+  "spending": {
+    "additionalCapUsd": 20.0,
+    "baselineUsd": 1.1117195,
+    "accountedAdditionalUsd": 2.672849,
+    "accountedLifetimeUsd": 3.7845685,
+    "uncertainOrReservedCalls": 0,
+    "reserveUsd": 30,
+    "note": "Charges reconciled by persisted job IDs. The development and feedback processes overlapped; their raw before/after ledger-window totals overlap and must not be added together. This is token/reservation accounting, not a billing-dashboard reconciliation."
+  },
+  "interpretation": [
+    "Final software readiness was 12/12 for VERA and 10/12 for direct generation on these selected packets.",
+    "Passing claim checks does not establish full solution correctness, factual entailment, equal difficulty, semantic originality or improved learning.",
+    "Model-rated assessment alignment is provisional; history is a writing-support benchmark without an official key.",
+    "The supplemental reference solve is separate from generation; a disputed official-key item remains visible and was quarantined before that solve.",
+    "Raw PDFs, extracted source text, full prompts and student/model responses remain local and are excluded from this public summary."
+  ]
+}

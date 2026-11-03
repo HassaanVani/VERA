@@ -1,0 +1,385 @@
+{
+  "id": "ocw-cross-subject-v2",
+  "developmentPairsPerCourse": 2,
+  "finalPairsPerCourse": 3,
+  "questions": 3,
+  "points": 30,
+  "minutes": 30,
+  "additionalCapUsd": 20,
+  "order": [
+    "direct-meta,vera",
+    "vera,direct-meta",
+    "direct-meta,vera"
+  ],
+  "model": "muse-spark-1.3",
+  "maxOutputTokens": 16000,
+  "reasoningEffort": "low",
+  "inputUsdPerMillion": 1.25,
+  "outputUsdPerMillion": 4.25,
+  "pricingChecked": "2026-11-03",
+  "pricingSource": "https://dev.meta.ai/docs/pricing-rate-limits",
+  "courses": [
+    {
+      "id": "linear-algebra",
+      "subject": "Linear algebra",
+      "attribution": "Gilbert Strang and MIT OpenCourseWare, 18.06 Spring 2010 and 18.06SC Fall 2011",
+      "keyed": true,
+      "development": [
+        {
+          "id": "la-eigen",
+          "url": "https://ocw.mit.edu/courses/18-06sc-linear-algebra-fall-2011/resources/mit18_06scf11_ses2-8sum/",
+          "role": "lecture-notes",
+          "partition": "generation",
+          "pages": [
+            1,
+            2,
+            3,
+            4
+          ]
+        },
+        {
+          "id": "la-prior1",
+          "url": "https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/resources/mit18_06s10_exam1_s10/",
+          "role": "past-exam",
+          "partition": "generation",
+          "pages": [
+            1,
+            2
+          ]
+        },
+        {
+          "id": "la-target2",
+          "url": "https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/resources/mit18_06s10_exam2_s10/",
+          "role": "past-exam",
+          "partition": "heldout-question"
+        },
+        {
+          "id": "la-key2",
+          "url": "https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/resources/mit18_06s10_exam2_s10_soln/",
+          "role": "solutions",
+          "partition": "heldout-solution"
+        }
+      ],
+      "evaluation": [
+        {
+          "id": "la-det",
+          "url": "https://ocw.mit.edu/courses/18-06sc-linear-algebra-fall-2011/resources/mit18_06scf11_ses2-5sum/",
+          "role": "lecture-notes",
+          "partition": "generation",
+          "pages": [
+            1,
+            2,
+            3,
+            4
+          ]
+        },
+        {
+          "id": "la-prior1-later",
+          "url": "https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/resources/mit18_06s10_exam1_s10/",
+          "role": "past-exam",
+          "partition": "generation",
+          "pages": [
+            3,
+            4,
+            5
+          ]
+        },
+        {
+          "id": "la-target3",
+          "url": "https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/resources/mit18_06s10_exam3_s10/",
+          "role": "past-exam",
+          "partition": "heldout-question"
+        },
+        {
+          "id": "la-key3",
+          "url": "https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/resources/mit18_06s10_exam3_s10_soln/",
+          "role": "solutions",
+          "partition": "heldout-solution"
+        }
+      ],
+      "topics": {
+        "development": [
+          "Eigenvalues and trace",
+          "Eigenvectors and matrix action",
+          "Reasoning about eigenpairs"
+        ],
+        "evaluation": [
+          "Computing a determinant",
+          "Determinant properties",
+          "Interpreting singularity"
+        ]
+      },
+      "types": [
+        "numeric",
+        "worked-response",
+        "short-answer"
+      ]
+    },
+    {
+      "id": "microeconomics",
+      "subject": "Microeconomics",
+      "attribution": "Jonathan Gruber, William Wheaton and MIT OpenCourseWare, 14.01SC Fall 2011 / practice exams Fall 2007",
+      "keyed": true,
+      "development": [
+        {
+          "id": "econ-notes1",
+          "url": "https://ocw.mit.edu/courses/14-01sc-principles-of-microeconomics-fall-2011/resources/mit14_01scf11_rev_midtm01/",
+          "role": "lecture-notes",
+          "partition": "generation",
+          "pages": [
+            1,
+            2,
+            3
+          ]
+        },
+        {
+          "id": "econ-prior1",
+          "url": "https://ocw.mit.edu/courses/14-01sc-principles-of-microeconomics-fall-2011/resources/mit14_01scf11_exam01_f07/",
+          "role": "past-exam",
+          "partition": "generation",
+          "pages": [
+            1,
+            2
+          ]
+        },
+        {
+          "id": "econ-target1",
+          "url": "https://ocw.mit.edu/courses/14-01sc-principles-of-microeconomics-fall-2011/resources/mit14_01scf11_exam01/",
+          "role": "past-exam",
+          "partition": "heldout-question"
+        },
+        {
+          "id": "econ-key1",
+          "url": "https://ocw.mit.edu/courses/14-01sc-principles-of-microeconomics-fall-2011/resources/mit14_01scf11_exam01_sol/",
+          "role": "solutions",
+          "partition": "heldout-solution"
+        }
+      ],
+      "evaluation": [
+        {
+          "id": "econ-notes2",
+          "url": "https://ocw.mit.edu/courses/14-01sc-principles-of-microeconomics-fall-2011/resources/mit14_01scf11_rev_midtm02/",
+          "role": "lecture-notes",
+          "partition": "generation",
+          "pages": [
+            1,
+            2,
+            3
+          ]
+        },
+        {
+          "id": "econ-prior2",
+          "url": "https://ocw.mit.edu/courses/14-01sc-principles-of-microeconomics-fall-2011/resources/mit14_01scf11_exam02_f07/",
+          "role": "past-exam",
+          "partition": "generation",
+          "pages": [
+            1,
+            2
+          ]
+        },
+        {
+          "id": "econ-target2",
+          "url": "https://ocw.mit.edu/courses/14-01sc-principles-of-microeconomics-fall-2011/resources/mit14_01scf11_exam02/",
+          "role": "past-exam",
+          "partition": "heldout-question"
+        },
+        {
+          "id": "econ-key2",
+          "url": "https://ocw.mit.edu/courses/14-01sc-principles-of-microeconomics-fall-2011/resources/mit14_01scf11_exam02_soln/",
+          "role": "solutions",
+          "partition": "heldout-solution"
+        }
+      ],
+      "topics": {
+        "development": [
+          "Market equilibrium",
+          "Demand and consumer choices",
+          "Interpreting a market intervention"
+        ],
+        "evaluation": [
+          "Costs and production",
+          "Competition and market power",
+          "Producer decisions and welfare"
+        ]
+      },
+      "types": [
+        "numeric",
+        "multiple-choice",
+        "worked-response"
+      ]
+    },
+    {
+      "id": "psychology",
+      "subject": "Psychology",
+      "attribution": "John D. E. Gabrieli and MIT OpenCourseWare, 9.00SC Fall 2011 / practice exams 2009",
+      "keyed": true,
+      "development": [
+        {
+          "id": "psych-research",
+          "url": "https://ocw.mit.edu/courses/9-00sc-introduction-to-psychology-fall-2011/resources/mit9_00scf11_lec02_scires/",
+          "role": "lecture-notes",
+          "partition": "generation",
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ]
+        },
+        {
+          "id": "psych-prior1",
+          "url": "https://ocw.mit.edu/courses/9-00sc-introduction-to-psychology-fall-2011/resources/mit9_00scf11_exam1_2009/",
+          "role": "past-exam",
+          "partition": "generation",
+          "pages": [
+            1,
+            2
+          ]
+        },
+        {
+          "id": "psych-target1",
+          "url": "https://ocw.mit.edu/courses/9-00sc-introduction-to-psychology-fall-2011/resources/mit9_00scf11_exam1/",
+          "role": "past-exam",
+          "partition": "heldout-question"
+        },
+        {
+          "id": "psych-key1",
+          "url": "https://ocw.mit.edu/courses/9-00sc-introduction-to-psychology-fall-2011/resources/mit9_00scf11_exam1_sol/",
+          "role": "solutions",
+          "partition": "heldout-solution"
+        }
+      ],
+      "evaluation": [
+        {
+          "id": "psych-memory",
+          "url": "https://ocw.mit.edu/courses/9-00sc-introduction-to-psychology-fall-2011/resources/mit9_00scf11_lec10_mem1/",
+          "role": "lecture-notes",
+          "partition": "generation",
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ]
+        },
+        {
+          "id": "psych-prior2",
+          "url": "https://ocw.mit.edu/courses/9-00sc-introduction-to-psychology-fall-2011/resources/mit9_00scf11_exam2_2009/",
+          "role": "past-exam",
+          "partition": "generation",
+          "pages": [
+            1,
+            2
+          ]
+        },
+        {
+          "id": "psych-target2",
+          "url": "https://ocw.mit.edu/courses/9-00sc-introduction-to-psychology-fall-2011/resources/mit9_00scf11_exam2/",
+          "role": "past-exam",
+          "partition": "heldout-question"
+        },
+        {
+          "id": "psych-key2",
+          "url": "https://ocw.mit.edu/courses/9-00sc-introduction-to-psychology-fall-2011/resources/mit9_00scf11_exam2_sol/",
+          "role": "solutions",
+          "partition": "heldout-solution"
+        }
+      ],
+      "topics": {
+        "development": [
+          "Scientific research methods",
+          "Experimental and correlational reasoning",
+          "Evaluating psychological evidence"
+        ],
+        "evaluation": [
+          "Memory processes",
+          "Interpreting memory research",
+          "Explaining memory evidence"
+        ]
+      },
+      "types": [
+        "multiple-choice",
+        "multiple-choice",
+        "short-answer"
+      ]
+    },
+    {
+      "id": "history",
+      "subject": "History",
+      "attribution": "Craig Steven Wilder, Malick Ghachem, Jeffrey S. Ravel and MIT OpenCourseWare, 21H.001 Fall 2013",
+      "keyed": false,
+      "development": [
+        {
+          "id": "history-britain",
+          "url": "https://ocw.mit.edu/courses/21h-001-how-to-stage-a-revolution-fall-2013/resources/mit21h_001f13_lec_03/",
+          "role": "lecture-notes",
+          "partition": "generation",
+          "pages": [
+            1,
+            2,
+            3
+          ]
+        },
+        {
+          "id": "history-paper1",
+          "url": "https://ocw.mit.edu/courses/21h-001-how-to-stage-a-revolution-fall-2013/pages/assignments/",
+          "role": "assignment",
+          "partition": "heldout-question",
+          "html": true,
+          "section": "Paper 1"
+        }
+      ],
+      "evaluation": [
+        {
+          "id": "history-race",
+          "url": "https://ocw.mit.edu/courses/21h-001-how-to-stage-a-revolution-fall-2013/resources/mit21h_001f13_lec_04/",
+          "role": "lecture-notes",
+          "partition": "generation",
+          "pages": [
+            1,
+            2,
+            3
+          ]
+        },
+        {
+          "id": "history-paper2",
+          "url": "https://ocw.mit.edu/courses/21h-001-how-to-stage-a-revolution-fall-2013/pages/assignments/",
+          "role": "assignment",
+          "partition": "heldout-question",
+          "html": true,
+          "section": "Paper 2"
+        }
+      ],
+      "topics": {
+        "development": [
+          "Imperial conflict and colonial independence",
+          "Evidence and competing perspectives",
+          "Explaining revolutionary change"
+        ],
+        "evaluation": [
+          "Slavery and colonial independence",
+          "Race and competing perspectives",
+          "Historical argument and limitations"
+        ]
+      },
+      "types": [
+        "short-answer",
+        "essay",
+        "essay"
+      ]
+    }
+  ],
+  "limitations": [
+    "Selected course excerpts, not representative of all subjects or full MIT exams.",
+    "History uses writing assignments without an official answer key.",
+    "Topic/format/reasoning alignment judged by a model is provisional, not independent ground truth.",
+    "Public-source pretraining contamination cannot be ruled out.",
+    "The prior linear algebra development target was already inspected in an earlier evaluation.",
+    "Cross-semester notes do not support chronological exam-prediction claims.",
+    "Failures stay in denominators. No learning gains or difficulty equivalence are established."
+  ]
+}

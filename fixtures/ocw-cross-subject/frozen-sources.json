@@ -1,0 +1,536 @@
+{
+  "protocolSha256": "89b13a6b954bfeb6b9a124aa1117a1fa685cc1e089e5bc2ff74283b1698dbfde",
+  "frozenAt": "2026-11-03T11:51:03.128Z",
+  "sources": [
+    {
+      "id": "la-eigen",
+      "url": "https://ocw.mit.edu/courses/18-06sc-linear-algebra-fall-2011/resources/mit18_06scf11_ses2-8sum/",
+      "role": "lecture-notes",
+      "partition": "generation",
+      "pages": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "course": "linear-algebra",
+      "phase": "development",
+      "downloadUrl": "https://ocw.mit.edu/courses/18-06sc-linear-algebra-fall-2011/1999c9f4accdbef05571a1014438f8dd_MIT18_06SCF11_Ses2.8sum.pdf",
+      "sha256": "b339359c086e37146cd0afebb6d6ecdd81691fc76d1b81a468b19baf0fe938ff"
+    },
+    {
+      "id": "la-prior1",
+      "url": "https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/resources/mit18_06s10_exam1_s10/",
+      "role": "past-exam",
+      "partition": "generation",
+      "pages": [
+        1,
+        2
+      ],
+      "course": "linear-algebra",
+      "phase": "development",
+      "downloadUrl": "https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/e9bbec7a9a25a87715e8edd75e21d7b9_MIT18_06S10_exam1_s10.pdf",
+      "sha256": "b5f28732378182d884e9cf7dcc711ea7c8bdba288c7933975697a1db10a2fff2"
+    },
+    {
+      "id": "la-target2",
+      "url": "https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/resources/mit18_06s10_exam2_s10/",
+      "role": "past-exam",
+      "partition": "heldout-question",
+      "course": "linear-algebra",
+      "phase": "development",
+      "downloadUrl": "https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/892238e7e16a658abd5813bea8399170_MIT18_06S10_exam2_s10.pdf",
+      "sha256": "ca54e2175f51c144e678668e7e3aee3c6cfc8be229ccdf06f57bcc238a8fa842"
+    },
+    {
+      "id": "la-key2",
+      "url": "https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/resources/mit18_06s10_exam2_s10_soln/",
+      "role": "solutions",
+      "partition": "heldout-solution",
+      "course": "linear-algebra",
+      "phase": "development",
+      "downloadUrl": "https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/d669bf89c103559d51427d0916c5db61_MIT18_06S10_exam2_s10_soln.pdf",
+      "sha256": "bba3056cc2f8e29b5656f95fec248bcfe0cd79a3d2c9157a895fb3518c5dafc4"
+    },
+    {
+      "id": "la-det",
+      "url": "https://ocw.mit.edu/courses/18-06sc-linear-algebra-fall-2011/resources/mit18_06scf11_ses2-5sum/",
+      "role": "lecture-notes",
+      "partition": "generation",
+      "pages": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "course": "linear-algebra",
+      "phase": "evaluation",
+      "downloadUrl": "https://ocw.mit.edu/courses/18-06sc-linear-algebra-fall-2011/5dd3f8ec0a398fd74264fef3fd591f81_MIT18_06SCF11_Ses2.5sum.pdf",
+      "sha256": "aea16eae29ec03cfc3bda4d8c0019d55b56e839d490ecddde62b2e2caeda27bc"
+    },
+    {
+      "id": "la-prior1-later",
+      "url": "https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/resources/mit18_06s10_exam1_s10/",
+      "role": "past-exam",
+      "partition": "generation",
+      "pages": [
+        3,
+        4,
+        5
+      ],
+      "course": "linear-algebra",
+      "phase": "evaluation",
+      "downloadUrl": "https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/e9bbec7a9a25a87715e8edd75e21d7b9_MIT18_06S10_exam1_s10.pdf",
+      "sha256": "b5f28732378182d884e9cf7dcc711ea7c8bdba288c7933975697a1db10a2fff2"
+    },
+    {
+      "id": "la-target3",
+      "url": "https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/resources/mit18_06s10_exam3_s10/",
+      "role": "past-exam",
+      "partition": "heldout-question",
+      "course": "linear-algebra",
+      "phase": "evaluation",
+      "downloadUrl": "https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/c72789c2ac2ccaf5568a024c662882d2_MIT18_06S10_exam3_s10.pdf",
+      "sha256": "a2388d7d6506b111d12f9c61d79511f7d4577bf9c0d7040633444e102f57dc6d"
+    },
+    {
+      "id": "la-key3",
+      "url": "https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/resources/mit18_06s10_exam3_s10_soln/",
+      "role": "solutions",
+      "partition": "heldout-solution",
+      "course": "linear-algebra",
+      "phase": "evaluation",
+      "downloadUrl": "https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/edf08929f3b2b435c7d8ca85e8d5118d_MIT18_06S10_exam3_s10_soln.pdf",
+      "sha256": "ae83b5f53fbbcb2253ae8a14b6c69f154ffe8ef7695dd00489dfcab040259e40"
+    },
+    {
+      "id": "econ-notes1",
+      "url": "https://ocw.mit.edu/courses/14-01sc-principles-of-microeconomics-fall-2011/resources/mit14_01scf11_rev_midtm01/",
+      "role": "lecture-notes",
+      "partition": "generation",
+      "pages": [
+        1,
+        2,
+        3
+      ],
+      "course": "microeconomics",
+      "phase": "development",
+      "downloadUrl": "https://ocw.mit.edu/courses/14-01sc-principles-of-microeconomics-fall-2011/20c1312e8e56a899ed91790b22f39938_MIT14_01SCF11_rev_midtm01.pdf",
+      "sha256": "ea314a2d75954aaa24a79374e78d8a29e73cec33b8e3142cc4c8725d2024a57f"
+    },
+    {
+      "id": "econ-prior1",
+      "url": "https://ocw.mit.edu/courses/14-01sc-principles-of-microeconomics-fall-2011/resources/mit14_01scf11_exam01_f07/",
+      "role": "past-exam",
+      "partition": "generation",
+      "pages": [
+        1,
+        2
+      ],
+      "course": "microeconomics",
+      "phase": "development",
+      "downloadUrl": "https://ocw.mit.edu/courses/14-01sc-principles-of-microeconomics-fall-2011/a899c18986c0667965a59915d7e587b1_MIT14_01SCF11_exam01_f07.pdf",
+      "sha256": "ef2254ae22c143aff56fc34378d5d35251ee01b85339f44cf2ef424c74ba8306"
+    },
+    {
+      "id": "econ-target1",
+      "url": "https://ocw.mit.edu/courses/14-01sc-principles-of-microeconomics-fall-2011/resources/mit14_01scf11_exam01/",
+      "role": "past-exam",
+      "partition": "heldout-question",
+      "course": "microeconomics",
+      "phase": "development",
+      "downloadUrl": "https://ocw.mit.edu/courses/14-01sc-principles-of-microeconomics-fall-2011/0454bc30df1666fe266f0a3353c0c633_MIT14_01SCF11_exam01.pdf",
+      "sha256": "3ae400ae9176f5188174136485f534667419c880a5fc1ac260ab3870868a5575"
+    },
+    {
+      "id": "econ-key1",
+      "url": "https://ocw.mit.edu/courses/14-01sc-principles-of-microeconomics-fall-2011/resources/mit14_01scf11_exam01_sol/",
+      "role": "solutions",
+      "partition": "heldout-solution",
+      "course": "microeconomics",
+      "phase": "development",
+      "downloadUrl": "https://ocw.mit.edu/courses/14-01sc-principles-of-microeconomics-fall-2011/4bae52b4c897ac7b853b856b9a8d2a45_MIT14_01SCF11_exam01_sol.pdf",
+      "sha256": "44cee872514894f758ecca681a226a92fd1063c94f748d344a77f8ffebc22010"
+    },
+    {
+      "id": "econ-notes2",
+      "url": "https://ocw.mit.edu/courses/14-01sc-principles-of-microeconomics-fall-2011/resources/mit14_01scf11_rev_midtm02/",
+      "role": "lecture-notes",
+      "partition": "generation",
+      "pages": [
+        1,
+        2,
+        3
+      ],
+      "course": "microeconomics",
+      "phase": "evaluation",
+      "downloadUrl": "https://ocw.mit.edu/courses/14-01sc-principles-of-microeconomics-fall-2011/66a11c228027ef6cd3dbc53a30e64921_MIT14_01SCF11_rev_midtm02.pdf",
+      "sha256": "9b1af28405fb1331e818ec629995514636741c647757868f2949d6afe1d81f29"
+    },
+    {
+      "id": "econ-prior2",
+      "url": "https://ocw.mit.edu/courses/14-01sc-principles-of-microeconomics-fall-2011/resources/mit14_01scf11_exam02_f07/",
+      "role": "past-exam",
+      "partition": "generation",
+      "pages": [
+        1,
+        2
+      ],
+      "course": "microeconomics",
+      "phase": "evaluation",
+      "downloadUrl": "https://ocw.mit.edu/courses/14-01sc-principles-of-microeconomics-fall-2011/1e7f3ad24377c2ce5b92c9017d63e2fc_MIT14_01SCF11_exam02_f07.pdf",
+      "sha256": "d5cbb51836e5c337d0b01f924824d1bfcc3a6880945f55c863fb02fdad774789"
+    },
+    {
+      "id": "econ-target2",
+      "url": "https://ocw.mit.edu/courses/14-01sc-principles-of-microeconomics-fall-2011/resources/mit14_01scf11_exam02/",
+      "role": "past-exam",
+      "partition": "heldout-question",
+      "course": "microeconomics",
+      "phase": "evaluation",
+      "downloadUrl": "https://ocw.mit.edu/courses/14-01sc-principles-of-microeconomics-fall-2011/848c8e311d4ddfc10f10c7819965338e_MIT14_01SCF11_exam02.pdf",
+      "sha256": "7ce7c09edc434574f655150065c187c335c9eca9e77523b457809082ae161d16"
+    },
+    {
+      "id": "econ-key2",
+      "url": "https://ocw.mit.edu/courses/14-01sc-principles-of-microeconomics-fall-2011/resources/mit14_01scf11_exam02_soln/",
+      "role": "solutions",
+      "partition": "heldout-solution",
+      "course": "microeconomics",
+      "phase": "evaluation",
+      "downloadUrl": "https://ocw.mit.edu/courses/14-01sc-principles-of-microeconomics-fall-2011/81a3f61fc64b47ebc0fbe50c0c0b5fcb_MIT14_01SCF11_exam02_soln.pdf",
+      "sha256": "af4d74a31e6cbe074913df19dd87b3b280c3c90b45d878e5b0c5c7d7004436be"
+    },
+    {
+      "id": "psych-research",
+      "url": "https://ocw.mit.edu/courses/9-00sc-introduction-to-psychology-fall-2011/resources/mit9_00scf11_lec02_scires/",
+      "role": "lecture-notes",
+      "partition": "generation",
+      "pages": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "course": "psychology",
+      "phase": "development",
+      "downloadUrl": "https://ocw.mit.edu/courses/9-00sc-introduction-to-psychology-fall-2011/5ff7eb6785f0575799a65af146ea17d2_MIT9_00SCF11_lec02_scires.pdf",
+      "sha256": "2915aaadee7d0721faeeae4c878582c15878caec7bd4229e3c7461749c41181b"
+    },
+    {
+      "id": "psych-prior1",
+      "url": "https://ocw.mit.edu/courses/9-00sc-introduction-to-psychology-fall-2011/resources/mit9_00scf11_exam1_2009/",
+      "role": "past-exam",
+      "partition": "generation",
+      "pages": [
+        1,
+        2
+      ],
+      "course": "psychology",
+      "phase": "development",
+      "downloadUrl": "https://ocw.mit.edu/courses/9-00sc-introduction-to-psychology-fall-2011/46607b6e274d72108fa1d7119ebb1864_MIT9_00SCF11_exam1_2009.pdf",
+      "sha256": "b57c2ace8324d49f567ae8f89566af29aec05262493c940b481461c2999436d8"
+    },
+    {
+      "id": "psych-target1",
+      "url": "https://ocw.mit.edu/courses/9-00sc-introduction-to-psychology-fall-2011/resources/mit9_00scf11_exam1/",
+      "role": "past-exam",
+      "partition": "heldout-question",
+      "course": "psychology",
+      "phase": "development",
+      "downloadUrl": "https://ocw.mit.edu/courses/9-00sc-introduction-to-psychology-fall-2011/70593d7a3f0a9ebcb6d8a71517e00669_MIT9_00SCF11_exam1.pdf",
+      "sha256": "ad61a334f4b5542b1b98a6f7209282410ad0c649f30824379b5cedb49c297278"
+    },
+    {
+      "id": "psych-key1",
+      "url": "https://ocw.mit.edu/courses/9-00sc-introduction-to-psychology-fall-2011/resources/mit9_00scf11_exam1_sol/",
+      "role": "solutions",
+      "partition": "heldout-solution",
+      "course": "psychology",
+      "phase": "development",
+      "downloadUrl": "https://ocw.mit.edu/courses/9-00sc-introduction-to-psychology-fall-2011/2aa4e53319de1efd3e82b755b5af6201_MIT9_00SCF11_exam1_sol.pdf",
+      "sha256": "c55c24c914a3013685c3349c05b548b7d75cb0c7d917e748af5591390c5c6eca"
+    },
+    {
+      "id": "psych-memory",
+      "url": "https://ocw.mit.edu/courses/9-00sc-introduction-to-psychology-fall-2011/resources/mit9_00scf11_lec10_mem1/",
+      "role": "lecture-notes",
+      "partition": "generation",
+      "pages": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "course": "psychology",
+      "phase": "evaluation",
+      "downloadUrl": "https://ocw.mit.edu/courses/9-00sc-introduction-to-psychology-fall-2011/70cf036a23528edafdc89c66b91ee198_MIT9_00SCF11_lec10_mem1.pdf",
+      "sha256": "86ebd9cfe7640f24083296e4364c9d73caae68b758bcecde0c89ba11c4d866ae"
+    },
+    {
+      "id": "psych-prior2",
+      "url": "https://ocw.mit.edu/courses/9-00sc-introduction-to-psychology-fall-2011/resources/mit9_00scf11_exam2_2009/",
+      "role": "past-exam",
+      "partition": "generation",
+      "pages": [
+        1,
+        2
+      ],
+      "course": "psychology",
+      "phase": "evaluation",
+      "downloadUrl": "https://ocw.mit.edu/courses/9-00sc-introduction-to-psychology-fall-2011/538ae15c425cf79de077517599a71da4_MIT9_00SCF11_exam2_2009.pdf",
+      "sha256": "6c75d1838d1782af78437839ced50044fc7887028549cd09d598fe00f4b11ede"
+    },
+    {
+      "id": "psych-target2",
+      "url": "https://ocw.mit.edu/courses/9-00sc-introduction-to-psychology-fall-2011/resources/mit9_00scf11_exam2/",
+      "role": "past-exam",
+      "partition": "heldout-question",
+      "course": "psychology",
+      "phase": "evaluation",
+      "downloadUrl": "https://ocw.mit.edu/courses/9-00sc-introduction-to-psychology-fall-2011/1cb6b9c6044bbc45708bac6ef370971a_MIT9_00SCF11_exam2.pdf",
+      "sha256": "ff45f6f7f9fa94ea87e39e7fb1de8145761e96eb4df2e71b0d98179e31854d40"
+    },
+    {
+      "id": "psych-key2",
+      "url": "https://ocw.mit.edu/courses/9-00sc-introduction-to-psychology-fall-2011/resources/mit9_00scf11_exam2_sol/",
+      "role": "solutions",
+      "partition": "heldout-solution",
+      "course": "psychology",
+      "phase": "evaluation",
+      "downloadUrl": "https://ocw.mit.edu/courses/9-00sc-introduction-to-psychology-fall-2011/9b7baf3c431c004169495436cc3da24e_MIT9_00SCF11_exam2_sol.pdf",
+      "sha256": "d6a6b50cca4ecc24de605578c93c8d447023ce35c29168046e47afb1570cc6a9"
+    },
+    {
+      "id": "history-britain",
+      "url": "https://ocw.mit.edu/courses/21h-001-how-to-stage-a-revolution-fall-2013/resources/mit21h_001f13_lec_03/",
+      "role": "lecture-notes",
+      "partition": "generation",
+      "pages": [
+        1,
+        2,
+        3
+      ],
+      "course": "history",
+      "phase": "development",
+      "downloadUrl": "https://ocw.mit.edu/courses/21h-001-how-to-stage-a-revolution-fall-2013/30a80d828ff02b0f9f89e051336e7f46_MIT21H_001F13_lec_03.pdf",
+      "sha256": "10f19b300a88ea016eee59ff4e1b98b02b567a7bdf027240a31d034272e40be7"
+    },
+    {
+      "id": "history-paper1",
+      "url": "https://ocw.mit.edu/courses/21h-001-how-to-stage-a-revolution-fall-2013/pages/assignments/",
+      "role": "assignment",
+      "partition": "heldout-question",
+      "html": true,
+      "section": "Paper 1",
+      "course": "history",
+      "phase": "development",
+      "downloadUrl": "https://ocw.mit.edu/courses/21h-001-how-to-stage-a-revolution-fall-2013/pages/assignments/",
+      "sha256": "c58e8e28992ab628aedc6dc339cc9e88ca1e91e710b0cdd6d6e0f776225a8e63"
+    },
+    {
+      "id": "history-race",
+      "url": "https://ocw.mit.edu/courses/21h-001-how-to-stage-a-revolution-fall-2013/resources/mit21h_001f13_lec_04/",
+      "role": "lecture-notes",
+      "partition": "generation",
+      "pages": [
+        1,
+        2,
+        3
+      ],
+      "course": "history",
+      "phase": "evaluation",
+      "downloadUrl": "https://ocw.mit.edu/courses/21h-001-how-to-stage-a-revolution-fall-2013/0788e4781884ddc9b206dd886aa76cae_MIT21H_001F13_lec_04.pdf",
+      "sha256": "984df2864ea544ca40a8439348a4e0d417ace3a47d4f10abcbdaa1c60da46833"
+    },
+    {
+      "id": "history-paper2",
+      "url": "https://ocw.mit.edu/courses/21h-001-how-to-stage-a-revolution-fall-2013/pages/assignments/",
+      "role": "assignment",
+      "partition": "heldout-question",
+      "html": true,
+      "section": "Paper 2",
+      "course": "history",
+      "phase": "evaluation",
+      "downloadUrl": "https://ocw.mit.edu/courses/21h-001-how-to-stage-a-revolution-fall-2013/pages/assignments/",
+      "sha256": "c58e8e28992ab628aedc6dc339cc9e88ca1e91e710b0cdd6d6e0f776225a8e63"
+    }
+  ],
+  "packets": [
+    {
+      "course": "linear-algebra",
+      "phase": "development",
+      "hash": "6435ddae48f0203b6188fc4cf9e78653399be525bb846a346fe2d56757a54c0e",
+      "pages": [
+        {
+          "id": "la-eigen",
+          "pages": [
+            1,
+            2,
+            3,
+            4
+          ]
+        },
+        {
+          "id": "la-prior1",
+          "pages": [
+            1,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "course": "linear-algebra",
+      "phase": "evaluation",
+      "hash": "98e8f7853999869988ca3867a2b4d3a304c1542dcb78d79528992d5ae8c1fbac",
+      "pages": [
+        {
+          "id": "la-det",
+          "pages": [
+            1,
+            2,
+            3,
+            4
+          ]
+        },
+        {
+          "id": "la-prior1-later",
+          "pages": [
+            3,
+            4,
+            5
+          ]
+        }
+      ]
+    },
+    {
+      "course": "microeconomics",
+      "phase": "development",
+      "hash": "ff60fe73ce59b07614533da2b2884b81943fc8a73ea31f0685dbc1248930908c",
+      "pages": [
+        {
+          "id": "econ-notes1",
+          "pages": [
+            1,
+            2,
+            3
+          ]
+        },
+        {
+          "id": "econ-prior1",
+          "pages": [
+            1,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "course": "microeconomics",
+      "phase": "evaluation",
+      "hash": "1f5e6d9184848fb27e3b5524343b3698cff43855a7a6c5413a0ae5fcd2fd93fc",
+      "pages": [
+        {
+          "id": "econ-notes2",
+          "pages": [
+            1,
+            2,
+            3
+          ]
+        },
+        {
+          "id": "econ-prior2",
+          "pages": [
+            1,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "course": "psychology",
+      "phase": "development",
+      "hash": "25bc7444b03f1d6a2b46165ea395e5958890df680d7b2499f3ecab4844fe0590",
+      "pages": [
+        {
+          "id": "psych-research",
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ]
+        },
+        {
+          "id": "psych-prior1",
+          "pages": [
+            1,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "course": "psychology",
+      "phase": "evaluation",
+      "hash": "58e2563fdaa3575b323f51631f58c64169676b326cd95de080a0088c25f85ab2",
+      "pages": [
+        {
+          "id": "psych-memory",
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ]
+        },
+        {
+          "id": "psych-prior2",
+          "pages": [
+            1,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "course": "history",
+      "phase": "development",
+      "hash": "f7299fe3d5f28163cf71b186fbfa5d5f5e99b2c53475df4ad85bc0f18aa8384a",
+      "pages": [
+        {
+          "id": "history-britain",
+          "pages": [
+            1,
+            2,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "course": "history",
+      "phase": "evaluation",
+      "hash": "7d441b862c7832d1434950d42c85b2cae8c96f75444c890f3d8a9070e6d5e0a7",
+      "pages": [
+        {
+          "id": "history-race",
+          "pages": [
+            1,
+            2,
+            3
+          ]
+        }
+      ]
+    }
+  ]
+}

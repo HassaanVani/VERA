@@ -29,3 +29,10 @@ The prior JEFF source has no open-source grant in its README. Reuse here follows
 The [Meta event overview](https://dev.meta.ai/events/global-hackathon) establishes the track and theme but did not establish the official rule for pre-existing code. The builder must check the accepted participant rules before submission. Preserve this disclosure and identify actual new work and dates accurately. No hackathon eligibility or submission-ready claim is made by the app.
 
 JEFF benchmark numbers are not VERA results. The builder's JEFF-generated practice exam is neither instructor evidence nor a held-out target. Physics II demo materials are a later milestone.
+
+
+## November 3 additions
+
+The subject-independent v2 contracts, explicit public/private assessment projections, attempt-scoped solution access, bounded arithmetic/polynomial and source-location registry, generic table/coordinate exhibits, retained repair artifacts, feedback/dispute records, shared spending ledger, controlled feedback cases and frozen cross-subject OCW evaluation are new VERA work. The revised review workspace, untimed mode, revision ordering, role corrections and editable follow-up approval extend VERA's original interface. JEFF's application and configuration were not changed.
+
+The evaluation compares VERA's current pipeline with direct Meta using the same permitted sources and model settings. JEFF's benchmark results are not reused as evidence. MIT course content is attributed and remains separate from the original distributable demo; model consistency and key agreement are not described as expert verification or learning gains.

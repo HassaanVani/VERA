@@ -1,0 +1,26 @@
+{
+  "frozenAt": "2026-11-03T12:14:49.444Z",
+  "developmentBatch": "development-2026-11-03",
+  "sourceFreezeSha256": "bb09933a1e2cc7fed6e570ae2cb3d326b2b03a22a6d88c674ebfa68cb00a2bb1",
+  "files": {
+    "lib/contracts.ts": "4d7fc75eceffa0db180c89eee9853656463d4d4ace739168cdc324c6a59665cd",
+    "lib/prompts.ts": "2363efe3856008c0aa3d78245f2826e6e6f72e11d30acb63e70aa958adec74ff",
+    "lib/pipeline.ts": "e2199e15e3b6382326e87ca18fe46414dd0788a464f0145d543ccae7f8c8550b",
+    "lib/domain.ts": "ab9c9333f079c7ff97e51ace9d0315448711bca93bfadf7fbb2cca51e4c194ab",
+    "lib/verification.ts": "cd98a24fcf29acbe56ed322282787f9885d6932435ca4d9da37d8cf4f5f687a3",
+    "lib/provider.ts": "64b7bd043dbf1b04dc4cf10b3365ef3b0812e04867f5f5430e8498321c2396ee",
+    "lib/feedback.ts": "46cfb009f5ce1edf6df3da3383f3cf5ff475f1c2138ad0e9e91c23e95fec5e7c",
+    "lib/source-policy.ts": "2b1732f49121e86d2fb60a3aa2c19d350dd6ee56b80814146d646143464ffa72",
+    "lib/store.ts": "90ebcff081fa55ab5424d73ff7da9ad943638d198114cdf7ad4f5a4d5c3aa7cf",
+    "lib/ocw-benchmark.ts": "c14d861d8c1f815efb7727327e299de8c524b537f1ee2dd830a5239cde7a7222",
+    "scripts/ocw-evaluate.ts": "701e5e78af661f4b43f9bfc56c1fa4d7cf3991470406c977f921f6f7093c0e26"
+  },
+  "inference": {
+    "model": "muse-spark-1.3",
+    "base": "https://api.meta.ai/v1",
+    "inputRate": 1.25,
+    "outputRate": 4.25,
+    "maxOutputTokens": 16000,
+    "reasoningEffort": "low"
+  }
+}
