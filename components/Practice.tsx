@@ -8,7 +8,8 @@ import {
   Flag,
   RotateCcw,
 } from "lucide-react";
-import type { Attempt, CheckedExam } from "@/lib/contracts";
+import type { Attempt } from "@/lib/contracts";
+import type { PublicCheckedExam } from "@/lib/assessment-access";
 import MathText from "./MathText";
 import Exhibits from "./Exhibits";
 import Dialog from "./Dialog";
@@ -22,7 +23,7 @@ export default function Practice({
   update,
 }: {
   attempt: Attempt;
-  exam: CheckedExam;
+  exam: PublicCheckedExam;
   onSubmit: () => void;
   onExit: () => void;
   update: (path: string, body: unknown) => Promise<unknown>;
@@ -74,6 +75,10 @@ export default function Practice({
     heading = useRef<HTMLHeadingElement>(null);
   const q = exam.exam.questions[index],
     seconds = Math.max(0, Math.ceil((attempt.endsAt - now) / 1000));
+  const untimed = attempt.mode === "untimed";
+  const hasMaterial =
+    !!exam.scenario ||
+    (exam.exam.exhibits ?? []).some((e) => q.exhibitIds.includes(e.id));
   const answered = exam.exam.questions.filter((question) =>
     responses[question.number]?.trim(),
   ).length;
@@ -138,18 +143,19 @@ export default function Practice({
     };
   });
   useEffect(() => {
+    if (untimed) return;
     const timer = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(timer);
-  }, []);
+  }, [untimed]);
   useEffect(() => {
-    if (!seconds) submitRef.current();
-  }, [seconds]);
+    if (!untimed && !seconds) submitRef.current();
+  }, [seconds, untimed]);
   const saveLabel =
     status === "error"
       ? "Answers not saved"
       : status === "saving" || status === "unsaved"
         ? "Saving answers…"
-        : "Responses saved locally";
+        : "Answers saved on this device’s VERA server";
   return (
     <>
       <div className="practice-bar">
@@ -170,17 +176,20 @@ export default function Practice({
           >
             Finish attempt
           </button>
-          <div
-            className={`timer ${seconds < 60 ? "urgent" : ""}`}
-            role="timer"
-            aria-label="Time remaining"
-          >
-            <Clock3 size={18} />
-            {Math.floor(seconds / 60)
-              .toString()
-              .padStart(2, "0")}
-            :{(seconds % 60).toString().padStart(2, "0")}
-          </div>
+          {!untimed && (
+            <div
+              className={`timer ${seconds < 60 ? "urgent" : ""}`}
+              role="timer"
+              aria-label="Time remaining"
+            >
+              <Clock3 size={18} />
+              {Math.floor(seconds / 60)
+                .toString()
+                .padStart(2, "0")}
+              :{(seconds % 60).toString().padStart(2, "0")}
+            </div>
+          )}
+          {untimed && <span className="badge">Untimed practice</span>}
         </div>
       </div>
       <div className="practice-progress">
@@ -191,30 +200,32 @@ export default function Practice({
         <span role="status">{saveLabel}</span>
       </div>
       <p className="sr-only" role="status">
-        {seconds <= 60 && seconds > 0
+        {!untimed && seconds <= 60 && seconds > 0
           ? "One minute or less remains. Finish your answers and review your attempt."
           : ""}
       </p>
-      <div
-        className="study-pane-switch"
-        role="group"
-        aria-label="Practice workspace"
-      >
-        <button
-          aria-pressed={mobilePane === "questions"}
-          onClick={() => setMobilePane("questions")}
+      {hasMaterial && (
+        <div
+          className="study-pane-switch"
+          role="group"
+          aria-label="Practice workspace"
         >
-          Questions
-        </button>
-        <button
-          aria-pressed={mobilePane === "exhibits"}
-          onClick={() => setMobilePane("exhibits")}
-        >
-          Supporting exhibits
-        </button>
-      </div>
+          <button
+            aria-pressed={mobilePane === "questions"}
+            onClick={() => setMobilePane("questions")}
+          >
+            Questions
+          </button>
+          <button
+            aria-pressed={mobilePane === "exhibits"}
+            onClick={() => setMobilePane("exhibits")}
+          >
+            Supporting exhibits
+          </button>
+        </div>
+      )}
       <div
-        className="exam-layout practice-layout"
+        className={`exam-layout practice-layout ${hasMaterial ? "" : "without-material"}`}
         data-mobile-pane={mobilePane}
       >
         <div className="practice-questions">
@@ -283,19 +294,30 @@ export default function Practice({
             <h3 ref={heading} tabIndex={-1}>
               <MathText text={q.question} />
             </h3>
-            <p className="muted small">
-              Use exhibits:{" "}
-              {q.exhibitIds
-                .map(
-                  (id) =>
-                    ({
-                      calibration: "Calibration",
-                      vectors: "Measurements",
-                      diagram: "Diagram",
-                    })[id],
-                )
-                .join(", ")}
-            </p>
+            {q.objective && (
+              <p className="muted small">Objective: {q.objective}</p>
+            )}
+            {(q.type === "numeric" || q.type === "multiple-choice") && (
+              <p className="muted small">
+                Key-based scoring: all {q.points} points or zero.{" "}
+                {q.type === "numeric"
+                  ? "Only the final value and requested unit are scored; written method is not graded."
+                  : "Choose one option."}
+              </p>
+            )}
+            {q.subparts?.map((part) => (
+              <p key={part.label}>
+                <strong>
+                  {part.label} ({part.points} points)
+                </strong>{" "}
+                <MathText text={part.prompt} />
+              </p>
+            ))}
+            {hasMaterial && (
+              <p className="muted small">
+                Use the supporting material for this question.
+              </p>
+            )}
             {q.type === "multiple-choice" ? (
               <fieldset className="options">
                 <legend className="sr-only">Select an answer</legend>
@@ -328,7 +350,9 @@ export default function Practice({
               </fieldset>
             ) : (
               <label className="response-label">
-                Your reasoning
+                {q.type === "numeric"
+                  ? "Your answer, including the requested unit"
+                  : "Your reasoning"}
                 <textarea
                   value={responses[q.number] || ""}
                   maxLength={20000}
@@ -390,8 +414,10 @@ export default function Practice({
           </article>
           <div className="practice-exit">
             <p className="muted small">
-              The timer keeps running if you leave. Return from the course
-              library to resume.
+              {untimed
+                ? "Your untimed attempt stays open until you finish."
+                : "The timer keeps running if you leave."}{" "}
+              Return from the course library to resume.
             </p>
             <button
               className="text-button"
@@ -406,7 +432,11 @@ export default function Practice({
             </button>
           </div>
         </div>
-        <Exhibits scenario={exam.scenario} />
+        <Exhibits
+          scenario={exam.scenario}
+          exhibits={exam.exam.exhibits}
+          ids={q.exhibitIds}
+        />
       </div>
       {confirmFinish && (
         <Dialog
@@ -442,7 +472,10 @@ export default function Practice({
           </div>
           <p className="muted">
             Select any question to return to it. Finishing locks your answers
-            and opens the solutions. The timer keeps running until you finish.
+            and opens the solutions.{" "}
+            {untimed
+              ? "There is no time limit."
+              : "The timer keeps running until you finish."}
           </p>
           <div className="modal-actions">
             <button

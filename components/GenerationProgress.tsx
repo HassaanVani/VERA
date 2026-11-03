@@ -5,33 +5,50 @@ import type { Job } from "@/lib/contracts";
 export default function GenerationProgress({
   job,
   fixture,
+  legacyScenario = false,
   onCancel,
 }: {
   job: Job;
   fixture: boolean;
+  legacyScenario?: boolean;
   onCancel: () => void;
 }) {
+  const savedExample = fixture && job.kind !== "feedback";
   const stages =
     job.kind === "analyze"
       ? ["Read sources", "Build exam plan", "Save for review"]
-      : ["Build scenario", "Write questions", "Check & solve", "Save exam"];
+      : job.kind === "feedback"
+        ? ["Read saved answers", "Prepare AI suggestions", "Save suggestions"]
+        : legacyScenario
+          ? ["Build scenario", "Write questions", "Check & solve", "Save exam"]
+          : ["Write questions", "Check claims", "Solve & review", "Save exam"];
   const stage = job.stage.toLowerCase();
   const position =
     job.status === "queued"
       ? -1
-      : fixture
+      : savedExample
         ? 0
         : job.kind === "analyze"
           ? stage.includes("save")
             ? 2
             : 1
-          : stage.includes("save")
-            ? 3
-            : /check|solve|compare|repair/.test(stage)
+          : job.kind === "feedback"
+            ? stage.includes("save")
               ? 2
-              : stage.includes("generate")
-                ? 1
-                : 0;
+              : 1
+            : stage.includes("save")
+              ? 3
+              : !legacyScenario
+                ? /solve|compare|repair/.test(stage)
+                  ? 2
+                  : /check/.test(stage)
+                    ? 1
+                    : 0
+                : /check|solve|compare|repair/.test(stage)
+                  ? 2
+                  : stage.includes("generate")
+                    ? 1
+                    : 0;
   return (
     <section className="generation-progress" aria-label="Generation progress">
       <div className="generation-heading">
@@ -39,7 +56,7 @@ export default function GenerationProgress({
         <div>
           <strong role="status">{job.stage}</strong>
           <p>
-            {fixture
+            {savedExample
               ? "Opening an authored example. No model calls or credits used."
               : "You can leave this screen. Progress is saved and no exact finish time is available."}
           </p>
@@ -48,7 +65,7 @@ export default function GenerationProgress({
           Cancel job
         </button>
       </div>
-      {!fixture && (
+      {!savedExample && (
         <ol>
           {stages.map((label, i) => (
             <li

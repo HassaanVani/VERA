@@ -50,10 +50,13 @@ export default function ExamPlanEditor({
     patch: Partial<Blueprint["slots"][number]>,
   ) {
     const slots = draft.slots.map((slot, i) =>
-      i === index ? { ...slot, ...patch } : slot,
+      i === index
+        ? { ...slot, ...patch, basis: "student-selected" as const }
+        : slot,
     );
     onEdit({
       ...draft,
+      settingsBasis: "student-selected",
       slots,
       totalPoints: slots.reduce((sum, s) => sum + s.points, 0),
       minutes: slots.reduce((sum, s) => sum + s.minutes, 0),
@@ -71,6 +74,12 @@ export default function ExamPlanEditor({
           </p>
         </div>
       </div>
+      {draft.schemaVersion !== 2 && (
+        <p className="muted small">
+          Saved legacy transformation plan. New course analyses and the evidence
+          & decisions sample use subject-independent question formats.
+        </p>
+      )}
       {draft.uncertainties.length > 0 && (
         <details className="plan-assumptions" open>
           <summary>
@@ -104,6 +113,32 @@ export default function ExamPlanEditor({
         </div>
       )}
       <fieldset disabled={busy} className="plan-fields">
+        <label htmlFor="plan-subject">Subject</label>
+        <input
+          id="plan-subject"
+          value={draft.domain}
+          maxLength={120}
+          onChange={(event) =>
+            onEdit({
+              ...draft,
+              settingsBasis: "student-selected",
+              domain: event.target.value,
+            })
+          }
+        />
+        <p className="muted small">
+          Plan settings:{" "}
+          {(
+            draft.settingsBasis || "basis not recorded for this legacy plan"
+          ).replaceAll("-", " ")}
+          . Source links show the evidence; inferred settings need your review.
+        </p>
+        <div className="plan-balance">
+          <span>{draft.slots.length} questions</span>
+          <span>{draft.totalPoints} points</span>
+          <span>{draft.minutes} minutes</span>
+          <span>{new Set(draft.slots.map((s) => s.type)).size} formats</span>
+        </div>
         <label htmlFor="plan-title">Exam title</label>
         <input
           id="plan-title"
@@ -113,7 +148,13 @@ export default function ExamPlanEditor({
           aria-describedby={
             errorFor("plan-title") ? "plan-title-error" : undefined
           }
-          onChange={(e) => onEdit({ ...draft, title: e.target.value })}
+          onChange={(e) =>
+            onEdit({
+              ...draft,
+              settingsBasis: "student-selected",
+              title: e.target.value,
+            })
+          }
         />
         {errorFor("plan-title") && (
           <p className="inline-error" id="plan-title-error">
@@ -142,6 +183,12 @@ export default function ExamPlanEditor({
                 <span className="slot-number">
                   {String(slot.number).padStart(2, "0")}
                 </span>
+                <span className="badge">
+                  {(slot.basis || "legacy basis unrecorded").replaceAll(
+                    "-",
+                    " ",
+                  )}
+                </span>
                 <label htmlFor={`plan-${index}-topic`}>
                   Topic for question {slot.number}
                 </label>
@@ -165,7 +212,19 @@ export default function ExamPlanEditor({
                     }
                   >
                     <option value="multiple-choice">Multiple choice</option>
-                    <option value="free-response">Written response</option>
+                    {draft.schemaVersion === 2 && (
+                      <>
+                        <option value="numeric">Numeric answer</option>
+                        <option value="short-answer">Short answer</option>
+                        <option value="worked-response">Worked response</option>
+                        <option value="essay">Essay</option>
+                      </>
+                    )}
+                    {draft.schemaVersion !== 2 && (
+                      <option value="free-response">
+                        Written response (legacy)
+                      </option>
+                    )}
                   </select>
                 </label>
                 <label>
@@ -199,6 +258,12 @@ export default function ExamPlanEditor({
                   />
                 </label>
               </div>
+              {(slot.type === "numeric" || slot.type === "multiple-choice") && (
+                <p className="muted small">
+                  Key-based, all-or-nothing scoring. Choose a worked response if
+                  you want to self-score method and partial credit.
+                </p>
+              )}
               {errors
                 .filter((e) => e.id.startsWith(`plan-${index}-`))
                 .map((e) => (
@@ -210,6 +275,24 @@ export default function ExamPlanEditor({
                 <summary>
                   Source evidence & difficulty <ChevronDown size={14} />
                 </summary>
+                <label>
+                  Learning objective
+                  <input
+                    value={slot.objective || ""}
+                    onChange={(event) =>
+                      updateSlot(index, { objective: event.target.value })
+                    }
+                  />
+                </label>
+                <label>
+                  Section
+                  <input
+                    value={slot.section || ""}
+                    onChange={(event) =>
+                      updateSlot(index, { section: event.target.value })
+                    }
+                  />
+                </label>
                 <p>{slot.pattern}</p>
                 <label>
                   Difficulty

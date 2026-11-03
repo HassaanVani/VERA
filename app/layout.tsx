@@ -3,6 +3,7 @@ import "katex/dist/katex.min.css";
 import "./globals.css";
 import "./studio.css";
 import "./experience.css";
+import "./review.css";
 export const metadata: Metadata = {
   title: "VERA · Make practice feel real",
   description:

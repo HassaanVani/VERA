@@ -11,19 +11,21 @@ import {
   Search,
   X,
 } from "lucide-react";
-import type { Packet, Revision, CheckedExam, Attempt } from "@/lib/contracts";
+import type { Packet, Revision, Attempt } from "@/lib/contracts";
+import type { PublicCheckedExam } from "@/lib/assessment-access";
 import { demoScenario } from "@/lib/demo-client";
 import { TransformationDiagram } from "./Exhibits";
 
 type Props = {
   packets: Packet[];
   revisions: Revision[];
-  exams: CheckedExam[];
+  exams: PublicCheckedExam[];
   attempts: Attempt[];
   now: number;
   busy: boolean;
   onUpload: () => void;
   onSample: () => void;
+  onGeneralSample: () => void;
   onOpen: (
     packet: Packet,
     next: "packet" | "blueprint" | "exam" | "practice" | "results",
@@ -40,6 +42,7 @@ export default function CourseLibrary({
   busy,
   onUpload,
   onSample,
+  onGeneralSample,
   onOpen,
 }: Props) {
   const [query, setQuery] = useState("");
@@ -83,7 +86,9 @@ export default function CourseLibrary({
               <p>
                 {expired
                   ? "Your time limit has ended. Open the attempt to review the answers you saved."
-                  : "Your practice attempt is open. The timer continues while you’re away."}
+                  : resume.mode === "untimed"
+                    ? "Your untimed practice is open. Continue at your pace."
+                    : "Your practice attempt is open. The timer continues while you’re away."}
               </p>
             </div>
             <button
@@ -301,8 +306,8 @@ export default function CourseLibrary({
       </section>
       <aside className="sample-desk" aria-label="Explore a sample assessment">
         <div className="sample-desk-heading">
-          <span className="eyebrow">THE VERA DIFFERENCE</span>
-          <span className="sample-marker">EXHIBIT 03</span>
+          <span className="eyebrow">EXPLORE SAVED EXAMPLES</span>
+          <span className="sample-marker">NO CREDITS NEEDED</span>
         </div>
         <h2>
           The question is only
@@ -349,6 +354,16 @@ export default function CourseLibrary({
         </div>
         <button className="sample-open" disabled={busy} onClick={onSample}>
           Open sample course <ArrowRight size={17} />
+        </button>
+        <p className="sample-other">
+          Research methods · choice, numeric, short answer and essay
+        </p>
+        <button
+          className="sample-open"
+          disabled={busy}
+          onClick={onGeneralSample}
+        >
+          Try evidence & decisions <ArrowRight size={17} />
         </button>
         <p className="sample-disclosure">
           An authored example with synthetic data.

@@ -28,16 +28,10 @@ import {
   PanelLeftClose,
 } from "lucide-react";
 
-import type {
-  Packet,
-  Revision,
-  Job,
-  CheckedExam,
-  Attempt,
-  Role,
-} from "@/lib/contracts";
+import type { Packet, Revision, Job, Attempt, Role } from "@/lib/contracts";
 
-import { results } from "@/lib/domain";
+import type { PublicCheckedExam } from "@/lib/assessment-access";
+import Review from "./Review";
 import usePlanDraft from "./usePlanDraft";
 import Dialog from "./Dialog";
 import CourseJourney from "./CourseJourney";
@@ -68,7 +62,7 @@ type WorkspaceData = {
 
   jobs: Job[];
 
-  exams: CheckedExam[];
+  exams: PublicCheckedExam[];
 
   attempts: Attempt[];
 
@@ -250,9 +244,14 @@ export default function Workspace() {
     [uploadOpen, setUploadOpen] = useState(false),
     [source, setSource] = useState<{ url: string; name: string }>(),
     [menu, setMenu] = useState(false),
-    [showSolutions, setShowSolutions] = useState(false),
     [startOpen, setStartOpen] = useState(false),
-    [uploadReview, setUploadReview] = useState(false);
+    [uploadReview, setUploadReview] = useState(false),
+    [practiceMode, setPracticeMode] = useState<"timed" | "untimed">("timed");
+
+  const [generationRequest, setGenerationRequest] = useState<{
+    id: string;
+    packetId: string;
+  }>();
 
   const [files, setFiles] = useState<{ file: File; role: Role }[]>([]),
     [packetName, setPacketName] = useState("");
@@ -364,17 +363,19 @@ export default function Workspace() {
 
   const attempt = data?.attempts.find((a) => a.examId === exam?.id);
 
-  const ungraded =
-    exam?.exam.questions.filter(
-      (q) =>
-        q.type === "free-response" &&
-        attempt?.selfScores[q.number] === undefined,
-    ).length || 0;
-
   const active = data?.jobs.find(
     (j) =>
       j.packetId === packet?.id && ["running", "queued"].includes(j.status),
   );
+
+  const requestedGeneration = data?.jobs.find(
+    (j) => j.id === generationRequest?.id,
+  );
+  const pendingGeneration =
+    generationRequest?.packetId === packet?.id &&
+    !!generationRequest &&
+    (!requestedGeneration ||
+      ["queued", "running"].includes(requestedGeneration.status));
 
   const recentJob = data?.jobs.find((j) => j.packetId === packet?.id);
 
@@ -391,12 +392,11 @@ export default function Workspace() {
     if (j?.status === "complete") {
       watching.current = "";
 
+      if (j.kind === "feedback") return;
       if (j.kind === "analyze")
         setView((current) => (current === "blueprint" ? "blueprint" : current));
       else {
         setExamId(j.resultId || "");
-
-        setShowSolutions(false);
 
         setView((current) => (current === "exam" ? "exam" : current));
       }
@@ -437,9 +437,9 @@ export default function Workspace() {
     setMenu(false);
   };
 
-  const demo = () =>
+  const demo = (kind = "legacy") =>
     act(async () => {
-      const r = await request("demo", {});
+      const r = await request("demo", { kind });
 
       setPacketId(r.packetId);
 
@@ -464,7 +464,11 @@ export default function Workspace() {
       if (!packet || !revision) return;
 
       const j = await request("jobs", {
-        kind: "generate",
+        kind: revision.parentExamId ? "follow-up" : "generate",
+        parentExamId: revision.parentExamId,
+        focus: revision.parentExamId
+          ? revision.blueprint.slots.map((s) => s.objective || s.topic)
+          : undefined,
 
         packetId: packet.id,
 
@@ -472,6 +476,8 @@ export default function Workspace() {
       });
 
       watching.current = j.id;
+      setGenerationRequest({ id: j.id, packetId: packet.id });
+      setExamId("");
 
       setView("exam");
     });
@@ -490,7 +496,7 @@ export default function Workspace() {
         setStartOpen(true);
         return;
       }
-      await request("attempts", { examId: exam.id });
+      await request("attempts", { examId: exam.id, mode: practiceMode });
       setStartOpen(false);
 
       setView("practice");
@@ -830,6 +836,7 @@ export default function Workspace() {
                 <GenerationProgress
                   job={active}
                   fixture={!!packet?.fixture}
+                  legacyScenario={revision?.blueprint.schemaVersion !== 2}
                   onCancel={() =>
                     void act(async () => {
                       await request(`jobs/${active.id}`, {});
@@ -915,6 +922,7 @@ export default function Workspace() {
                   busy={busy || !!active}
                   onUpload={openUpload}
                   onSample={() => void demo()}
+                  onGeneralSample={() => void demo("general")}
                   onOpen={(p, next, selectedExam) => {
                     setPacketId(p.id);
 
@@ -1000,6 +1008,31 @@ export default function Workspace() {
                       </button>
                     </div>
 
+                    <div className="material-readiness panel">
+                      <h3>Material readiness</h3>
+                      <p>
+                        {packet.documents.reduce(
+                          (n, d) =>
+                            n +
+                            d.pages.filter(
+                              (p) =>
+                                p.text.trim().length > 80 && !p.needsVision,
+                            ).length,
+                          0,
+                        )}{" "}
+                        pages with readable extracted text ·{" "}
+                        {packet.documents.reduce(
+                          (n, d) =>
+                            n + d.pages.filter((p) => p.needsVision).length,
+                          0,
+                        )}{" "}
+                        pages need visual inspection
+                      </p>
+                      <p>
+                        Check the page previews and document roles below. Role
+                        changes invalidate plan approval.
+                      </p>
+                    </div>
                     <div className="source-grid">
                       {packet.documents.map((d) => (
                         <article className="panel source-card" key={d.id}>
@@ -1008,7 +1041,31 @@ export default function Workspace() {
                               <FileText size={21} />
                             </span>
 
-                            <span className="badge">{roleName(d.role)}</span>
+                            <label className="source-role">
+                              Document role
+                              <select
+                                aria-label={`Role for ${d.name}`}
+                                value={d.role}
+                                disabled={busy || !!active}
+                                onChange={(event) =>
+                                  void act(async () => {
+                                    await request(
+                                      `packets/${packet.id}/roles`,
+                                      {
+                                        documentId: d.id,
+                                        role: event.target.value,
+                                      },
+                                    );
+                                  })
+                                }
+                              >
+                                {roles.map((role) => (
+                                  <option key={role} value={role}>
+                                    {roleName(role)}
+                                  </option>
+                                ))}
+                              </select>
+                            </label>
                           </div>
 
                           <h3>{d.name}</h3>
@@ -1117,6 +1174,16 @@ export default function Workspace() {
                           : "Check that these topics match what you want to practice. Review the assumptions and open each question’s source evidence where needed."}
                       </p>
                     </div>
+                    {!!revision.changes?.length && (
+                      <section className="panel revision-changes">
+                        <h3>Changes since the previous plan</h3>
+                        <ul>
+                          {revision.changes.map((change, i) => (
+                            <li key={i}>{change}</li>
+                          ))}
+                        </ul>
+                      </section>
+                    )}
                     <div className="blueprint-layout">
                       {packet && (
                         <ExamPlanEditor
@@ -1176,16 +1243,19 @@ export default function Workspace() {
                 ))}
 
               {view === "exam" &&
-                (!exam ? (
+                (!exam ||
+                active?.kind === "generate" ||
+                active?.kind === "follow-up" ||
+                pendingGeneration ? (
                   <Empty
                     title={
-                      active
+                      active || pendingGeneration
                         ? "Assembling your assessment"
                         : "Your practice exam will appear here"
                     }
                   >
-                    {active ? (
-                      active.stage
+                    {active || pendingGeneration ? (
+                      active?.stage || "Waiting for the saved job status…"
                     ) : (
                       <>
                         <p>
@@ -1236,8 +1306,6 @@ export default function Workspace() {
                             value={exam.id}
                             onChange={(e) => {
                               setExamId(e.target.value);
-
-                              setShowSolutions(false);
                             }}
                           >
                             {data.exams
@@ -1275,6 +1343,14 @@ export default function Workspace() {
                           <ArrowDownToLine size={16} /> Export
                         </button>
 
+                        {!exam.ready && (
+                          <button
+                            className="primary"
+                            onClick={() => goto("blueprint")}
+                          >
+                            Review plan & generate again
+                          </button>
+                        )}
                         <button
                           className="primary"
                           disabled={!exam.ready || busy}
@@ -1301,14 +1377,14 @@ export default function Workspace() {
                       <div>
                         <strong>
                           {exam.ready
-                            ? "Numerical & structural checks passed"
+                            ? "Structural checks passed · review checking coverage"
                             : "Unresolved checks · practice blocked"}
                         </strong>
 
                         <p>
                           {exam.fixture
                             ? "Saved demonstration. Model review was not run. Numerical claims and structure are checked locally."
-                            : `Separate model review: ${exam.review.questions.filter((q) => q.status === "consistent").length}/${exam.exam.questions.length} consistent. ${exam.repairAttempts} repair cycles. A consistency check is not proof of correctness.`}
+                            : `Recorded claim checks: ${exam.verification?.filter((v) => v.result === "passed").length ?? "legacy"}. ${exam.repairAttempts} repair cycles. Written reasoning is not automatically verified. Model review is provisional.`}
                         </p>
 
                         {exam.issues.map((i, n) => (
@@ -1326,23 +1402,18 @@ export default function Workspace() {
                       </div>
                     </div>
 
-                    <div className="exam-layout">
+                    <div
+                      className={`exam-layout ${exam.scenario || exam.exam.exhibits?.length ? "" : "without-material"}`}
+                    >
                       <div>
                         <div className="instructions panel">
                           <span className="eyebrow">BEFORE YOU BEGIN</span>
 
                           <p>{exam.exam.instructions}</p>
 
-                          <button
-                            className="text-button"
-                            onClick={() => setShowSolutions(!showSolutions)}
-                          >
-                            {showSolutions
-                              ? "Hide solutions & marking guide"
-                              : "Show solutions & marking guide"}
-
-                            <ChevronRight size={14} />
-                          </button>
+                          <p className="muted small">
+                            Solutions unlock after you finish an attempt.
+                          </p>
                         </div>
 
                         {exam.exam.questions.map((q) => (
@@ -1367,7 +1438,9 @@ export default function Workspace() {
                             </h3>
 
                             <p className="muted small">
-                              Exhibits: {q.exhibitIds.join(", ")}
+                              {q.exhibitIds.length
+                                ? `Supporting material: ${q.exhibitIds.join(", ")}`
+                                : "No additional supporting material needed."}
                             </p>
 
                             {q.options.length > 0 && (
@@ -1383,53 +1456,14 @@ export default function Workspace() {
                                 ))}
                               </div>
                             )}
-
-                            {showSolutions && (
-                              <div className="solution">
-                                <span className="eyebrow">WORKED SOLUTION</span>
-
-                                <p>
-                                  <MathText text={q.solution} />
-                                </p>
-
-                                <strong>
-                                  Answer: <MathText text={q.answer} />
-                                </strong>
-
-                                <h4>Marking guide</h4>
-
-                                {q.rubric.map((r, i) => (
-                                  <p key={i}>
-                                    {r.criterion}
-
-                                    <span>{r.points} pts</span>
-                                  </p>
-                                ))}
-
-                                {exam.review.questions.find(
-                                  (r) => r.number === q.number,
-                                ) && (
-                                  <details>
-                                    <summary>Independent model answer</summary>
-
-                                    <p>
-                                      <MathText
-                                        text={
-                                          exam.review.questions.find(
-                                            (r) => r.number === q.number,
-                                          )!.independentAnswer
-                                        }
-                                      />
-                                    </p>
-                                  </details>
-                                )}
-                              </div>
-                            )}
                           </article>
                         ))}
                       </div>
 
-                      <Exhibits scenario={exam.scenario} />
+                      <Exhibits
+                        scenario={exam.scenario}
+                        exhibits={exam.exam.exhibits}
+                      />
                     </div>
                   </>
                 ))}
@@ -1455,288 +1489,33 @@ export default function Workspace() {
                 ))}
 
               {view === "results" &&
-                (!exam || !attempt?.submittedAt ? (
-                  <Empty title="Make room for a first attempt">
-                    {exam?.ready ? (
-                      <button
-                        className="primary"
-                        onClick={() => void practice()}
-                      >
-                        {attempt
-                          ? attempt.endsAt <= clock
-                            ? "Review ended attempt"
-                            : "Resume practice"
-                          : "Start practice"}{" "}
-                        <ArrowRight size={16} />
-                      </button>
-                    ) : (
-                      <>
-                        <p>
-                          Complete a checked practice exam to see your results
-                          here.
-                        </p>
-                        <button
-                          className="primary"
-                          onClick={() =>
-                            goto(
-                              exam ? "exam" : revision ? "blueprint" : "packet",
-                            )
-                          }
-                        >
-                          {exam
-                            ? "Review checking report"
-                            : revision
-                              ? "Review exam plan"
-                              : "Review course materials"}{" "}
-                          <ArrowRight size={16} />
-                        </button>
-                      </>
-                    )}
-                  </Empty>
+                (exam && attempt?.submittedAt && packet ? (
+                  <Review
+                    key={attempt.id}
+                    attempt={attempt}
+                    packet={packet}
+                    api={request}
+                    refresh={refresh}
+                    onPlan={() => goto("blueprint")}
+                    onSource={openSource}
+                    feedbackRevision={
+                      data.jobs.find((j) => j.attemptId === attempt.id)
+                        ?.updatedAt
+                    }
+                    canSuggest={
+                      data.meta.configured && data.meta.workerOnline && !active
+                    }
+                  />
                 ) : (
-                  <>
-                    <div className="results-top">
-                      <div className="panel score-card">
-                        <span className="eyebrow">PRACTICE SCORE</span>
-                        {ungraded > 0 && (
-                          <p className="score-context">
-                            Score so far · written answers pending
-                          </p>
-                        )}
-
-                        {ungraded > 0 && (
-                          <span className="badge amber score-pending">
-                            {ungraded} written{" "}
-                            {ungraded === 1 ? "answer needs" : "answers need"} a
-                            score
-                          </span>
-                        )}
-
-                        <strong>
-                          {results(exam, attempt).reduce(
-                            (n, r) => n + r.earned,
-
-                            0,
-                          )}
-
-                          <small>
-                            {" "}
-                            /{" "}
-                            {ungraded > 0
-                              ? exam.exam.questions
-                                  .filter(
-                                    (q) =>
-                                      q.type === "multiple-choice" ||
-                                      attempt.selfScores[q.number] !==
-                                        undefined,
-                                  )
-                                  .reduce((sum, q) => sum + q.points, 0)
-                              : exam.exam.totalPoints}
-                          </small>
-                        </strong>
-
-                        <p>
-                          {ungraded > 0
-                            ? "Only scored questions are included above. Your full exam total appears after you score the written answers."
-                            : "Includes your self-reported written scores and automatically scored multiple choice."}
-                        </p>
-                      </div>
-
-                      <div className="panel next-session">
-                        <span className="quick-icon">
-                          <Target size={23} />
-                        </span>
-
-                        <div>
-                          <h2>Choose what to practice next.</h2>
-
-                          <p>
-                            Use the marking guide to score each written answer.
-                            Then create a short exam focused on the topics that
-                            need more work.
-                          </p>
-
-                          <button
-                            className="primary"
-                            disabled={busy || !!active || ungraded > 0}
-                            onClick={() =>
-                              void act(async () => {
-                                const j = await request("follow-up", {
-                                  examId: exam.id,
-                                });
-
-                                watching.current = j.id;
-
-                                setView("exam");
-                              })
-                            }
-                          >
-                            Create focused practice <ArrowRight size={16} />
-                          </button>
-
-                          {ungraded > 0 && (
-                            <button
-                              className="text-button grade-next"
-                              onClick={() => {
-                                const next = exam.exam.questions.find(
-                                  (q) =>
-                                    q.type === "free-response" &&
-                                    attempt.selfScores[q.number] === undefined,
-                                );
-                                const target = document.getElementById(
-                                  `score-question-${next?.number}`,
-                                );
-                                target?.scrollIntoView({
-                                  block: "center",
-                                  behavior: "smooth",
-                                });
-                                target?.focus({ preventScroll: true });
-                              }}
-                            >
-                              Score next written answer <ArrowRight size={14} />
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="info-strip">
-                      <CircleHelp size={18} />
-
-                      <span>
-                        Free-response scores are self-reported. Topic estimates
-                        describe this attempt; they do not establish mastery or
-                        learning gains.
-                      </span>
-                    </div>
-
-                    {results(exam, attempt).map((r) => {
-                      const q = exam.exam.questions.find(
-                        (q) => q.number === r.number,
-                      )!;
-
-                      return (
-                        <article
-                          className="panel result-question"
-                          key={r.number}
-                        >
-                          <div className="result-line">
-                            <span className="slot-number">
-                              {r.number.toString().padStart(2, "0")}
-                            </span>
-
-                            <div>
-                              <h3>{r.topic}</h3>
-
-                              <span className="muted small">
-                                {r.selfReported
-                                  ? "Score your work using the marking guide"
-                                  : "Multiple choice · scored automatically"}
-                              </span>
-                            </div>
-
-                            <strong>
-                              {r.selfReported &&
-                              attempt.selfScores[r.number] === undefined
-                                ? "Pending"
-                                : r.earned}{" "}
-                              / {r.possible}
-                            </strong>
-                          </div>
-
-                          <p>
-                            <MathText text={q.question} />
-                          </p>
-
-                          <div className="your-response">
-                            <span className="eyebrow">YOUR RESPONSE</span>
-
-                            <p>
-                              {q.type === "multiple-choice" &&
-                              attempt.responses[q.number] ? (
-                                <>
-                                  <strong>
-                                    {attempt.responses[q.number]}.{" "}
-                                  </strong>
-                                  <MathText
-                                    text={
-                                      q.options[
-                                        attempt.responses[q.number].charCodeAt(
-                                          0,
-                                        ) - 65
-                                      ] || ""
-                                    }
-                                  />
-                                </>
-                              ) : (
-                                <MathText
-                                  text={
-                                    attempt.responses[q.number] ||
-                                    "No response recorded"
-                                  }
-                                />
-                              )}
-                            </p>
-                          </div>
-
-                          <details
-                            open={
-                              r.selfReported &&
-                              attempt.selfScores[q.number] === undefined
-                            }
-                          >
-                            <summary>Solution & marking guide</summary>
-
-                            <div className="solution">
-                              <MathText text={q.solution} />
-
-                              {q.rubric.map((c, i) => (
-                                <p key={i}>
-                                  {c.criterion}
-
-                                  <span>{c.points} pts</span>
-                                </p>
-                              ))}
-                            </div>
-                          </details>
-
-                          {r.selfReported && (
-                            <label className="self-score">
-                              Points earned
-                              <select
-                                id={`score-question-${q.number}`}
-                                disabled={busy}
-                                value={attempt.selfScores[q.number] ?? ""}
-                                onChange={(e) =>
-                                  void act(async () => {
-                                    await request(`attempts/${attempt.id}`, {
-                                      selfScores: {
-                                        [q.number]: Number(e.target.value),
-                                      },
-                                    });
-                                  })
-                                }
-                              >
-                                <option value="" disabled>
-                                  Select rubric score
-                                </option>
-
-                                {Array.from(
-                                  { length: q.points + 1 },
-
-                                  (_, i) => (
-                                    <option key={i} value={i}>
-                                      {i} / {q.points}
-                                    </option>
-                                  ),
-                                )}
-                              </select>
-                            </label>
-                          )}
-                        </article>
-                      );
-                    })}
-                  </>
+                  <Empty title="Finish practice to review your answers">
+                    <p>Solutions and feedback open after submission.</p>
+                    <button
+                      className="primary"
+                      onClick={() => (exam ? void practice() : goto("packet"))}
+                    >
+                      {exam ? "Open practice" : "Review course materials"}
+                    </button>
+                  </Empty>
                 ))}
 
               {view === "activity" && (
@@ -2119,8 +1898,10 @@ export default function Workspace() {
           )}
           <p className="muted small">
             Only add materials you have permission to use. Label AI-generated
-            exams as generated reference. VERA currently checks linear algebra
-            development scenarios; Physics II support comes later.
+            exams as generated reference. VERA supports subject-independent
+            practice, with bounded numerical and source checks. Legacy examples
+            cover linear algebra development scenarios; Physics II support comes
+            later.
           </p>
 
           <div className="modal-actions">
@@ -2190,7 +1971,7 @@ export default function Workspace() {
           locked={busy}
           className="start-practice-dialog"
         >
-          <span className="eyebrow">BEFORE THE TIMER STARTS</span>
+          <span className="eyebrow">CHOOSE YOUR PRACTICE MODE</span>
           <h2 id="start-practice-title">Ready to start practice?</h2>
           <p>{exam.exam.title}</p>
           {error && (
@@ -2198,10 +1979,39 @@ export default function Workspace() {
               {error}
             </p>
           )}
+          <fieldset className="practice-mode">
+            <legend>Practice mode</legend>
+            <label>
+              <input
+                type="radio"
+                name="practice-mode"
+                checked={practiceMode === "timed"}
+                onChange={() => setPracticeMode("timed")}
+              />
+              Timed exam
+              <span>Use the plan’s time limit. Leaving does not pause it.</span>
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="practice-mode"
+                checked={practiceMode === "untimed"}
+                onChange={() => setPracticeMode("untimed")}
+              />
+              Untimed practice
+              <span>
+                Work at your pace. Solutions stay hidden until you finish.
+              </span>
+            </label>
+          </fieldset>
           <dl className="start-practice-facts">
             <div>
               <dt>Time limit</dt>
-              <dd>{exam.exam.minutes} minutes</dd>
+              <dd>
+                {practiceMode === "untimed"
+                  ? "No time limit"
+                  : `${exam.exam.minutes} minutes`}
+              </dd>
             </div>
             <div>
               <dt>Questions</dt>
@@ -2215,20 +2025,16 @@ export default function Workspace() {
           <ul className="start-practice-notes">
             <li>Exhibits stay available while you work.</li>
             <li>
-              Answers save automatically. The timer continues if you leave or
-              refresh.
+              Answers save automatically.{" "}
+              {practiceMode === "untimed"
+                ? "You can leave and resume without a deadline."
+                : "The timer continues if you leave or refresh."}
             </li>
             <li>
-              Multiple choice is scored automatically. You’ll score written work
-              using the marking guide after finishing.
+              Choice and supported numeric answers use the key. You’ll score
+              written work using the marking guide after finishing.
             </li>
           </ul>
-          {showSolutions && (
-            <p className="source-warning">
-              You opened the solutions. Keep that in mind when interpreting your
-              score.
-            </p>
-          )}
           <div className="modal-actions">
             <button
               className="secondary"
@@ -2242,7 +2048,11 @@ export default function Workspace() {
               disabled={busy}
               onClick={() => void practice()}
             >
-              {busy ? "Starting…" : "Start timed practice"}{" "}
+              {busy
+                ? "Starting…"
+                : practiceMode === "untimed"
+                  ? "Start untimed practice"
+                  : "Start timed practice"}{" "}
               <ArrowRight size={16} />
             </button>
           </div>

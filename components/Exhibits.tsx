@@ -1,7 +1,8 @@
 "use client";
 import { useState, useId } from "react";
 import { ArrowUpRight, FileSpreadsheet, MoveUpRight } from "lucide-react";
-import type { Scenario } from "@/lib/contracts";
+import type { Scenario, Exam } from "@/lib/contracts";
+import MathText from "./MathText";
 import { multiply } from "@/lib/domain";
 
 export function TransformationDiagram({
@@ -20,6 +21,8 @@ export function TransformationDiagram({
     Math.max(
       5,
       ...points.flatMap((p) => [...p.input, ...p.output].map(Math.abs)),
+      ...scenario.matrix.flat().map(Math.abs),
+      ...scenario.matrix.map((row) => Math.abs(row[0] + row[1])),
     ) + 1;
   const scale = 130 / bound,
     x = (n: number) => 170 + n * scale,
@@ -102,7 +105,7 @@ export function TransformationDiagram({
     </svg>
   );
 }
-export default function Exhibits({ scenario }: { scenario: Scenario }) {
+function MatrixExhibits({ scenario }: { scenario: Scenario }) {
   const [tab, setTab] = useState("calibration");
   const tabId = useId();
   const tabs = [
@@ -224,5 +227,154 @@ export default function Exhibits({ scenario }: { scenario: Scenario }) {
         </footer>
       </div>
     </section>
+  );
+}
+
+export default function Exhibits({
+  scenario,
+  exhibits = [],
+  ids,
+}: {
+  scenario?: Scenario;
+  exhibits?: Exam["exhibits"];
+  ids?: string[];
+}) {
+  const available = exhibits.filter((e) => !ids || ids.includes(e.id));
+  const [selected, setSelected] = useState("");
+  const tabId = useId();
+  if (scenario) return <MatrixExhibits scenario={scenario} />;
+  if (!available.length) return null;
+  const current = available.find((e) => e.id === selected) ?? available[0];
+  const bound =
+    Math.max(
+      1,
+      ...current.points.flatMap((p) => [Math.abs(p.x), Math.abs(p.y)]),
+    ) * 1.2;
+  return (
+    <aside className="exhibit-panel" aria-label="Supporting exhibits">
+      <div className="exhibit-heading">
+        <span className="eyebrow">SUPPORTING MATERIAL</span>
+        <span className="badge">
+          {current.synthetic ? "Synthetic material" : "Source-based material"}
+        </span>
+      </div>
+      <div
+        className="exhibit-tabs"
+        role="tablist"
+        aria-label="Exhibit"
+        onKeyDown={(event) => {
+          if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key))
+            return;
+          event.preventDefault();
+          const index = available.indexOf(current);
+          const next =
+            event.key === "Home"
+              ? 0
+              : event.key === "End"
+                ? available.length - 1
+                : (index +
+                    (event.key === "ArrowRight" ? 1 : -1) +
+                    available.length) %
+                  available.length;
+          setSelected(available[next].id);
+          (event.currentTarget.children[next] as HTMLButtonElement).focus();
+        }}
+      >
+        {available.map((e) => (
+          <button
+            key={e.id}
+            id={`${tabId}-${e.id}`}
+            role="tab"
+            aria-selected={current.id === e.id}
+            aria-controls={`${tabId}-material`}
+            tabIndex={current.id === e.id ? 0 : -1}
+            onClick={() => setSelected(e.id)}
+          >
+            {e.title}
+          </button>
+        ))}
+      </div>
+      <div
+        className="paper"
+        role="tabpanel"
+        id={`${tabId}-material`}
+        aria-labelledby={`${tabId}-${current.id}`}
+        tabIndex={0}
+      >
+        <h3>{current.title}</h3>
+        <p className="paper-sub">
+          {current.synthetic
+            ? "CREATED FOR THIS PRACTICE"
+            : "PREPARED FROM COURSE EVIDENCE"}
+        </p>
+        {current.content && <MathText text={current.content} />}
+        {current.kind === "table" && (
+          <div className="material-table">
+            <table>
+              <thead>
+                <tr>
+                  {current.columns.map((c, i) => (
+                    <th key={i} scope="col">
+                      {c}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {current.rows.map((r, i) => (
+                  <tr key={i}>
+                    {r.map((c, j) => (
+                      <td key={j}>
+                        <MathText text={c} />
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+        {current.kind === "diagram" && (
+          <>
+            <svg
+              viewBox="0 0 340 340"
+              role="img"
+              aria-label={`${current.title}. Coordinates listed below.`}
+            >
+              <line x1="10" y1="170" x2="330" y2="170" stroke="currentColor" />
+              <line x1="170" y1="10" x2="170" y2="330" stroke="currentColor" />
+              {current.points.map((p, i) => (
+                <g key={i}>
+                  <circle
+                    cx={170 + (p.x / bound) * 145}
+                    cy={170 - (p.y / bound) * 145}
+                    r="4"
+                    fill="#1766d9"
+                  />
+                  <text
+                    x={175 + (p.x / bound) * 145}
+                    y={165 - (p.y / bound) * 145}
+                    fill="currentColor"
+                    fontSize="12"
+                  >
+                    {p.label}
+                  </text>
+                </g>
+              ))}
+            </svg>
+            <ul>
+              {current.points.map((p, i) => (
+                <li key={i}>
+                  {p.label}: ({p.x}, {p.y})
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+        <footer>
+          VERA <span>One shared reference for this assessment</span>
+        </footer>
+      </div>
+    </aside>
   );
 }

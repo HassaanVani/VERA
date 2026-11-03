@@ -90,16 +90,30 @@ try {
   await screenshot("blueprint-desktop");
   await page.getByRole("button", { name: "Generate practice exam" }).click();
   await page
-    .getByText("Numerical & structural checks passed", { exact: true })
+    .getByText("Structural checks passed · review checking coverage", {
+      exact: true,
+    })
     .waitFor({ timeout: 30000 });
   await page.getByRole("tab", { name: "02 Measurements" }).click();
   await page.getByRole("cell", { name: "(3, 1)", exact: true }).waitFor();
   await page.getByRole("tab", { name: "03 Diagram" }).click();
   await screenshot("assessment-desktop");
-  await page
-    .getByRole("button", { name: "Show solutions & marking guide" })
-    .click();
-  await page.getByText("WORKED SOLUTION", { exact: true }).first().waitFor();
+  if (
+    await page
+      .getByRole("button", { name: "Show solutions & marking guide" })
+      .count()
+  )
+    throw new Error("Preview exposes solutions before submission.");
+  const privateSnapshot = JSON.stringify((await snapshot()).exams);
+  for (const field of [
+    '"answer":',
+    '"solution":',
+    '"claims":',
+    '"numeric":',
+    '"rubric":',
+  ])
+    if (privateSnapshot.includes(field))
+      throw new Error(`Workspace leaked ${field}`);
   await page
     .getByRole("button", { name: "Start practice", exact: true })
     .click();
@@ -117,11 +131,22 @@ try {
   await page
     .getByRole("button", { name: "Start timed practice", exact: true })
     .click();
-  await page.getByRole("radio").first().check();
+  const firstAnswerSaved = page.waitForResponse(
+    (response) =>
+      response.url().includes("/api/attempts/") &&
+      response.request().method() === "POST",
+  );
+  await page
+    .locator('.practice-questions .options input[type="radio"]')
+    .first()
+    .check();
+  await firstAnswerSaved;
   await page
     .getByRole("button", { name: "Flag for review", exact: true })
     .click();
-  await page.getByText("Responses saved locally", { exact: true }).waitFor();
+  await page
+    .getByText("Answers saved on this device’s VERA server", { exact: true })
+    .waitFor();
   const data = await snapshot();
   const attempt = data.attempts[0],
     exam = data.exams.find((e) => e.id === attempt.examId);
@@ -159,7 +184,9 @@ try {
   )
     throw new Error("Question navigation stole focus while typing.");
   await typedSave;
-  await page.getByText("Responses saved locally", { exact: true }).waitFor();
+  await page
+    .getByText("Answers saved on this device’s VERA server", { exact: true })
+    .waitFor();
   page.off("request", countAnswerSave);
   if (answerSaveRequests !== 1)
     throw new Error(
@@ -181,7 +208,11 @@ try {
     .getByRole("textbox", { name: "Your reasoning" })
     .fill("Unsaved recovery draft: A(2,-1) = (5,-1).");
   await page.getByText("Answers not saved", { exact: true }).waitFor();
-  if (await page.getByText("Responses saved locally", { exact: true }).count())
+  if (
+    await page
+      .getByText("Answers saved on this device’s VERA server", { exact: true })
+      .count()
+  )
     throw new Error("Failed save is being shown as saved.");
   await page.reload();
   await page.getByRole("textbox", { name: "Your reasoning" }).waitFor();
@@ -194,7 +225,9 @@ try {
   await page.getByText("Answers not saved", { exact: true }).waitFor();
   await page.unroute("**/api/attempts/*");
   await page.getByRole("button", { name: "Retry saving", exact: true }).click();
-  await page.getByText("Responses saved locally", { exact: true }).waitFor();
+  await page
+    .getByText("Answers saved on this device’s VERA server", { exact: true })
+    .waitFor();
   const recovered = await snapshot();
   if (
     !recovered.attempts[0].responses["3"].startsWith("Unsaved recovery draft")
@@ -251,7 +284,7 @@ try {
     .getByRole("button", { name: "Finish attempt", exact: true })
     .click();
   await page.getByRole("button", { name: "Finish & view results" }).click();
-  await page.getByText("PRACTICE SCORE", { exact: true }).waitFor();
+  await page.getByText("AUTOMATICALLY CHECKED", { exact: true }).waitFor();
   await page
     .getByText("Score so far · written answers pending", { exact: true })
     .waitFor();
@@ -270,7 +303,15 @@ try {
   await screenshot("results-desktop");
   await page.getByRole("button", { name: "Create focused practice" }).click();
   await page
-    .getByRole("heading", { name: /Targeted follow-up/ })
+    .getByRole("heading", { name: "Question plan", exact: true })
+    .waitFor();
+  const proposed = (await snapshot()).revisions[0];
+  if (proposed.approved || proposed.blueprint.slots.length !== 3)
+    throw new Error("Follow-up bypassed plan approval or omitted objectives.");
+  await page.getByRole("button", { name: "Approve exam plan" }).click();
+  await page.getByRole("button", { name: "Generate practice exam" }).click();
+  await page
+    .getByRole("heading", { name: /^Targeted follow-up/ })
     .waitFor({ timeout: 30000 });
   const after = await snapshot();
   if (
@@ -374,7 +415,9 @@ try {
           "blueprint approval",
           "saved exam generation",
           "exhibits",
-          "solutions",
+          "solutions withheld before submission",
+          "workspace answer-key redaction",
+          "targeted-plan approval",
           "MC autosave",
           "refresh recovery",
           "free-response autosave",
