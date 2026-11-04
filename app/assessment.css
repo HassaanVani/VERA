@@ -910,3 +910,214 @@ a:focus-visible {
     padding: 22px;
   }
 }
+
+.pdf-download {
+  position: relative;
+}
+.pdf-error {
+  color: #ffb5ad;
+  font-size: 0.82rem;
+  max-width: 340px;
+  margin-top: 8px;
+}
+.review-export {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 18px;
+}
+
+.check-coverage,
+.provenance-note {
+  font-size: 0.8rem;
+  color: #c1d3e0;
+  margin: 8px 0;
+  line-height: 1.6;
+}
+.provenance-note {
+  border-left: 2px solid #75c8ff;
+  padding-left: 12px;
+}
+.run-evidence {
+  border-bottom: 1px solid var(--line, #22313d);
+  padding: 12px 0;
+  font-size: 0.84rem;
+}
+.run-evidence > summary {
+  cursor: pointer;
+  color: #deebf5;
+}
+.run-evidence summary span {
+  color: #a0b7c7;
+  margin-left: 12px;
+  font-weight: normal;
+}
+.run-evidence-content {
+  max-width: 900px;
+  padding: 10px 0;
+  color: #bacbd9;
+  line-height: 1.65;
+}
+.run-evidence-content h3 {
+  color: #e1edf6;
+  font-size: 0.95rem;
+  margin-top: 20px;
+}
+.run-history {
+  padding-left: 22px;
+}
+.run-history > li {
+  padding: 10px 0;
+  border-bottom: 1px solid #1b2b38;
+}
+.run-history p,
+.question-coverage p {
+  margin: 5px 0;
+}
+.question-coverage {
+  padding: 10px 0;
+}
+.question-coverage summary {
+  cursor: pointer;
+}
+.question-coverage li {
+  margin: 12px 0;
+}
+@media (max-width: 600px) {
+  .run-evidence summary span {
+    display: block;
+    margin: 5px 0 0 16px;
+  }
+}
+
+.exam-readiness {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 6px 20px;
+  padding: 8px 0;
+  font-size: 0.78rem;
+  line-height: 1.55;
+  color: #b6cbd9;
+}
+.exam-readiness p {
+  margin: 0;
+}
+.exam-readiness a,
+.return-to-question {
+  color: #91cfee;
+  text-underline-offset: 4px;
+}
+.assessment-checks-after {
+  border-top: 1px solid #22313d;
+  margin-top: 30px;
+  padding-top: 14px;
+  scroll-margin-top: 16px;
+}
+.return-to-question {
+  display: inline-block;
+  font-size: 0.8rem;
+  margin: 14px 0;
+}
+@media (max-width: 600px) {
+  .view-exam .topbar {
+    min-height: 52px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+  .view-exam .course-journey {
+    margin-top: 0;
+    margin-bottom: 10px;
+  }
+  .view-exam .exam-header {
+    gap: 12px;
+    padding-bottom: 10px;
+  }
+  .view-exam .exam-header h2 {
+    font-size: 19px;
+    line-height: 1.35;
+  }
+  .view-exam .exam-controls {
+    gap: 10px;
+  }
+  .view-exam .exam-header p {
+    font-size: 11px;
+  }
+  .exam-readiness {
+    padding: 6px 0;
+    font-size: 0.72rem;
+    gap: 4px;
+  }
+  .preview-toolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 10px;
+  }
+  .preview-toolbar .preview-position {
+    padding: 8px 0;
+    gap: 5px;
+    font-size: 11px;
+  }
+  .preview-toolbar .assessment-instructions {
+    grid-column: 2;
+    grid-row: 1;
+    font-size: 11px;
+    padding: 8px 0;
+  }
+  .preview-toolbar .assessment-instructions[open] {
+    grid-column: 1/-1;
+    grid-row: 2;
+  }
+  .assessment-preview .question-sheet {
+    padding-top: 20px;
+  }
+}
+@media (max-width: 360px) {
+  .preview-toolbar {
+    display: block;
+  }
+}
+@media (max-width: 600px) {
+  .view-exam .page-title .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+  }
+  .view-exam .course-return {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    margin: 0;
+    min-height: 36px;
+  }
+  .view-exam .course-context {
+    display: block;
+    min-width: 0;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .view-exam .course-journey ol {
+    gap: 18px;
+  }
+  .view-exam .course-journey button {
+    min-height: 38px;
+    padding-top: 7px;
+    padding-bottom: 7px;
+  }
+  .assessment-preview .assessment-desk {
+    margin-top: 8px;
+  }
+  .assessment-preview .question-sheet {
+    padding-top: 10px;
+  }
+  .assessment-preview .question-sheet h3 {
+    margin-top: 12px;
+  }
+  .exam-readiness a {
+    min-height: 24px;
+    display: inline-flex;
+    align-items: center;
+  }
+}

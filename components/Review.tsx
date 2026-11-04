@@ -9,6 +9,7 @@ import type {
 } from "@/lib/contracts";
 import { results } from "@/lib/domain";
 import MathText from "./MathText";
+import PdfDownload from "./PdfDownload";
 import VectorAnswer from "./VectorAnswer";
 
 type Solution = {
@@ -108,6 +109,9 @@ export default function Review({
     items.reduce((n, r) => n + r[key], 0);
   return (
     <div className="review-workspace" aria-busy={busy}>
+      <div className="review-export">
+        <PdfDownload examId={attempt.examId} attemptId={attempt.id} />
+      </div>
       <div className="review-summary">
         <section className="panel">
           <span className="eyebrow">AUTOMATICALLY CHECKED</span>

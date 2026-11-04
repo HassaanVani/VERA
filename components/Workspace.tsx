@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 
 import {
-  ArrowDownToLine,
   ArrowRight,
   ArrowUpRight,
   Clock3,
@@ -23,6 +22,7 @@ import type { Packet, Revision, Job, Attempt, Role } from "@/lib/contracts";
 
 import type { PublicCheckedExam } from "@/lib/assessment-access";
 import Review from "./Review";
+import PdfDownload from "./PdfDownload";
 import usePlanDraft from "./usePlanDraft";
 import Dialog from "./Dialog";
 import CourseJourney from "./CourseJourney";
@@ -33,7 +33,7 @@ import CourseLibrary from "./CourseLibrary";
 import Brand from "./Brand";
 import CourseMaterials from "./CourseMaterials";
 import ExamPreview from "./ExamPreview";
-import ExamChecks from "./ExamChecks";
+import ExamChecks, { ExamReadiness } from "./ExamChecks";
 
 import Practice from "./Practice";
 
@@ -986,26 +986,7 @@ export default function Workspace() {
                           </select>
                         )}
 
-                        <button
-                          className="secondary"
-                          onClick={() => {
-                            const a = document.createElement("a");
-
-                            a.href = URL.createObjectURL(
-                              new Blob([JSON.stringify(exam, null, 2)], {
-                                type: "application/json",
-                              }),
-                            );
-
-                            a.download = "vera-assessment.json";
-
-                            a.click();
-
-                            URL.revokeObjectURL(a.href);
-                          }}
-                        >
-                          <ArrowDownToLine size={16} /> Export
-                        </button>
+                        <PdfDownload examId={exam.id} />
 
                         {!exam.ready && (
                           <button
@@ -1033,13 +1014,33 @@ export default function Workspace() {
                       </div>
                     </div>
 
-                    <ExamChecks exam={exam} />
+                    {exam.ready ? (
+                      <ExamReadiness exam={exam} />
+                    ) : (
+                      <ExamChecks exam={exam} />
+                    )}
 
                     <ExamPreview
                       key={exam.id}
                       exam={exam}
                       onSource={openSource}
                     />
+                    {exam.ready && (
+                      <section
+                        id="assessment-checks"
+                        className="assessment-checks-after"
+                        aria-label="Checking scope and run evidence"
+                        tabIndex={-1}
+                      >
+                        <ExamChecks exam={exam} />
+                        <a
+                          href="#assessment-top"
+                          className="return-to-question"
+                        >
+                          Return to question
+                        </a>
+                      </section>
+                    )}
                   </>
                 ))}
 

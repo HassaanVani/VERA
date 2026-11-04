@@ -1,3 +1,5 @@
+import { exportPdf, pdfFilename } from "@/lib/pdf-export";
+import { examProvenance, runEvidence } from "@/lib/run-evidence";
 import { illustratedPacket } from "@/lib/illustrated-demo";
 import { vectorPacket } from "@/lib/vector-demo";
 import { NextRequest } from "next/server";
@@ -92,7 +94,9 @@ export async function GET(
               ? "This operation failed. Retry after checking configuration and the source packet; the private diagnostic is retained locally."
               : undefined,
           })),
-        exams: exams.map(publicExam),
+        exams: exams.map((e) =>
+          publicExam({ ...e, provenance: examProvenance(e) }),
+        ),
         attempts: list<Attempt>("attempt").filter((a) => examIds.has(a.examId)),
         usage: (() => {
           const summary = usageSummary();
@@ -127,6 +131,63 @@ export async function GET(
           capabilityTested: !!get("probe", modelConfig().model),
         },
       });
+    }
+    if (path[0] === "exams" && path[2] === "evidence" && path.length === 3) {
+      const exam = get<CheckedExam>("exam", path[1]);
+      return exam
+        ? json(runEvidence(exam))
+        : json({ error: "Assessment not found." }, 404);
+    }
+    if (
+      (path[0] === "exams" || path[0] === "attempts") &&
+      path[2] === "pdf" &&
+      path.length === 3
+    ) {
+      const attempt =
+        path[0] === "attempts" ? get<Attempt>("attempt", path[1]) : undefined;
+      if (path[0] === "attempts" && !attempt?.submittedAt)
+        return json(
+          { error: "Submit this attempt before exporting its review." },
+          403,
+        );
+      const exam = get<CheckedExam>("exam", attempt?.examId || path[1]);
+      const packet = exam ? get<Packet>("packet", exam.packetId) : undefined;
+      if (!exam || !packet)
+        return json({ error: "Assessment not found." }, 404);
+      try {
+        const bytes = await exportPdf(
+          { ...exam, provenance: examProvenance(exam) },
+          packet,
+          attempt,
+        );
+        return new Response(new Uint8Array(bytes), {
+          headers: {
+            "Content-Type": "application/pdf",
+            "Content-Disposition": `attachment; filename="${pdfFilename(exam.exam.title, !!attempt)}"`,
+            "Cache-Control": "no-store",
+            "X-Content-Type-Options": "nosniff",
+          },
+        });
+      } catch (error) {
+        console.error(
+          "PDF export failed:",
+          error instanceof Error ? error.stack : "Unknown renderer error",
+        );
+        const message =
+          error instanceof Error
+            ? error.message
+            : "Could not create the PDF. Try again.";
+        return json(
+          {
+            error: /figure|PDF|browser|Chromium|Chrome|VERA_PDF_BROWSER/.test(
+              message,
+            )
+              ? message
+              : "Could not create the PDF. Try again; check the local PDF browser setup if this persists.",
+          },
+          503,
+        );
+      }
     }
     if (path[0] === "attempts" && path[2] === "solutions") {
       const attempt = get<Attempt>("attempt", path[1]);
