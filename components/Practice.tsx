@@ -14,6 +14,7 @@ import MathText from "./MathText";
 import Exhibits from "./Exhibits";
 import Dialog from "./Dialog";
 import useAttemptResponses from "./useAttemptResponses";
+import VectorAnswer from "./VectorAnswer";
 
 export default function Practice({
   attempt,
@@ -79,9 +80,20 @@ export default function Practice({
   const q = exam.exam.questions[index],
     seconds = Math.max(0, Math.ceil((attempt.endsAt - now) / 1000));
   const untimed = attempt.mode === "untimed";
+  const supportingIds = q.exhibitIds.filter(
+    (id) => id !== q.responseDiagram?.exhibitId,
+  );
   const hasMaterial =
     !!exam.scenario ||
-    (exam.exam.exhibits ?? []).some((e) => q.exhibitIds.includes(e.id));
+    (exam.exam.exhibits ?? []).some((e) => supportingIds.includes(e.id));
+  const referenceLayout =
+    !!exam.scenario ||
+    (exam.exam.exhibits ?? []).some((e) =>
+      exam.exam.questions.some(
+        (q) =>
+          q.exhibitIds.includes(e.id) && q.responseDiagram?.exhibitId !== e.id,
+      ),
+    );
   const answered = exam.exam.questions.filter((question) =>
     responses[question.number]?.trim(),
   ).length;
@@ -104,7 +116,7 @@ export default function Practice({
       if (focused !== trigger && focused !== document.body && !leavingReview)
         return;
       heading.current?.focus({ preventScroll: true });
-      heading.current?.scrollIntoView({ block: "center", behavior: "smooth" });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     });
   }
   function toggleFlag() {
@@ -237,7 +249,7 @@ export default function Practice({
         </div>
       )}
       <div
-        className={`exam-layout practice-layout assessment-desk ${hasMaterial ? "with-reference" : "without-material reading-only"}`}
+        className={`exam-layout practice-layout assessment-desk ${referenceLayout ? "with-reference" : "without-material reading-only"}`}
         data-mobile-pane={mobilePane}
       >
         <div className="practice-questions">
@@ -306,9 +318,11 @@ export default function Practice({
                   : "Flag for review"}
               </button>
             </div>
-            <h3 ref={heading} tabIndex={-1}>
-              <MathText text={q.question} />
-            </h3>
+            <div className="question-prompt">
+              <h3 ref={heading} tabIndex={-1}>
+                <MathText text={q.question} />
+              </h3>
+            </div>
             <details className="question-scoring">
               <summary>Scoring & objective</summary>
               {q.objective && <p>{q.objective}</p>}
@@ -331,7 +345,18 @@ export default function Practice({
                 Use the supporting material for this question.
               </p>
             )}
-            {q.type === "multiple-choice" ? (
+            {q.responseDiagram ? (
+              <VectorAnswer
+                key={q.number}
+                config={q.responseDiagram}
+                exhibit={exam.exam.exhibits?.find(
+                  (e) => e.id === q.responseDiagram!.exhibitId,
+                )}
+                value={responses[q.number] || ""}
+                disabled={submitting || !seconds}
+                onChange={(value) => answer(q.number, value)}
+              />
+            ) : q.type === "multiple-choice" ? (
               <fieldset className="options">
                 <legend className="sr-only">Select an answer</legend>
                 {q.options.map((option, i) => (
@@ -452,7 +477,7 @@ export default function Practice({
         <Exhibits
           scenario={exam.scenario}
           exhibits={exam.exam.exhibits}
-          ids={q.exhibitIds}
+          ids={supportingIds}
           onSource={onSource}
           imageExhibits={exam.imageExhibits}
         />

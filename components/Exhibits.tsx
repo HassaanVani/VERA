@@ -300,7 +300,7 @@ export default function Exhibits({
         </div>
       )}
       <div
-        className="paper"
+        className={`paper paper-${current.kind} ${current.readingLayout === "prose" ? "paper-prose" : ""}`}
         role={available.length > 1 ? "tabpanel" : "region"}
         id={`${tabId}-material`}
         aria-labelledby={
@@ -314,7 +314,9 @@ export default function Exhibits({
             ? "CREATED FOR THIS PRACTICE"
             : "PREPARED FROM COURSE EVIDENCE"}
         </p>
-        {current.content && <MathText text={current.content} />}
+        {current.content && current.kind !== "image" && (
+          <MathText text={current.content} />
+        )}
         {current.kind === "table" && (
           <div className="material-table">
             <table>
@@ -374,6 +376,7 @@ export default function Exhibits({
               </p>
               <details className="diagram-data">
                 <summary>Figure description</summary>
+                {current.content && <MathText text={current.content} />}
                 <p>{image.description}</p>
               </details>
             </div>

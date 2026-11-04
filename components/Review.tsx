@@ -9,6 +9,7 @@ import type {
 } from "@/lib/contracts";
 import { results } from "@/lib/domain";
 import MathText from "./MathText";
+import VectorAnswer from "./VectorAnswer";
 
 type Solution = {
   exam: CheckedExam;
@@ -262,13 +263,24 @@ export default function Review({
             <div className="review-pair">
               <section className="your-response">
                 <h4>Your answer</h4>
-                <MathText
-                  text={
-                    q.type === "multiple-choice" && response
-                      ? `${response}. ${q.options[response.charCodeAt(0) - 65] ?? ""}`
-                      : response || "No response recorded"
-                  }
-                />
+                {q.responseDiagram ? (
+                  <VectorAnswer
+                    config={q.responseDiagram}
+                    exhibit={exam.exam.exhibits?.find(
+                      (e) => e.id === q.responseDiagram!.exhibitId,
+                    )}
+                    value={response}
+                    readOnly
+                  />
+                ) : (
+                  <MathText
+                    text={
+                      q.type === "multiple-choice" && response
+                        ? `${response}. ${q.options[response.charCodeAt(0) - 65] ?? ""}`
+                        : response || "No response recorded"
+                    }
+                  />
+                )}
               </section>
               <section>
                 <h4>

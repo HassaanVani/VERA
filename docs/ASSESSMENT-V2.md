@@ -37,6 +37,8 @@ Originality defenses include exact duplicate stems, eight-word overlap warnings 
 
 ## Persistence and recovery
 
+Worked-response questions may optionally carry a public, answer-free `responseDiagram` configuration when their approved slot selects vector drawing. `VERA_VECTOR_V1:` response strings contain a version, bounded vector endpoints and reasoning; existing text responses remain readable. The server rejects malformed/non-finite/out-of-bounds/excessive vectors before storing the patch. The same autosave, browser backup, server acknowledgment, submission lock and self-scoring flow applies. A missing drawing is not a successful automatic answer. Review reconstructs the saved vectors; provisional feedback quotes a readable coordinate description and still cannot assign points. See [DIAGRAMS.md](DIAGRAMS.md).
+
 The records database stores plans, revisions, immutable stage outputs, deterministic snapshots, independent solutions, comparison results, repair replacements and feedback. Every repair cycle retains its before/replacement records; no more than two cycles are permitted. Completion checks cancellation inside the publication transaction. An interrupted provider call retains uncertain spending rather than assuming it was free.
 
 The shared budget database imports old app and MIT-evaluation usage rows by ID, without rewriting either source database. New reservations use one SQLite transaction across concurrent app/evaluation calls. The additional OCW campaign has a persistent USD 20 cap within the USD 90 development allocation. A repeated process or new batch name does not reset that cap; original USD 30 demo and reserve allocations remain protected.

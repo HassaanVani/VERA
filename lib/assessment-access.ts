@@ -76,6 +76,7 @@ export function publicExam(e: CheckedExam) {
           kind,
           title,
           content,
+          readingLayout,
           columns,
           rows,
           points,
@@ -87,6 +88,7 @@ export function publicExam(e: CheckedExam) {
           kind,
           title,
           content,
+          readingLayout,
           columns,
           rows,
           points,
@@ -104,6 +106,16 @@ export function publicExam(e: CheckedExam) {
         question: q.question,
         options: q.options,
         exhibitIds: q.exhibitIds,
+        responseDiagram: q.responseDiagram
+          ? {
+              exhibitId: q.responseDiagram.exhibitId,
+              minX: q.responseDiagram.minX,
+              maxX: q.responseDiagram.maxX,
+              minY: q.responseDiagram.minY,
+              maxY: q.responseDiagram.maxY,
+              maxVectors: q.responseDiagram.maxVectors,
+            }
+          : undefined,
         objective: q.objective,
         section: q.section,
         subparts: q.subparts,

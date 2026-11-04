@@ -84,6 +84,17 @@ export function blueprintIssues(b: Blueprint, packet?: Packet): Issue[] {
       "TOPIC_EVIDENCE",
       "Each question topic needs at least one course-content source beyond solutions or generated references.",
     );
+  if (
+    b.slots.some(
+      (slot) =>
+        slot.responseMode === "vector-drawing" &&
+        slot.type !== "worked-response",
+    )
+  )
+    add(
+      "RESPONSE_MODE",
+      "Vector drawing requires a worked-response question and self-scoring.",
+    );
   for (const o of b.observations) {
     if (o.kind === "observed" && !o.evidence.length)
       add("NO_EVIDENCE", "Observed facts need a source reference.");
@@ -182,6 +193,49 @@ export function checkExam(
       stem = q.question.toLowerCase().replace(/\s+/g, " ");
     if (q.number !== i + 1)
       add("NUMBERING", p, "Question numbering is not sequential.");
+    if (slot?.responseMode === "vector-drawing" && !q.responseDiagram)
+      add(
+        "RESPONSE_DIAGRAM",
+        p,
+        "The approved question needs a vector response diagram.",
+      );
+    if (q.responseDiagram) {
+      const c = q.responseDiagram,
+        exhibit = e.exhibits?.find((e) => e.id === c.exhibitId);
+      if (
+        slot?.responseMode !== "vector-drawing" ||
+        q.type !== "worked-response" ||
+        !q.exhibitIds.includes(c.exhibitId) ||
+        exhibit?.kind !== "diagram" ||
+        exhibit?.drawing?.axes === "none" ||
+        c.minX >= c.maxX ||
+        c.minY >= c.maxY ||
+        (exhibit?.drawing?.circles ?? []).some((circle) => {
+          const center = exhibit?.points.find(
+            (point) => point.label === circle.center,
+          );
+          return (
+            !center ||
+            center.x - circle.radius < c.minX ||
+            center.x + circle.radius > c.maxX ||
+            center.y - circle.radius < c.minY ||
+            center.y + circle.radius > c.maxY
+          );
+        }) ||
+        exhibit.points.some(
+          (point) =>
+            point.x < c.minX ||
+            point.x > c.maxX ||
+            point.y < c.minY ||
+            point.y > c.maxY,
+        )
+      )
+        add(
+          "RESPONSE_DIAGRAM",
+          p,
+          "Vector responses need an approved worked question, a referenced precise diagram and valid bounds containing all givens.",
+        );
+    }
     if (
       !slot ||
       q.type !== slot.type ||

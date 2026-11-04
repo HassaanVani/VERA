@@ -15,6 +15,7 @@ type Props = {
   onUpload: () => void;
   onGeneralSample: () => void;
   onIllustratedSample: () => void;
+  onVectorSample?: () => void;
   onOpen: (
     packet: Packet,
     next: "packet" | "blueprint" | "exam" | "practice" | "results",
@@ -32,6 +33,7 @@ export default function CourseLibrary({
   onUpload,
   onGeneralSample,
   onIllustratedSample,
+  onVectorSample,
   onOpen,
 }: Props) {
   const [query, setQuery] = useState("");
@@ -263,8 +265,8 @@ export default function CourseLibrary({
           </summary>
           <div>
             <p>
-              A short research-methods course with original questions and
-              synthetic data. Loading it uses no model credits.
+              Try original saved examples with written, numerical or drawing
+              responses. Loading them uses no model credits.
             </p>
             <button
               className="secondary"
@@ -280,6 +282,15 @@ export default function CourseLibrary({
             >
               Explore diagrams & documents <ArrowRight size={15} />
             </button>
+            {onVectorSample && (
+              <button
+                className="text-button"
+                disabled={busy}
+                onClick={onVectorSample}
+              >
+                Try vector drawing <ArrowRight size={15} />
+              </button>
+            )}
           </div>
         </details>
       </section>

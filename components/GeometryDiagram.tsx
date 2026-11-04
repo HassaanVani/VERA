@@ -1,33 +1,20 @@
 import { useId } from "react";
 import type { Exam } from "@/lib/contracts";
+import { diagramGeometry } from "@/lib/diagram-geometry";
 type Exhibit = NonNullable<Exam["exhibits"]>[number];
 export default function GeometryDiagram({ exhibit }: { exhibit: Exhibit }) {
   const arrow = useId().replaceAll(":", "");
   const drawing = exhibit.drawing;
   const points = new Map(exhibit.points.map((p) => [p.label, p]));
-  const bounds = [...exhibit.points];
-  if (drawing?.axes !== "none") bounds.push({ label: "", x: 0, y: 0 });
-  for (const circle of drawing?.circles ?? []) {
-    const center = points.get(circle.center);
-    if (center)
-      for (const direction of [-1, 1])
-        bounds.push({
-          label: "",
-          x: center.x + direction * circle.radius,
-          y: center.y + direction * circle.radius,
-        });
-  }
-  const minX = Math.min(0, ...bounds.map((p) => p.x)),
-    maxX = Math.max(0, ...bounds.map((p) => p.x));
-  const minY = Math.min(0, ...bounds.map((p) => p.y)),
-    maxY = Math.max(0, ...bounds.map((p) => p.y));
-  const span = Math.max(1, maxX - minX, maxY - minY) * 1.15;
-  const x = (v: number) => 170 + ((v - (minX + maxX) / 2) / span) * 280,
-    y = (v: number) => 170 - ((v - (minY + maxY) / 2) / span) * 280;
+  const { x, y, width, height, scale } = diagramGeometry(exhibit);
   return (
     <div className="geometry-reference">
       <svg
-        viewBox="0 0 340 340"
+        viewBox={`0 0 ${width} ${height}`}
+        style={{
+          maxWidth: Math.min(620, (480 * width) / height),
+          height: "auto",
+        }}
         role="img"
         aria-label={`${exhibit.title}. ${drawing?.description || "Coordinates listed below."}`}
       >
@@ -50,9 +37,9 @@ export default function GeometryDiagram({ exhibit }: { exhibit: Exhibit }) {
         </defs>
         {drawing?.axes !== "none" && (
           <g className="geometry-axes">
-            <line x1="15" y1={y(0)} x2="325" y2={y(0)} />
-            <line x1={x(0)} y1="15" x2={x(0)} y2="325" />
-            <text x="320" y={y(0) + 15}>
+            <line x1="15" y1={y(0)} x2={width - 15} y2={y(0)} />
+            <line x1={x(0)} y1="15" x2={x(0)} y2={height - 15} />
+            <text x={width - 24} y={y(0) + 15}>
               x
             </text>
             <text x={x(0) + 8} y="22">
@@ -94,7 +81,7 @@ export default function GeometryDiagram({ exhibit }: { exhibit: Exhibit }) {
               key={`circle-${i}`}
               cx={x(center.x)}
               cy={y(center.y)}
-              r={(circle.radius / span) * 280}
+              r={circle.radius * scale}
               fill="none"
               stroke="currentColor"
               strokeWidth="1.6"

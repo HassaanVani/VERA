@@ -1,3 +1,4 @@
+import { validVectorResponse } from "./vector-response";
 import { z } from "zod";
 import {
   Attempt,
@@ -174,6 +175,13 @@ export function updateAttempt(attemptId: string, body: unknown): Attempt {
       const q = e.exam.questions.find((q) => String(q.number) === key);
       if (!q || (q.type === "multiple-choice" && !/^[A-D]$/.test(response)))
         throw new Error("Invalid question response.");
+      if (
+        q.responseDiagram &&
+        !validVectorResponse(response, q.responseDiagram)
+      )
+        throw new Error(
+          "Diagram response is malformed or outside its stated coordinate bounds.",
+        );
     }
     if (a.submittedAt && patch.responses)
       throw new Error("Responses are locked after submission.");

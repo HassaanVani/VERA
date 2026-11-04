@@ -102,9 +102,12 @@ describe("precise diagrams and retrieved source passages", () => {
     ];
     expect(circles.length).toBeGreaterThan(3);
     for (const [, cx, cy, radius] of circles) {
-      for (const center of [Number(cx), Number(cy)]) {
+      const viewport = markup.match(/viewBox="0 0 ([\d.]+) ([\d.]+)"/)!;
+      for (const [axis, center] of [Number(cx), Number(cy)].entries()) {
         expect(center - Number(radius)).toBeGreaterThan(10);
-        expect(center + Number(radius)).toBeLessThan(330);
+        expect(center + Number(radius)).toBeLessThan(
+          Number(viewport[axis + 1]) - 10,
+        );
       }
     }
   });

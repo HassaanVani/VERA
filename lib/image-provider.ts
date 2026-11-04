@@ -98,7 +98,7 @@ export class MetaImageProvider implements ImageProvider {
                   enable_image_search: false,
                   enable_shell: true,
                   reasoning_strength: "high",
-                  size: "1536x1024",
+                  size: "auto",
                   output_format: "png",
                 },
               ],

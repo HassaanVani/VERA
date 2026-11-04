@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import type { Attempt, CheckedExam, FeedbackRecord, Packet } from "./contracts";
 import { automaticGrade, CHECKER_VERSION } from "./verification";
 import { get, put } from "./store";
+import { responseText } from "./vector-response";
 
 export const responseHash = (a: Attempt) =>
   createHash("sha256").update(JSON.stringify(a.responses)).digest("hex");
@@ -53,7 +54,7 @@ export function persistFeedback(
       attemptId: attempt.id,
       examId: exam.id,
       question: q.number,
-      answerExcerpt: response.slice(0, 1000),
+      answerExcerpt: responseText(response).slice(0, 1000),
       criterion,
       text,
       basis,

@@ -15,6 +15,127 @@
 .primary svg {
   color: currentColor;
 }
+.vector-answer {
+  margin-top: 24px;
+  min-width: 0;
+}
+.vector-answer > h4 {
+  font-size: 14px;
+  margin: 0 0 8px;
+}
+.vector-answer > p {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+.vector-answer-canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 620px;
+  touch-action: none;
+  border: 1px solid #798b99;
+  border-radius: 3px;
+}
+.is-readonly .vector-answer-canvas {
+  touch-action: auto;
+}
+.vector-grid line {
+  stroke: #d8e0e3;
+  stroke-width: 0.65;
+}
+.vector-grid text {
+  fill: #536675;
+  font-size: 11px;
+  text-anchor: middle;
+}
+.vector-givens {
+  stroke: #354d61;
+  fill: none;
+  stroke-width: 1.5;
+}
+.vector-givens text {
+  font-size: 12px;
+  fill: #354d61;
+  stroke: none;
+}
+.answer-vector {
+  stroke: #126ca8;
+  stroke-width: 2.6;
+  fill: none;
+}
+.answer-vector text {
+  fill: #126ca8;
+  stroke: none;
+  font-size: 13px;
+}
+.vector-list {
+  padding-left: 20px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.8;
+}
+.vector-answer .diagram-data {
+  color: var(--muted);
+}
+.vector-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.vector-coordinate-entry {
+  margin: 16px 0;
+  font-size: 12px;
+}
+.vector-coordinate-entry summary {
+  cursor: pointer;
+  padding: 8px 0;
+}
+.vector-fields {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin: 10px 0;
+}
+.vector-fields label {
+  min-width: 0;
+  margin: 0;
+}
+.vector-fields input {
+  display: block;
+  margin-top: 6px;
+  width: 100%;
+  min-width: 0;
+}
+.vector-answer .response-label textarea {
+  min-height: 120px;
+}
+.skip-link:not(:focus) {
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+.vector-notice {
+  min-height: 24px;
+}
+.response-method {
+  display: block;
+  margin-top: 16px;
+}
+.response-method select {
+  display: block;
+  width: 100%;
+  max-width: 360px;
+  margin-top: 8px;
+}
+.response-method small {
+  display: block;
+  margin-top: 8px;
+  color: var(--muted);
+  line-height: 1.6;
+}
 .figure-fullsize {
   display: inline-flex;
   align-items: center;
@@ -44,7 +165,55 @@ a:focus-visible {
   margin-bottom: 8px;
 }
 .view-exam main {
-  padding-top: 20px;
+  padding-top: 6px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 24px;
+}
+.view-exam main > * {
+  grid-column: 1/-1;
+}
+.view-exam main > .page-title {
+  grid-column: 1;
+  grid-row: 1;
+  margin-bottom: 8px;
+}
+.view-exam main > .course-journey {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: end;
+}
+.view-exam .topbar {
+  padding-top: 12px;
+  padding-bottom: 0;
+}
+.view-exam .exam-header h2 {
+  margin: 0 0 6px;
+}
+.view-exam .exam-header p {
+  margin: 4px 0 0;
+}
+.preview-toolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0 24px;
+  align-items: start;
+  border-bottom: 1px solid var(--line);
+}
+.preview-toolbar .preview-position {
+  grid-column: 1;
+  grid-row: 1;
+  border: 0;
+}
+.preview-toolbar .assessment-instructions {
+  grid-column: 2;
+  grid-row: 1;
+  padding-top: 15px;
+}
+.preview-toolbar .assessment-instructions[open] {
+  grid-column: 1/-1;
+  grid-row: 2;
+  padding-top: 4px;
 }
 .view-exam .page-title p {
   display: none;
@@ -152,7 +321,93 @@ a:focus-visible {
   max-width: 1600px;
 }
 .assessment-preview .assessment-desk {
-  margin-top: 24px;
+  margin-top: 12px;
+}
+.exam-checks .check-report.pass {
+  display: block;
+  padding: 4px 0;
+  margin: 0;
+}
+.exam-checks summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  min-height: 32px;
+  flex-wrap: wrap;
+}
+.authored-label {
+  color: #c8b895;
+  font-size: 10px;
+}
+.exam-checks summary > span {
+  margin-left: auto;
+  font-size: 11px;
+}
+.exam-checks p {
+  margin: 8px 0;
+  max-width: 95ch;
+}
+.assessment-preview .question-sheet {
+  display: flex;
+  flex-direction: column;
+  min-height: clamp(380px, calc(100svh - 340px), 640px);
+}
+.assessment-preview .preview-paging {
+  margin-top: auto;
+  padding-top: 20px;
+  width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+}
+.question-prompt {
+  min-height: clamp(120px, 17svh, 180px);
+}
+.question-prompt h3 {
+  margin-top: 14px;
+}
+.question-sheet .katex-display {
+  margin: 0.45em 0;
+  line-height: 1.2;
+}
+.practice-questions {
+  scroll-margin-top: 24px;
+}
+.question-topic {
+  min-height: 36px;
+}
+.paper.paper-image {
+  padding: clamp(12px, 1.2vw, 20px);
+  background: #f5f3ee;
+}
+.paper-image h3 {
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+.paper-image .paper-sub {
+  margin-bottom: 16px;
+}
+.paper-image .generated-figure {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+.paper-image footer {
+  margin-top: 16px;
+  padding-top: 12px;
+}
+.view-exam .course-journey {
+  margin-bottom: 8px;
+}
+.view-exam .exam-header {
+  padding-bottom: 10px;
+}
+.assessment-instructions {
+  padding: 4px 0 8px;
+}
+.preview-position {
+  min-height: 44px;
 }
 .assessment-desk.with-reference {
   grid-template-columns: minmax(0, 760px) minmax(320px, 620px);
@@ -303,6 +558,9 @@ a:focus-visible {
   font-size: 18px;
   line-height: 1.9;
 }
+.paper-prose > .math-text {
+  white-space: normal;
+}
 .paper-sub {
   font-size: 9px;
   color: #51606d;
@@ -367,6 +625,36 @@ a:focus-visible {
   max-width: 1600px;
   margin: 10px auto 0;
   align-items: center;
+}
+.view-practice .topbar {
+  padding-top: 12px;
+  padding-bottom: 0;
+}
+.view-practice .practice-bar {
+  margin-top: 0;
+}
+.view-practice .practice-bar h2 {
+  font-size: 21px;
+  margin: 4px 0;
+}
+.view-practice .practice-bar .eyebrow {
+  display: none;
+}
+.view-practice .practice-progress {
+  margin-top: 10px;
+  padding-bottom: 10px;
+}
+.view-practice .practice-layout {
+  margin-top: 18px;
+}
+.view-practice .question-dots {
+  padding-bottom: 4px;
+}
+.view-practice .question-nav-legend {
+  margin-bottom: 8px;
+}
+.view-practice .question-sheet {
+  padding-top: 8px;
 }
 .practice-bar h2 {
   font-size: 23px;
@@ -554,6 +842,15 @@ a:focus-visible {
   }
 }
 @media (max-width: 760px) {
+  .view-exam main {
+    display: block;
+  }
+  .preview-toolbar {
+    display: block;
+  }
+  .preview-toolbar .assessment-instructions {
+    padding: 6px 0;
+  }
   .assessment-desk.with-reference,
   .assessment-desk.reading-only {
     grid-template-columns: minmax(0, 1fr) !important;
@@ -562,6 +859,12 @@ a:focus-visible {
   .assessment-preview .exhibit-panel {
     position: static;
     grid-row: auto;
+  }
+  .question-prompt {
+    min-height: 0;
+  }
+  .assessment-preview .question-sheet {
+    min-height: 360px;
   }
   .question-sheet h3 {
     font-size: 21px;

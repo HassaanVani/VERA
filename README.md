@@ -18,7 +18,7 @@ Open [http://127.0.0.1:3000](http://127.0.0.1:3000). The launcher starts both Ne
 
 The `--legacy-peer-deps` installation option avoids a peer-resolution crash observed with npm 10.9. A lockfile is included. A clean installation can use `npm ci --legacy-peer-deps`.
 
-Choose **Try evidence & decisions** for an original example with choice, numeric, short-answer and essay questions, or **Open sample course** for the legacy transformation-lab example. Review and approve the plan, then load the **saved demonstration**. Both paths make **no Meta calls** and remain labeled examples. Their authored questions are not evidence of model quality.
+Open **Explore a saved example** and choose **Try evidence & decisions**, **Explore diagrams & documents**, or **Try vector drawing**. Review and approve its plan, then load the saved demonstration. These original authored examples make **no Meta calls** and are not evidence of model quality. Legacy transformation-lab records remain readable.
 
 ## Enable live Meta generation
 
@@ -42,6 +42,7 @@ See [Meta integration](docs/META.md) for supported API shapes, pricing, usage ac
 - Select **Diagram rendering → Muse Image** in a live exam plan for agentic Meta image generation. Precise SVG remains available. Actual generated PNGs receive separate provisional visual review and stay outside the public directory. See the [image integration and retained trial results](docs/MUSE-IMAGE-TRIAL.md); circuit-symbol reliability remains limited.
 - Structural, evidence-location, bounded arithmetic/polynomial, table/coordinate and legacy matrix checks; independent solving with the key withheld; provisional model review; and two bounded repair cycles with retained intermediate artifacts.
 - Timed or untimed practice, server-acknowledged autosave with browser recovery, key-based choice/numeric grading, rubric-guided written self-scoring, reported feedback disputes and editable targeted plans requiring approval.
+- Vector construction on a precise diagram using drag, touch start/end or exact coordinates, with saved geometry/explanation, refresh recovery and read-only rubric review. This is self-scored; arbitrary handwriting/raster annotation is not supported. See the [drawing and source-handling limits](docs/DIAGRAMS.md) and [real historical-source capability example](docs/HUMANITIES-CAPABILITY.md).
 - A question-only JSON export. Keys, worked solutions, rubrics, numeric grading specifications and review answers stay private until an attempt is submitted; solutions open through an attempt-scoped endpoint.
 
 Course evidence is sent to Meta when you explicitly request analysis, generation or AI feedback; analysis also accompanies live generation in the benchmark. The app attaches extracted text and relevant rendered pages for analysis/generation. Pages carrying explicit rights-restriction notices are omitted from model inputs; this filter does not establish a blanket license for other pages. Unreadable or over-limit files are rejected with an error. Uploaded content is not application instructions. AI-generated reference material is excluded from course analysis.

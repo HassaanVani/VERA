@@ -395,6 +395,18 @@ export function verifyExam(exam: Exam, context: Context): Verification[] {
           : "Checks geometry references and bounded data, not conceptual relevance or every answer.",
       });
     }
+    if (q.responseDiagram)
+      results.push({
+        question: q.number,
+        claim: null,
+        method: "vector-response-grading",
+        result: "unsupported",
+        artifact:
+          "Vector coordinates and explanation are recorded; no automatic grading of the student's construction.",
+        checkerVersion: "vector-response/1",
+        limitation:
+          "Response bounds are checked, but those checks do not determine whether the drawn vector answers the question. Self-score against the rubric after submission.",
+      });
     results.push({
       question: q.number,
       claim: null,

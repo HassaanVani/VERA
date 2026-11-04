@@ -1,5 +1,69 @@
 import type { Blueprint, Exam, Packet } from "./contracts";
 import { excludedFromModel } from "./source-policy";
+// Match only whitespace and typographic quote variants, then return the actual
+// page substring. Never publish a model's rewritten quotation as a literal source.
+function canonicalSource(text: string) {
+  let normalized = "";
+  const starts: number[] = [],
+    ends: number[] = [];
+  for (let index = 0; index < text.length; index++) {
+    const char = text[index],
+      value = /\s/.test(char)
+        ? " "
+        : /[“”]/.test(char)
+          ? '"'
+          : /[‘’]/.test(char)
+            ? "'"
+            : char;
+    if (value === " " && normalized.endsWith(" ")) {
+      ends[ends.length - 1] = index + 1;
+      continue;
+    }
+    normalized += value;
+    starts.push(index);
+    ends.push(index + 1);
+  }
+  return { normalized, starts, ends };
+}
+export function exactSourceSlice(page: string, proposed: string) {
+  const haystack = canonicalSource(page),
+    needle = canonicalSource(proposed).normalized.trim();
+  if (needle.length < 8) return undefined;
+  const index = haystack.normalized.indexOf(needle);
+  return index < 0
+    ? undefined
+    : page.slice(
+        haystack.starts[index],
+        haystack.ends[index + needle.length - 1],
+      );
+}
+export function bindSourcePassages(exam: Exam, packet: Packet) {
+  const changes: { exhibitId: string; before: string; after: string }[] = [];
+  const exhibits = exam.exhibits?.map((exhibit) => {
+    if (exhibit.kind !== "passage" || exhibit.synthetic || !exhibit.source)
+      return exhibit;
+    const document = packet.documents.find(
+        (d) => d.id === exhibit.source!.documentId,
+      ),
+      page = document?.pages.find((p) => p.number === exhibit.source!.page);
+    if (
+      !document ||
+      ["solutions", "generated-reference"].includes(document.role) ||
+      !page ||
+      excludedFromModel(page)
+    )
+      return exhibit;
+    const actual = exactSourceSlice(page.text, exhibit.content);
+    if (actual === undefined || actual === exhibit.content) return exhibit;
+    changes.push({
+      exhibitId: exhibit.id,
+      before: exhibit.content,
+      after: actual,
+    });
+    return { ...exhibit, content: actual };
+  });
+  return { exam: changes.length ? { ...exam, exhibits } : exam, changes };
+}
 type Exhibit = NonNullable<Exam["exhibits"]>[number];
 const normalize = (text: string) => text.replace(/\s+/g, " ").trim();
 

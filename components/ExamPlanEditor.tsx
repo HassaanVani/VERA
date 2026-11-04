@@ -253,6 +253,10 @@ export default function ExamPlanEditor({
                           onChange={(e) =>
                             updateSlot(index, {
                               type: e.target.value as typeof slot.type,
+                              responseMode:
+                                e.target.value === "worked-response"
+                                  ? slot.responseMode
+                                  : undefined,
                             })
                           }
                         >
@@ -311,6 +315,33 @@ export default function ExamPlanEditor({
                         />
                       </label>
                     </div>
+                    {draft.schemaVersion === 2 &&
+                      slot.type === "worked-response" && (
+                        <label className="response-method">
+                          Answer method
+                          <select
+                            aria-label={`Question ${slot.number} answer method`}
+                            value={slot.responseMode || "written"}
+                            disabled={packet.fixture}
+                            onChange={(event) =>
+                              updateSlot(index, {
+                                responseMode: event.target.value as
+                                  | "written"
+                                  | "vector-drawing",
+                              })
+                            }
+                          >
+                            <option value="written">Written response</option>
+                            <option value="vector-drawing">
+                              Draw vectors on a diagram
+                            </option>
+                          </select>
+                          <small>
+                            Vector answers use a precise coordinate diagram and
+                            are self-scored after submission.
+                          </small>
+                        </label>
+                      )}
                     {(slot.type === "numeric" ||
                       slot.type === "multiple-choice") && (
                       <p className="muted small">

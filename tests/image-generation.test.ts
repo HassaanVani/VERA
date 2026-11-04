@@ -152,6 +152,7 @@ describe("Muse Image provider and exam boundaries", () => {
       tools: [
         {
           type: "image_generation",
+          size: "auto",
           enable_shell: true,
           enable_web_search: false,
           enable_image_search: false,

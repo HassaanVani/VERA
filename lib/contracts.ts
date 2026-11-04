@@ -40,6 +40,7 @@ export const Slot = z.object({
   objective: z.string().optional(),
   section: z.string().optional(),
   basis: DecisionBasis.optional(),
+  responseMode: z.enum(["written", "vector-drawing"]).optional(),
 });
 export const Blueprint = z.object({
   schemaVersion: z.literal(2).optional(),
@@ -118,6 +119,7 @@ export const Exhibit = z.object({
   kind: z.enum(["passage", "table", "diagram", "image"]),
   title: z.string().min(1),
   content: z.string(),
+  readingLayout: z.enum(["prose", "preserve-lines"]).optional(),
   columns: z.array(z.string()),
   rows: z.array(z.array(z.string())),
   points: z.array(
@@ -175,6 +177,14 @@ export const Exhibit = z.object({
     })
     .optional(),
 });
+export const ResponseDiagram = z.object({
+  exhibitId: z.string().min(1),
+  minX: z.number().finite().min(-10000).max(10000),
+  maxX: z.number().finite().min(-10000).max(10000),
+  minY: z.number().finite().min(-10000).max(10000),
+  maxY: z.number().finite().min(-10000).max(10000),
+  maxVectors: z.number().int().min(1).max(6),
+});
 export const Question = z.object({
   number: z.number().int().positive(),
   topic: z.string(),
@@ -194,6 +204,7 @@ export const Question = z.object({
     )
     .min(1),
   exhibitIds: z.array(z.string()),
+  responseDiagram: ResponseDiagram.optional(),
   claims: z.array(Claim),
   evidence: z.array(Evidence).optional(),
   objective: z.string().optional(),

@@ -12,7 +12,6 @@ import {
   LoaderCircle,
   Plus,
   RotateCcw,
-  ShieldCheck,
   Target,
   UploadCloud,
   X,
@@ -34,6 +33,7 @@ import CourseLibrary from "./CourseLibrary";
 import Brand from "./Brand";
 import CourseMaterials from "./CourseMaterials";
 import ExamPreview from "./ExamPreview";
+import ExamChecks from "./ExamChecks";
 
 import Practice from "./Practice";
 
@@ -797,6 +797,7 @@ export default function Workspace() {
                   onUpload={openUpload}
                   onGeneralSample={() => void demo("general")}
                   onIllustratedSample={() => void demo("illustrated")}
+                  onVectorSample={() => void demo("vector")}
                   onOpen={(p, next, selectedExam) => {
                     setPacketId(p.id);
 
@@ -1032,38 +1033,7 @@ export default function Workspace() {
                       </div>
                     </div>
 
-                    <div
-                      className={`check-report ${exam.ready ? "pass" : "fail"}`}
-                    >
-                      <ShieldCheck size={21} />
-
-                      <div>
-                        <strong>
-                          {exam.ready
-                            ? "Structural checks passed · review checking coverage"
-                            : "Unresolved checks · practice blocked"}
-                        </strong>
-
-                        <p>
-                          {exam.fixture
-                            ? "Saved demonstration. Model review was not run. Numerical claims and structure are checked locally."
-                            : `Recorded claim checks: ${exam.verification?.filter((v) => v.result === "passed").length ?? "legacy"}. ${exam.repairAttempts} repair cycles. Written reasoning is not automatically verified. Model review is provisional.`}
-                        </p>
-
-                        {exam.issues.map((i, n) => (
-                          <p
-                            className={
-                              i.severity === "error"
-                                ? "inline-error"
-                                : "source-warning"
-                            }
-                            key={n}
-                          >
-                            {i.code}: {i.message}
-                          </p>
-                        ))}
-                      </div>
-                    </div>
+                    <ExamChecks exam={exam} />
 
                     <ExamPreview
                       key={exam.id}
