@@ -7,6 +7,7 @@ import "./review.css";
 import "./workspace.css";
 import "./study.css";
 import "./assessment.css";
+import "./planning.css";
 export const metadata: Metadata = {
   title: "VERA · Make practice feel real",
   description:

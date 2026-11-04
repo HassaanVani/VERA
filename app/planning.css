@@ -1,0 +1,530 @@
+/* Preparation pages share a centered boundary and a clear primary column. */
+.view-packet main,
+.view-blueprint main,
+.view-packet .topbar,
+.view-blueprint .topbar {
+  max-width: 1440px;
+  margin-inline: auto;
+  width: 100%;
+}
+.view-packet main,
+.view-blueprint main {
+  padding-top: 24px;
+}
+.view-packet .page-title,
+.view-blueprint .page-title {
+  margin-bottom: 24px;
+}
+.view-packet .page-title h1,
+.view-blueprint .page-title h1 {
+  max-width: 38ch;
+  font-size: clamp(26px, 2.5vw, 34px);
+  letter-spacing: -1px;
+  overflow-wrap: anywhere;
+}
+.view-packet .page-title p,
+.view-blueprint .page-title p {
+  max-width: 68ch;
+  line-height: 1.8;
+}
+.view-packet .course-journey,
+.view-blueprint .course-journey {
+  margin-bottom: 36px;
+}
+.view-packet .course-context,
+.view-blueprint .course-context {
+  overflow-wrap: anywhere;
+}
+.materials-workbench {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 56px;
+  align-items: start;
+}
+.materials-sources,
+.plan-primary,
+.plan-context,
+.plan-footer {
+  min-width: 0;
+}
+.materials-heading {
+  padding-bottom: 18px;
+  margin-bottom: 0;
+  border-bottom: 1px solid var(--line);
+}
+.material-file {
+  padding: 24px 0;
+}
+.material-file-main {
+  gap: 14px;
+}
+.material-file h3 {
+  font-size: 16px;
+  line-height: 1.6;
+}
+.material-file-main .text-button {
+  font-size: 12px;
+  padding-right: 0;
+}
+.material-warning,
+.material-note {
+  max-width: 72ch;
+}
+.material-file > .material-warning,
+.material-file > .material-note {
+  margin-left: 36px;
+}
+.material-details {
+  margin-left: 36px;
+}
+.material-details summary {
+  min-height: 40px;
+  padding: 8px 0;
+  font-size: 12px;
+}
+.material-details select {
+  background: #0b1017;
+  border-color: #46515f;
+}
+.materials-next {
+  border-left: 1px solid var(--line);
+  padding: 2px 0 0 30px;
+}
+.materials-next .preparation-label {
+  font-size: 10px;
+  letter-spacing: 1.2px;
+  color: var(--muted);
+  margin: 0 0 12px;
+}
+.materials-next .material-text-coverage {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.8;
+  margin: 0;
+}
+.materials-action {
+  margin-top: 26px;
+  border-top: 1px solid var(--line);
+  padding-top: 24px;
+}
+.materials-next h2 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 25px;
+  font-weight: 400;
+  line-height: 1.45;
+  margin: 0 0 12px;
+}
+.materials-action > p {
+  font-size: 13px;
+  line-height: 1.9;
+  color: var(--muted);
+}
+.materials-action .primary {
+  width: 100%;
+  margin-top: 14px;
+}
+.materials-action .material-sharing {
+  font-size: 11px;
+  margin: 14px 0 0;
+}
+.source-policy {
+  margin-top: 26px;
+  border: 0;
+  padding: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+.source-policy summary {
+  cursor: pointer;
+  width: fit-content;
+  padding: 10px 0;
+}
+.source-policy > p {
+  line-height: 1.9;
+  max-width: 68ch;
+}
+.source-policy .text-button {
+  line-height: 1.7;
+  text-align: left;
+}
+.plan-editor.panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  column-gap: 56px;
+  row-gap: 0;
+}
+.plan-primary {
+  grid-column: 1;
+  grid-row: 1;
+}
+.plan-primary > .section-heading {
+  margin-bottom: 25px;
+}
+.plan-primary .section-heading h2 {
+  font-size: 15px;
+}
+.plan-primary .section-heading p {
+  font-size: 12px;
+  margin-top: 8px;
+  line-height: 1.8;
+}
+.plan-proposal {
+  padding-bottom: 14px;
+}
+.plan-proposal h3 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 28px;
+  font-weight: 400;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.plan-identity {
+  padding-bottom: 10px;
+  border-bottom: 0;
+}
+.plan-fields input,
+.plan-fields select,
+.plan-fields textarea {
+  background: #0b1017;
+  border-color: #46515f;
+  border-radius: 4px;
+}
+.plan-identity > input,
+.plan-identity > .plan-instructions {
+  max-width: 620px;
+}
+.plan-question > summary {
+  gap: 16px;
+  padding: 23px 0;
+  min-height: 92px;
+}
+.proposal-topic strong {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1.6;
+}
+.proposal-topic > span {
+  font-size: 12px;
+  line-height: 1.8;
+  margin-top: 4px;
+}
+.proposal-number {
+  padding-top: 7px;
+  color: var(--muted);
+}
+.plan-question-fields {
+  padding: 8px 0 28px 32px;
+}
+.plan-slot-heading {
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.plan-slot-heading .slot-number {
+  display: none;
+}
+.plan-slot-heading .badge {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  color: var(--muted);
+  font-size: 11px;
+}
+.plan-slot-context > summary,
+.plan-instructions > summary {
+  color: var(--blue-light);
+}
+.plan-context {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  border-left: 1px solid var(--line);
+  padding: 0 0 0 30px;
+}
+.assessment-outline h3 {
+  font-size: 15px;
+  font-weight: 500;
+  margin: 0 0 22px;
+}
+.plan-subject {
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.7;
+  margin: 0 0 25px;
+  overflow-wrap: anywhere;
+}
+.plan-subject > span,
+.assessment-outline h4 {
+  display: block;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--muted);
+  margin: 0 0 8px;
+}
+.assessment-outline h4 {
+  margin-top: 22px;
+}
+.balance-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.balance-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 6px 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: #c5cdd7;
+}
+.balance-list li > span:last-child {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.plan-basis {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.8;
+  margin: 22px 0 0;
+}
+.plan-context .plan-assumptions {
+  margin: 26px 0 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+  padding: 20px 0 0;
+}
+.plan-assumptions summary {
+  font-size: 12px;
+  line-height: 1.7;
+  gap: 12px;
+}
+.plan-assumptions ul {
+  font-size: 12px;
+  line-height: 1.9;
+  padding-left: 16px;
+}
+.plan-context .plan-evidence {
+  margin-top: 24px;
+  padding-top: 20px;
+}
+.plan-evidence > summary {
+  font-size: 12px;
+  line-height: 1.8;
+}
+.plan-evidence .evidence-panel {
+  background: none;
+  border: 0;
+}
+.plan-evidence .observation {
+  padding: 16px 0;
+  margin: 0;
+}
+.plan-evidence .observation p {
+  font-size: 12px;
+  line-height: 1.9;
+  color: var(--muted);
+}
+.evidence-basis {
+  font-size: 10px;
+  color: #c5cdd7;
+}
+.plan-evidence .source-link {
+  font-size: 11px;
+  line-height: 1.8;
+  text-align: left;
+  overflow-wrap: anywhere;
+  min-height: 44px;
+}
+.plan-footer {
+  grid-column: 1;
+  grid-row: 2;
+  margin-top: 8px;
+  border-top: 1px solid var(--line);
+}
+.plan-footer .plan-commit {
+  padding: 20px 0 0;
+  margin: 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: center;
+  border-radius: 0;
+  position: static;
+}
+.plan-commit p {
+  margin: 0;
+  color: var(--muted);
+  max-width: 34ch;
+}
+.plan-commit-actions {
+  flex-shrink: 0;
+  max-width: 100%;
+}
+.plan-footer .plan-disclaimer {
+  font-size: 11px;
+  line-height: 1.9;
+  max-width: 75ch;
+  margin-top: 20px;
+}
+.revision-changes {
+  background: none;
+  border: 0;
+  border-left: 2px solid #698096;
+  border-radius: 0;
+  padding: 8px 0 8px 20px;
+  max-width: 72ch;
+  margin-bottom: 28px;
+  font-size: 12px;
+  line-height: 1.9;
+}
+@media (max-width: 1100px) {
+  .materials-workbench,
+  .plan-editor.panel {
+    grid-template-columns: minmax(0, 1fr) 270px;
+    column-gap: 32px;
+  }
+  .materials-next,
+  .plan-context {
+    padding-left: 24px;
+  }
+  .plan-footer .plan-commit {
+    flex-wrap: wrap;
+  }
+}
+@media (max-width: 820px) {
+  .materials-workbench,
+  .plan-editor.panel {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .materials-sources,
+  .materials-next,
+  .plan-primary,
+  .plan-context,
+  .plan-footer {
+    width: 100%;
+  }
+  .materials-sources {
+    display: contents;
+  }
+  .material-files,
+  .materials-heading {
+    width: 100%;
+  }
+  .materials-next {
+    order: 2;
+  }
+  .source-policy {
+    order: 3;
+    width: 100%;
+  }
+  .plan-assumptions > summary,
+  .plan-evidence > summary {
+    min-height: 44px;
+  }
+  .materials-next,
+  .plan-context {
+    border-left: 0;
+    border-top: 1px solid var(--line);
+    padding: 26px 0 0;
+    margin-top: 30px;
+  }
+  .materials-action {
+    border: 0;
+    padding-top: 0;
+    max-width: 540px;
+  }
+  .materials-action .primary {
+    width: auto;
+  }
+  .assessment-outline {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 32px;
+    align-items: start;
+  }
+  .assessment-outline > h3,
+  .plan-subject,
+  .plan-basis {
+    grid-column: 1 / -1;
+  }
+  .assessment-outline > h4 {
+    grid-row: 3;
+    margin-top: 0;
+  }
+  .balance-list {
+    grid-row: 4;
+  }
+  .assessment-outline h3 {
+    margin-bottom: 16px;
+  }
+  .plan-subject {
+    margin-bottom: 20px;
+  }
+  .plan-footer {
+    margin-top: 30px;
+  }
+}
+@media (max-width: 540px) {
+  .view-packet .page-title .eyebrow,
+  .view-blueprint .page-title .eyebrow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+  }
+  .view-packet .course-return,
+  .view-blueprint .course-return {
+    white-space: nowrap;
+  }
+  .view-packet .course-context,
+  .view-blueprint .course-context {
+    display: block;
+    margin: 0 0 8px;
+  }
+  .material-file-main {
+    grid-template-columns: 20px minmax(0, 1fr);
+  }
+  .material-file-main .text-button {
+    grid-column: 2;
+    justify-self: start;
+    padding-left: 0;
+  }
+  .material-file > .material-warning,
+  .material-file > .material-note,
+  .material-details {
+    margin-left: 34px;
+  }
+  .materials-action .primary {
+    width: 100%;
+  }
+  .plan-proposal h3 {
+    font-size: 25px;
+  }
+  .proposal-topic strong {
+    font-size: 19px;
+  }
+  .plan-question-fields {
+    padding-left: 0;
+  }
+  .plan-slot-settings {
+    grid-template-columns: 1fr 1fr;
+    gap: 16px 12px;
+  }
+  .plan-slot-settings > label:first-child {
+    grid-column: 1 / -1;
+  }
+  .plan-footer .plan-commit {
+    display: block;
+  }
+  .plan-commit-actions {
+    margin-top: 16px;
+    justify-content: flex-start;
+  }
+  .plan-commit-actions > .primary {
+    flex: 1;
+  }
+  .assessment-outline {
+    column-gap: 20px;
+  }
+}

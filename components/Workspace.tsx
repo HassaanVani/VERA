@@ -901,40 +901,6 @@ export default function Workspace() {
                           onSource={openSource}
                         />
                       )}
-
-                      <details className="plan-evidence">
-                        <summary>Why these topics?</summary>
-                        <section className="evidence-panel">
-                          {draft.observations.map((o, i) => (
-                            <div className="observation" key={i}>
-                              <span
-                                className={`badge ${o.kind === "observed" ? "blue" : ""}`}
-                              >
-                                {o.kind.replaceAll("-", " ")}
-                              </span>
-
-                              <p>{o.text}</p>
-
-                              {o.evidence.map((r, n) => (
-                                <button
-                                  key={n}
-                                  className="source-link"
-                                  onClick={() =>
-                                    openSource(r.documentId, r.page)
-                                  }
-                                >
-                                  {
-                                    packet?.documents.find(
-                                      (d) => d.id === r.documentId,
-                                    )?.name
-                                  }{" "}
-                                  · p. {r.page} <ArrowUpRight size={12} />
-                                </button>
-                              ))}
-                            </div>
-                          ))}
-                        </section>
-                      </details>
                     </div>
                   </>
                 ))}
