@@ -45,3 +45,11 @@ Read [the research and audit](docs/UX-RESEARCH.md) for the rationale and limitat
 - Treat model feedback as provisional, including when citations resolve. Reports preserve the original feedback and do not change scores.
 - Target missed objectives with an editable proposal. Require approval before generating follow-up; a perfect score can lead to explicitly labeled transfer practice instead.
 - Failed checks need a concrete recovery route without exposing answer keys in workspace or practice payloads.
+
+## November 4 export and judging refinements
+
+Question papers download as readable PDFs, with mathematics, complete diagram geometry, named shared reference sheets and explicit checking limits. Submitted review PDFs include server-saved responses, criteria and suggested solutions; they require server-confirmed submission. A PDF is a snapshot, not an answer-sync mechanism. Missing renderers/images need a concrete retry/setup action.
+
+On ready exam previews, a compact checking count and provenance label precede the question, with a direct link to the detailed checking/run evidence below. This keeps mobile questions visible earlier while preserving the complete report. Blocking errors remain before the question. Per-course run evidence includes retained failed generations and separates rechecks, inherited repair history and unresolved reservations. It must not present a curated copy as an unedited generation success.
+
+Approved page boundaries apply to question evidence, source claims and referenced source passages. Matching plan metadata or a literal source location still does not establish semantic alignment, historical interpretation or whole-answer correctness. Evidence descriptions and private checker artifacts do not belong in pre-submission question data.

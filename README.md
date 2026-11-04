@@ -20,6 +20,18 @@ The `--legacy-peer-deps` installation option avoids a peer-resolution crash obse
 
 Open **Explore a saved example** and choose **Try evidence & decisions**, **Explore diagrams & documents**, or **Try vector drawing**. Review and approve its plan, then load the saved demonstration. These original authored examples make **no Meta calls** and are not evidence of model quality. Legacy transformation-lab records remain readable.
 
+## PDF downloads
+
+Choose **Download PDF** in an exam preview. After submitting an attempt, choose **Download review PDF** from its review. The paper contains no answer keys or worked solutions; the review requires server-confirmed submission. References are printed once on named sheets, and vector questions include a coordinate grid. PDF export runs locally, without Meta calls or external network access.
+
+Install Google Chrome, or install a separate Chromium runtime once:
+
+```powershell
+npm run setup:pdf
+```
+
+VERA first tries installed Chrome and then Playwright's Chromium. For a custom installation, set `VERA_PDF_BROWSER` to its absolute executable path. A missing browser or image produces a retryable error. A PDF is a snapshot; writing on it does not sync answers back to VERA. See [PDF behavior and validation](docs/PDF-EXPORT.md).
+
 ## Enable live Meta generation
 
 Add `MODEL_API_KEY` to `.env.local`, leave `META_MODEL=muse-spark-1.3` as the candidate Standard-mode model, and restart. Run:
@@ -43,7 +55,7 @@ See [Meta integration](docs/META.md) for supported API shapes, pricing, usage ac
 - Structural, evidence-location, bounded arithmetic/polynomial, table/coordinate and legacy matrix checks; independent solving with the key withheld; provisional model review; and two bounded repair cycles with retained intermediate artifacts.
 - Timed or untimed practice, server-acknowledged autosave with browser recovery, key-based choice/numeric grading, rubric-guided written self-scoring, reported feedback disputes and editable targeted plans requiring approval.
 - Vector construction on a precise diagram using drag, touch start/end or exact coordinates, with saved geometry/explanation, refresh recovery and read-only rubric review. This is self-scored; arbitrary handwriting/raster annotation is not supported. See the [drawing and source-handling limits](docs/DIAGRAMS.md) and [real historical-source capability example](docs/HUMANITIES-CAPABILITY.md).
-- A question-only JSON export. Keys, worked solutions, rubrics, numeric grading specifications and review answers stay private until an attempt is submitted; solutions open through an attempt-scoped endpoint.
+- Readable question-paper PDF downloads with mathematics, precise diagrams, Muse images and attributed reference sheets. Submitted attempts also support a review PDF with saved responses, solutions, criteria and separate automatic/self-score labels. Keys, worked solutions, rubrics, numeric grading specifications and review answers stay private until an attempt is submitted; solutions open through an attempt-scoped endpoint.
 
 Course evidence is sent to Meta when you explicitly request analysis, generation or AI feedback; analysis also accompanies live generation in the benchmark. The app attaches extracted text and relevant rendered pages for analysis/generation. Pages carrying explicit rights-restriction notices are omitted from model inputs; this filter does not establish a blanket license for other pages. Unreadable or over-limit files are rejected with an error. Uploaded content is not application instructions. AI-generated reference material is excluded from course analysis.
 
@@ -86,7 +98,7 @@ See [interface research and overhaul](docs/UI-OVERHAUL.md) for the design ration
 - Duplicate detection requires substantial identical normalized text. It does not match all different scans or extractors.
 - Vision can misread mathematical notation. Users should inspect citations and final answers.
 - Written scores are self-reported; AI feedback never changes automatic scores. Practice results do not establish mastery or learning gains.
-- No PDF export, automatic free-response grading, cloud synchronization, or public access controls are included.
+- No automatic free-response grading, cloud synchronization, or public access controls are included.
 - Hackathon submission readiness is pending confirmation of the official pre-existing-code rules; the public event overview did not establish that policy.
 
 The builder's supplied textbook and JEFF-generated exam are not redistributed. The JEFF exam is excluded from instructor-format inference and held-out evaluation.
@@ -118,3 +130,25 @@ node --experimental-sqlite --import tsx scripts/archive-development.ts --restore
 ```
 
 Archiving writes visibility metadata and a private manifest under the data directory. It preserves the source records, uploads, attempts, verification history and spending. The command only selects known authored demonstration names or the exact browser-test name/file bytes; unrelated real courses stay visible. Existing links to archived courses show an unavailable-course message rather than selecting a different course.
+
+## Reproduce the silent workflow preflight
+
+This recording is a software check, not the final narrated submission video. It uses original authored examples and makes no Meta requests. In a separate PowerShell terminal after building:
+
+```powershell
+$env:MODEL_API_KEY=''
+$env:VERA_TEST_WORKSPACE='1'
+$env:VERA_DATA_DIR='.vera/demo-preflight'
+$env:VERA_BUDGET_DIR='.vera/demo-preflight'
+$env:VERA_PORT='3001'
+npm start
+```
+
+In another terminal with Chrome installed:
+
+```powershell
+npx playwright install ffmpeg
+node scripts/record-demo.mjs
+```
+
+The recorder refuses a normal or credential-enabled workspace. Output is ignored under `output/demo-preflight/`: a captioned WebM, original question paper, submitted review and scene/error report. It creates its own authored example, completes only that isolated attempt and leaves the follow-up unapproved. Use a fresh test workspace and run browser suites serially because some existing harnesses assume their attempt is the latest record.
