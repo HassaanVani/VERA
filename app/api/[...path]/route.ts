@@ -11,6 +11,7 @@ import type {
   CheckedExam,
   Attempt,
   FeedbackRecord,
+  ImageArtifact,
 } from "@/lib/contracts";
 import {
   get,
@@ -143,6 +144,34 @@ export async function GET(
           (f) => f.attemptId === attempt.id && f.basis === "ai-suggestion",
         ),
       });
+    }
+    if (path[0] === "exams" && path[2] === "images") {
+      const exam = get<CheckedExam>("exam", path[1]);
+      const linked = exam?.imageExhibits?.find(
+        (image) => image.assetId === path[3],
+      );
+      const asset = linked
+        ? get<ImageArtifact>("image", linked.assetId)
+        : undefined;
+      if (!linked || !asset || asset.exhibitId !== linked.exhibitId)
+        return json({ error: "Assessment image not found." }, 404);
+      try {
+        return new Response(await readFile(asset.path), {
+          headers: {
+            "Content-Type": "image/png",
+            "Cache-Control": "no-store",
+            "X-Content-Type-Options": "nosniff",
+          },
+        });
+      } catch {
+        return json(
+          {
+            error:
+              "Assessment image is unavailable. Generate a new assessment.",
+          },
+          404,
+        );
+      }
     }
     if (path[0] === "source") {
       const packet = get<Packet>(

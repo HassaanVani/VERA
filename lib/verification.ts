@@ -8,7 +8,7 @@ import type {
 } from "./contracts";
 import { excludedFromModel } from "./source-policy";
 
-export const CHECKER_VERSION = "vera-checkers/2.0";
+export const CHECKER_VERSION = "vera-checkers/2.1";
 export const capabilities = [
   {
     id: "arithmetic",
@@ -148,6 +148,11 @@ export const approximately = (
   absolute = 1e-8,
   relative = 1e-8,
 ) => Math.abs(a - b) <= Math.max(absolute, relative * Math.abs(b));
+// SI quantities can be much smaller than 1e-8 (for example capacitance).
+// A fixed absolute floor would incorrectly accept zero or a wrong exponent.
+export const calculationClose = (a: number, b: number) =>
+  Math.abs(a - b) <=
+  Math.max(Number.MIN_VALUE, 1e-9 * Math.max(Math.abs(a), Math.abs(b)));
 const normalize = (s: string) =>
   s.normalize("NFKC").replace(/\s+/g, " ").trim();
 export function referenceExists(
@@ -256,7 +261,7 @@ const registry: Verifier[] = [
       if (c.kind !== "calculation") throw new Error("Claim mismatch");
       const computed = arithmetic(c.expression);
       return outcome(
-        approximately(computed, c.answer),
+        calculationClose(computed, c.answer),
         `${c.expression} = ${computed}; proposed ${c.answer} ${c.unit}`,
         "Checks this calculation only, not whether its formula answers the question or its units are physically valid.",
       );

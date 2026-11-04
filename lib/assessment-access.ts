@@ -1,6 +1,14 @@
 import type { CheckedExam } from "./contracts";
 
 const checkMessages: Record<string, string> = {
+  CROSS_ITEM_LEAK:
+    "A question gives away another question’s numeric result. Review the plan and generate again; practice is blocked.",
+  VISUAL_MODE:
+    "The generated figure did not follow your diagram preference. Review the plan and generate again.",
+  IMAGE_REVIEW:
+    "A generated figure has a mismatch or could not be confidently reviewed. Practice is blocked; revise the plan and generate again.",
+  IMAGE_REQUIRED:
+    "The requested Muse Image figures were not generated. Review the plan and try again.",
   INVALID_REFERENCE:
     "A source reference names a missing or excluded page. Review the materials and generate again.",
   NO_EVIDENCE:
@@ -35,6 +43,15 @@ export function publicExam(e: CheckedExam) {
     ready: e.ready,
     fixture: e.fixture,
     createdAt: e.createdAt,
+    imageExhibits: (e.imageExhibits ?? []).map((image) => ({
+      exhibitId: image.exhibitId,
+      assetId: image.assetId,
+      description: image.description,
+      width: image.width,
+      height: image.height,
+      reviewStatus: image.reviewStatus,
+      url: `/api/exams/${encodeURIComponent(e.id)}/images/${encodeURIComponent(image.assetId)}`,
+    })),
     repairAttempts: e.repairAttempts,
     scenario: e.scenario
       ? {
@@ -53,7 +70,31 @@ export function publicExam(e: CheckedExam) {
       instructions: e.exam.instructions,
       totalPoints: e.exam.totalPoints,
       minutes: e.exam.minutes,
-      exhibits: e.exam.exhibits,
+      exhibits: e.exam.exhibits?.map(
+        ({
+          id,
+          kind,
+          title,
+          content,
+          columns,
+          rows,
+          points,
+          synthetic,
+          source,
+          drawing,
+        }) => ({
+          id,
+          kind,
+          title,
+          content,
+          columns,
+          rows,
+          points,
+          synthetic,
+          source,
+          drawing,
+        }),
+      ),
       questions: e.exam.questions.map((q) => ({
         number: q.number,
         topic: q.topic,

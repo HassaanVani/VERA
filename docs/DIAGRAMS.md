@@ -1,5 +1,13 @@
 # Diagrams and uploaded source passages
 
+## Meta-generated illustrations
+
+Live version-2 plans expose **Diagram rendering**: subject-appropriate selection, Muse Image, or precise SVG. A preference edit invalidates approval like other plan edits. Saved authored examples retain their existing figures. Precise mode rejects raster specifications and does not invoke image generation for them.
+
+A synthetic `kind:"image"` exhibit supplies private `illustration:{prompt,description}` metadata and empty points/columns/rows. At most two figures may be requested per exam. Muse Image receives the figure specification rather than question stems/options, which reduced unwanted question-text rendering in the live trial. The accessible description and question text must preserve essential givens. React displays the private PNG at its actual aspect ratio, plus a text description and visible AI-review/verification limits. Raster images are not a replacement for precise coordinate verification.
+
+Generated image records and each repair remain local. Unchanged same-job figures are cached; changed dependent questions/specifications invalidate the fingerprint. A disputed or uncertain visual review blocks readiness. Images, private briefs and review artifacts are distinct from public exam metadata. A resolving local image URL proves availability, not visual correctness. See [Muse integration](META.md) and the [retained pilot results](MUSE-IMAGE-TRIAL.md).
+
 New version-2 generation can request precise applied-math diagrams and retrieved passages. The interface shows only the current question's referenced exhibits. Existing matrix exams and point-only diagrams remain readable; historical verification records are not recomputed on read.
 
 ## Structured diagrams

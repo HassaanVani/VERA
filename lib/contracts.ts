@@ -44,6 +44,7 @@ export const Slot = z.object({
 export const Blueprint = z.object({
   schemaVersion: z.literal(2).optional(),
   settingsBasis: DecisionBasis.optional(),
+  visuals: z.enum(["auto", "precise", "muse-image"]).optional(),
   title: z.string().min(1).max(160),
   domain: z.string().min(1).max(120),
   instructions: z.string(),
@@ -114,7 +115,7 @@ export const Claim = z.discriminatedUnion("kind", [
 ]);
 export const Exhibit = z.object({
   id: z.string().min(1).max(80),
-  kind: z.enum(["passage", "table", "diagram"]),
+  kind: z.enum(["passage", "table", "diagram", "image"]),
   title: z.string().min(1),
   content: z.string(),
   columns: z.array(z.string()),
@@ -127,6 +128,12 @@ export const Exhibit = z.object({
     }),
   ),
   synthetic: z.boolean(),
+  illustration: z
+    .object({
+      prompt: z.string().min(20).max(4000),
+      description: z.string().min(20).max(2000),
+    })
+    .optional(),
   source: z
     .object({
       documentId: z.string().min(1),
@@ -336,6 +343,34 @@ export type CheckedExam = {
   fixture: boolean;
   createdAt: string;
   schemaVersion?: 2;
+  imageExhibits?: ImageExhibit[];
+};
+export type ImageExhibit = {
+  exhibitId: string;
+  assetId: string;
+  description: string;
+  width: number;
+  height: number;
+  reviewStatus: "consistent" | "disputed" | "unverifiable";
+};
+export type ImageArtifact = {
+  id: string;
+  jobId: string;
+  exhibitId: string;
+  path: string;
+  mime: "image/png";
+  sha256: string;
+  fingerprint: string;
+  model: string;
+  width: number;
+  height: number;
+  responseId?: string;
+  createdAt: string;
+  review?: {
+    status: ImageExhibit["reviewStatus"];
+    issues: string[];
+    observedDescription: string;
+  };
 };
 export type Job = {
   id: string;

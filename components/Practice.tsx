@@ -454,6 +454,7 @@ export default function Practice({
           exhibits={exam.exam.exhibits}
           ids={q.exhibitIds}
           onSource={onSource}
+          imageExhibits={exam.imageExhibits}
         />
       </div>
       {confirmFinish && (

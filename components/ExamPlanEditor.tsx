@@ -439,6 +439,30 @@ export default function ExamPlanEditor({
               " ",
             )}
           </p>
+          <label className="visual-mode">
+            Diagram rendering
+            <select
+              aria-label="Diagram rendering"
+              disabled={busy || packet.fixture}
+              value={draft.visuals || "auto"}
+              onChange={(event) =>
+                onEdit({
+                  ...draft,
+                  visuals: event.target.value as Blueprint["visuals"],
+                  settingsBasis: "student-selected",
+                })
+              }
+            >
+              <option value="auto">Choose for this subject</option>
+              <option value="muse-image">Muse Image · AI illustrations</option>
+              <option value="precise">Precise SVG diagrams</option>
+            </select>
+          </label>
+          <p className="visual-mode-note">
+            {packet.fixture
+              ? "Saved examples keep their authored visuals."
+              : "Image figures receive AI visual review. Exact given data stays available as text."}
+          </p>
         </section>
         {draft.uncertainties.length > 0 && (
           <details className="plan-assumptions" open>

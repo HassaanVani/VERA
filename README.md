@@ -38,7 +38,8 @@ See [Meta integration](docs/META.md) for supported API shapes, pricing, usage ac
 - Explicit document roles, per-page text and images, source inspection, and exact normalized-text duplicate detection.
 - Editable evidence-backed blueprint with observed/inferred/student-selected labels and citations validated against real uploaded pages.
 - Versioned, subject-independent plans and exams with choice, numeric, short-answer, worked-response and essay questions. Optional diagrams now support exact segments/arrows, polygons, sampled polylines and circles; uploaded source passages retain page links and literal-excerpt checks. See [diagrams and retrieval](docs/DIAGRAMS.md) for supported bounds and limits. Legacy 2×2 transformation examples remain readable.
-- One-question preview and practice, a bounded reading column, relevant reference sheets beside the question, a mobile question/reference switch and an optional hidden timer. The midnight-black workspace uses restrained steel-blue actions.
+- One-question preview and practice, a bounded reading column, relevant reference sheets beside the question, a mobile question/reference switch and an optional hidden timer. Near-black surfaces use clear light-blue actions with dark labels.
+- Select **Diagram rendering → Muse Image** in a live exam plan for agentic Meta image generation. Precise SVG remains available. Actual generated PNGs receive separate provisional visual review and stay outside the public directory. See the [image integration and retained trial results](docs/MUSE-IMAGE-TRIAL.md); circuit-symbol reliability remains limited.
 - Structural, evidence-location, bounded arithmetic/polynomial, table/coordinate and legacy matrix checks; independent solving with the key withheld; provisional model review; and two bounded repair cycles with retained intermediate artifacts.
 - Timed or untimed practice, server-acknowledged autosave with browser recovery, key-based choice/numeric grading, rubric-guided written self-scoring, reported feedback disputes and editable targeted plans requiring approval.
 - A question-only JSON export. Keys, worked solutions, rubrics, numeric grading specifications and review answers stay private until an attempt is submitted; solutions open through an attempt-scoped endpoint.
@@ -52,6 +53,7 @@ All local data lives in ignored `.vera/` by default:
 - `vera.sqlite` in WAL mode: packets, blueprint revisions, jobs, exams, attempts, feedback/disputes, intermediate pipeline artifacts and model probes.
 - `budget.sqlite`: shared usage reservations and persistent additional-evaluation spending caps. Legacy app and MIT-evaluation ledger entries are imported idempotently; source databases remain intact. Set `VERA_BUDGET_DIR` consistently when using a custom data directory.
 - `uploads/<packet-id>/<document-id>/`: original files and rendered page images.
+- `generated-images/<asset-id>.png`: private generated figures, exposed only through their linked assessment's local image endpoint. Specifications, hashes, image reviews and repair provenance are retained in SQLite.
 
 The background worker claims one local SQLite lease and processes jobs sequentially. Heartbeats keep the lease active. A new worker marks previously running jobs interrupted and preserves uncertain cost reservations. Source packets and blueprint revisions survive refreshes and process restarts. Queued jobs run when the worker reconnects. Cancellation aborts an active provider call and prevents result publication.
 

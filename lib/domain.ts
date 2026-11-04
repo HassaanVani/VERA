@@ -10,6 +10,7 @@ import type {
 } from "./contracts";
 import {
   automaticGrade,
+  calculationClose,
   numericGrade,
   referenceExists,
   verifyExam,
@@ -25,6 +26,19 @@ export const multiply = (
 ];
 export const close = (a: number, b: number) =>
   Math.abs(a - b) <= 1e-8 * Math.max(1, Math.abs(a), Math.abs(b));
+// Conservative known-case check: an explicit cross-question reference that
+// repeats the referenced numeric answer with its unit. Not semantic leakage proof.
+function statedQuantities(text: string) {
+  const plain = text
+    .replace(/\\(?:mathrm|text)\{([^{}]*)\}/g, "$1")
+    .replace(/\\times\s*10\^\{([+-]?\d+)\}/g, "e$1")
+    .replace(/\\[,!; ]|\$|\s/g, "");
+  return [
+    ...plain.matchAll(
+      /([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?)([a-z/]+)/gi,
+    ),
+  ].map((match) => ({ value: Number(match[1]), unit: match[2].toLowerCase() }));
+}
 export function scenarioIssues(s: Scenario): Issue[] {
   return s.eigenpairs.flatMap((e, i) => {
     const v = multiply(s.matrix, e.vector);
@@ -238,7 +252,10 @@ export function checkExam(
       );
     if (
       q.type === "numeric" &&
-      (!q.numeric || numericGrade(q, q.answer) !== true)
+      (!q.numeric ||
+        numericGrade(q, q.answer) !== true ||
+        (q.numeric.value !== 0 &&
+          q.numeric.absoluteTolerance >= Math.abs(q.numeric.value) * 0.1))
     )
       add(
         "NUMERIC_KEY",
@@ -251,7 +268,7 @@ export function checkExam(
       !q.claims.some(
         (c) =>
           c.kind === "calculation" &&
-          close(c.answer, q.numeric!.value) &&
+          calculationClose(c.answer, q.numeric!.value) &&
           c.unit === q.numeric!.unit,
       )
     )
@@ -298,6 +315,34 @@ export function checkExam(
       add("EXHIBIT_REFERENCE", p, "A question references a missing exhibit.");
   }
   const verification = verifyExam(e, { scenario: s, packet });
+  for (const question of e.questions) {
+    const visibleText = [
+      question.question,
+      ...question.options,
+      ...(question.subparts ?? []).map((p) => p.prompt),
+    ].join(" ");
+    const quantities = statedQuantities(visibleText);
+    for (const source of e.questions.filter(
+      (q) =>
+        q.number !== question.number && q.type === "numeric" && q.numeric?.unit,
+    )) {
+      if (
+        new RegExp(`\\b(?:question|item)\\s+${source.number}\\b`, "i").test(
+          visibleText,
+        ) &&
+        quantities.some(
+          (value) =>
+            value.unit === source.numeric!.unit.toLowerCase() &&
+            calculationClose(value.value, source.numeric!.value),
+        )
+      )
+        add(
+          "CROSS_ITEM_LEAK",
+          `questions.${question.number - 1}`,
+          "An explicitly referenced numeric question has its answer stated in another question. Remove the derived result while retaining original givens.",
+        );
+    }
+  }
   for (const v of verification)
     if (v.result === "failed")
       add(
@@ -338,8 +383,31 @@ export function checkExam(
       );
   }
   const exhibitIds = new Set<string>();
+  if (
+    (e.exhibits ?? []).filter((exhibit) => exhibit.kind === "image").length > 2
+  )
+    add(
+      "IMAGE_LIMIT",
+      "exhibits",
+      "At most two generated images are supported per assessment.",
+    );
+  if (
+    b.visuals === "muse-image" &&
+    !(e.exhibits ?? []).some((exhibit) => exhibit.kind === "image")
+  )
+    add(
+      "IMAGE_REQUIRED",
+      "exhibits",
+      "This plan requested Muse Image figures; none were supplied.",
+    );
   for (const [index, exhibit] of (e.exhibits ?? []).entries()) {
     const exhibitPath = `exhibits.${index}`;
+    if (b.visuals === "precise" && exhibit.kind === "image")
+      add(
+        "VISUAL_MODE",
+        exhibitPath,
+        "This plan permits precise diagrams only; replace the raster image specification.",
+      );
     if (exhibitIds.has(exhibit.id))
       add(
         "EXHIBIT_DUPLICATE",
@@ -353,6 +421,9 @@ export function checkExam(
           exhibit.title,
           ...exhibit.points.map((p) => p.label),
           ...exhibit.columns,
+          exhibit.kind === "image"
+            ? exhibit.illustration?.description || ""
+            : "",
         ].join(" "),
       )
     )

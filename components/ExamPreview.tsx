@@ -102,6 +102,7 @@ export default function ExamPreview({
           exhibits={exam.exam.exhibits}
           ids={question.exhibitIds}
           onSource={onSource}
+          imageExhibits={exam.imageExhibits}
         />
       </div>
     </section>

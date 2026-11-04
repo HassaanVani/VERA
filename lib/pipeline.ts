@@ -4,6 +4,8 @@ import {
   isIllustratedDemo,
 } from "./illustrated-demo";
 import { retrievePassages } from "./supporting-material";
+import { MetaImageProvider, type ImageProvider } from "./image-provider";
+import { prepareExamImages, imageVerification } from "./exam-images";
 import {
   Blueprint,
   Scenario,
@@ -49,6 +51,7 @@ export async function runJob(
   job: Job,
   provider: AssessmentProvider = new MetaProvider(),
   signal?: AbortSignal,
+  imageProvider: ImageProvider = new MetaImageProvider(),
 ) {
   const packet = get<Packet>("packet", job.packetId);
   if (!packet) throw new Error("Source packet no longer exists.");
@@ -322,24 +325,48 @@ export async function runJob(
   let review: Review = { questions: [] },
     issues: Issue[] = [],
     repairs = 0;
+  let generatedImages: Awaited<ReturnType<typeof prepareExamImages>> = {
+    images: [],
+    attachments: [],
+    issues: [],
+  };
   for (;;) {
     stage("Run deterministic checks");
     cycle = repairs;
     issues = checkExam(exam, b, scenario, packetText(packet), packet);
+    stage("Prepare and inspect requested figures");
+    generatedImages =
+      b.visuals === "precise"
+        ? { images: [], attachments: [], issues: [] }
+        : await prepareExamImages(
+            exam,
+            job.id,
+            imageProvider,
+            call,
+            record,
+            signal,
+          );
+    issues.push(...generatedImages.issues);
     record("Deterministic check snapshot", {
       exam,
       issues,
-      verification: verifyExam(exam, { packet, scenario }),
+      imageExhibits: generatedImages.images,
+      verification: [
+        ...verifyExam(exam, { packet, scenario }),
+        ...imageVerification(exam, generatedImages.images),
+      ],
     });
     const independent = await call(
       "Solve independently · key withheld",
       Independent,
       independentPrompt(exam, scenario),
+      generatedImages.attachments,
     );
     review = await call(
       "Compare worked solutions",
       Review,
       comparisonPrompt(exam, independent),
+      generatedImages.attachments,
     );
     for (const q of exam.questions) {
       const matches = review.questions.filter((v) => v.number === q.number);
@@ -373,6 +400,7 @@ export async function runJob(
       `Targeted repair ${repairs + 1} of 2`,
       b.schemaVersion === 2 ? V2Patch : Patch,
       `${repairPrompt(exam, b, scenario, issues)}\nUNTRUSTED_COURSE_EVIDENCE: ${packetText(packet)}`,
+      generatedImages.attachments,
     );
     const affected = new Set(
       issues
@@ -441,7 +469,11 @@ export async function runJob(
     issues,
     review,
     schemaVersion: b.schemaVersion,
-    verification: verifyExam(exam, { packet, scenario }),
+    verification: [
+      ...verifyExam(exam, { packet, scenario }),
+      ...imageVerification(exam, generatedImages.images),
+    ],
+    imageExhibits: generatedImages.images,
     repairAttempts: repairs,
     ready: !issues.some((i) => i.severity === "error"),
     fixture: false,

@@ -5,6 +5,18 @@ const normalize = (text: string) => text.replace(/\s+/g, " ").trim();
 
 export function materialProblems(exhibit: Exhibit, packet?: Packet): string[] {
   const problems: string[] = [];
+  if (exhibit.illustration && exhibit.kind !== "image")
+    problems.push("Muse Image specifications belong only to image exhibits.");
+  if (
+    exhibit.kind === "image" &&
+    (!exhibit.synthetic ||
+      !exhibit.illustration ||
+      exhibit.drawing ||
+      exhibit.points.length)
+  )
+    problems.push(
+      "Generated images require a synthetic label, a text alternative and an image specification; coordinate data belongs in precise diagrams.",
+    );
   if (exhibit.drawing && exhibit.kind !== "diagram")
     problems.push("Drawing data belongs only to a diagram.");
   if (exhibit.kind === "diagram") {

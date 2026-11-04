@@ -4,6 +4,8 @@ import { ArrowUpRight, FileSpreadsheet, MoveUpRight } from "lucide-react";
 import type { Scenario, Exam } from "@/lib/contracts";
 import MathText from "./MathText";
 import GeometryDiagram from "./GeometryDiagram";
+import Image from "next/image";
+import type { PublicCheckedExam } from "@/lib/assessment-access";
 import { multiply } from "@/lib/domain";
 
 export function TransformationDiagram({
@@ -236,11 +238,13 @@ export default function Exhibits({
   exhibits = [],
   ids,
   onSource,
+  imageExhibits = [],
 }: {
   scenario?: Scenario;
   exhibits?: Exam["exhibits"];
   ids?: string[];
   onSource?: (documentId: string, page: number) => void;
+  imageExhibits?: PublicCheckedExam["imageExhibits"];
 }) {
   const available = exhibits.filter((e) => !ids || ids.includes(e.id));
   const [selected, setSelected] = useState("");
@@ -248,6 +252,7 @@ export default function Exhibits({
   if (scenario) return <MatrixExhibits scenario={scenario} />;
   if (!available.length) return null;
   const current = available.find((e) => e.id === selected) ?? available[0];
+  const image = imageExhibits.find((image) => image.exhibitId === current.id);
   return (
     <aside className="exhibit-panel" aria-label="Supporting exhibits">
       <div className="exhibit-heading">
@@ -337,6 +342,47 @@ export default function Exhibits({
           </div>
         )}
         {current.kind === "diagram" && <GeometryDiagram exhibit={current} />}
+        {current.kind === "image" &&
+          (image ? (
+            <div className="generated-reference">
+              <Image
+                src={image.url}
+                alt={image.description}
+                width={image.width}
+                height={image.height}
+                unoptimized
+                className="generated-figure"
+              />
+              <a
+                className="figure-fullsize"
+                href={image.url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Open full-size figure{" "}
+                <ArrowUpRight size={13} aria-hidden="true" />
+              </a>
+              <p className="image-review-label">
+                Muse Image ·{" "}
+                {image.reviewStatus === "consistent"
+                  ? "AI visual review completed"
+                  : "Needs review"}
+              </p>
+              <p className="diagram-description">
+                Image geometry is not automatically verified. Use the stated
+                data, not pixel measurements.
+              </p>
+              <details className="diagram-data">
+                <summary>Figure description</summary>
+                <p>{image.description}</p>
+              </details>
+            </div>
+          ) : (
+            <p className="material-warning">
+              This figure is unavailable. Generate a new assessment before
+              practicing.
+            </p>
+          ))}
         {current.source && (
           <button
             className="source-link original-source"

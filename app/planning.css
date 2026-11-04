@@ -287,6 +287,26 @@
   line-height: 1.8;
   margin: 22px 0 0;
 }
+.visual-mode {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 22px;
+}
+.visual-mode select {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  min-height: 44px;
+  background: #080e14;
+  border-color: #42596b;
+}
+.visual-mode-note {
+  font-size: 11px;
+  line-height: 1.9;
+  color: var(--muted);
+  margin-top: 12px;
+}
 .plan-context .plan-assumptions {
   margin: 26px 0 0;
   border: 0;
@@ -527,4 +547,8 @@
   .assessment-outline {
     column-gap: 20px;
   }
+}
+.assessment-outline .visual-mode,
+.assessment-outline .visual-mode-note {
+  grid-column: 1 / -1;
 }

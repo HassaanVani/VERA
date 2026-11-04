@@ -121,6 +121,55 @@ describe("subject-independent checks and bounded grading", () => {
       ]),
     );
   });
+  it("does not mistake tiny SI values or permissive tolerances for a checked key", () => {
+    const { e, b, p } = setup(),
+      q = e.exam.questions[1];
+    q.numeric = {
+      value: 1.77e-10,
+      absoluteTolerance: 1e-14,
+      relativeTolerance: 0.001,
+      unit: "F",
+    };
+    q.answer = "1.77e-10 F";
+    q.claims = [
+      {
+        kind: "calculation",
+        expression: "8.85e-12*0.02/0.001",
+        answer: 1.77e-10,
+        unit: "F",
+      },
+    ];
+    expect(
+      checkExam(e.exam, b, undefined, "", p).filter(
+        (i) => i.severity === "error",
+      ),
+    ).toEqual([]);
+    q.claims[0] = {
+      kind: "calculation",
+      expression: "8.85e-12*0.02/0.001",
+      answer: 0,
+      unit: "F",
+    };
+    expect(checkExam(e.exam, b, undefined, "", p).map((i) => i.code)).toEqual(
+      expect.arrayContaining([
+        "NUMERICAL_CLAIM",
+        "NUMERIC_BASIS",
+        "NUMERIC_UNVERIFIED",
+      ]),
+    );
+    q.claims[0] = {
+      kind: "calculation",
+      expression: "8.85e-12*0.02/0.001",
+      answer: 1.77e-10,
+      unit: "F",
+    };
+    q.numeric.absoluteTolerance = 1e-8;
+    expect(
+      checkExam(e.exam, b, undefined, "", p).some(
+        (i) => i.code === "NUMERIC_KEY",
+      ),
+    ).toBe(true);
+  });
   it("rejects answer-bearing labels, absent exhibits, duplicate stems and bad table dimensions", () => {
     const { e, b, p } = setup(),
       bad = structuredClone(e.exam);
@@ -146,6 +195,29 @@ describe("subject-independent checks and bounded grading", () => {
         "EXHIBIT_TABLE",
       ]),
     );
+  });
+  it("blocks an explicitly referenced numeric answer repeated in a later question", () => {
+    const { e, b, p } = setup();
+    e.exam.questions[1].numeric = {
+      value: 1.18e-10,
+      absoluteTolerance: 1e-14,
+      relativeTolerance: 0.001,
+      unit: "F",
+    };
+    e.exam.questions[3].question =
+      "Use Question 2: the capacitance is $C=1.18\\times 10^{-10}\\,\\mathrm{F}$. Explain the stored energy.";
+    expect(
+      checkExam(e.exam, b, undefined, "", p).some(
+        (i) => i.code === "CROSS_ITEM_LEAK",
+      ),
+    ).toBe(true);
+    e.exam.questions[3].question =
+      "Use your capacitance from Question 2 and explain how stored energy changes when voltage doubles.";
+    expect(
+      checkExam(e.exam, b, undefined, "", p).some(
+        (i) => i.code === "CROSS_ITEM_LEAK",
+      ),
+    ).toBe(false);
   });
   it("verifies quote locations without upgrading interpretation to ground truth", () => {
     const { e, p } = setup();
