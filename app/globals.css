@@ -5,17 +5,17 @@
   font-display: swap;
 }
 :root {
-  --bg: #07090e;
-  --sidebar: #07090e;
-  --panel: #0d1119;
-  --panel-light: #111826;
-  --line: #252d3d;
-  --blue: #5686ff;
-  --blue-light: #a9c2ff;
+  --bg: #030609;
+  --sidebar: #030609;
+  --panel: #080d13;
+  --panel-light: #0d1720;
+  --line: #25343f;
+  --blue: #75c8ff;
+  --blue-light: #a7ddff;
   --cyan: #94b9c8;
-  --text: #e9edf5;
-  --muted: #a9b3c6;
-  --faint: #929eb4;
+  --text: #e6f1f7;
+  --muted: #a3b7c4;
+  --faint: #8ca3b2;
   --radius: 6px;
   color-scheme: dark;
 }

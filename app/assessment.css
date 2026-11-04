@@ -1,26 +1,44 @@
 /* A wide tool canvas, with a deliberate reading measure for each question. */
 :root {
-  --blue: #809fbc;
-  --blue-light: #b7cbdc;
+  --blue: #75c8ff;
+  --blue-light: #a7ddff;
 }
 .primary {
-  background: #455e7c;
-  border-color: #738da8;
+  background: #75c8ff;
+  border-color: #a7ddff;
+  color: #04131e;
 }
 .primary:hover:not(:disabled) {
-  background: #506b8a;
+  background: #a1ddff;
+  color: #04131e;
+}
+.primary svg {
+  color: currentColor;
+}
+.figure-fullsize {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 8px;
+  font-size: 12px;
+}
+.paper .figure-fullsize {
+  color: #245578;
+}
+.brand-mark {
+  color: #86d0ff;
 }
 a,
 .source-link,
 .text-button {
-  color: #b7cbdc;
+  color: #a7ddff;
 }
 button:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible,
 a:focus-visible {
-  outline-color: #bed1e0;
+  outline-color: #86d0ff;
 }
 .view-exam .page-title {
   margin-bottom: 8px;
@@ -303,6 +321,17 @@ a:focus-visible {
   color: #365876;
   overflow: visible;
 }
+.generated-figure {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 22px;
+}
+.image-review-label {
+  font-size: 11px;
+  color: #394957;
+  line-height: 1.8;
+}
 .geometry-axes {
   fill: #56636e;
   stroke: #8d99a3;
@@ -532,6 +561,7 @@ a:focus-visible {
   }
   .assessment-preview .exhibit-panel {
     position: static;
+    grid-row: auto;
   }
   .question-sheet h3 {
     font-size: 21px;
