@@ -1,6 +1,10 @@
 import type { CheckedExam } from "./contracts";
 
 const checkMessages: Record<string, string> = {
+  OBJECTIVE_ALIGNMENT:
+    "A question changed the approved learning objective or section. Review the plan and generate again.",
+  EVIDENCE_ALIGNMENT:
+    "A question used course pages outside its approved plan. Review the evidence in the plan and generate again.",
   CROSS_ITEM_LEAK:
     "A question gives away another question’s numeric result. Review the plan and generate again; practice is blocked.",
   VISUAL_MODE:
@@ -42,6 +46,9 @@ export function publicExam(e: CheckedExam) {
     schemaVersion: e.schemaVersion,
     ready: e.ready,
     fixture: e.fixture,
+    provenance: e.provenance
+      ? { kind: e.provenance.kind, parentExamId: e.provenance.parentExamId }
+      : undefined,
     createdAt: e.createdAt,
     imageExhibits: (e.imageExhibits ?? []).map((image) => ({
       exhibitId: image.exhibitId,
@@ -119,7 +126,10 @@ export function publicExam(e: CheckedExam) {
         objective: q.objective,
         section: q.section,
         subparts: q.subparts,
-        evidence: q.evidence,
+        evidence: q.evidence?.map(({ documentId, page }) => ({
+          documentId,
+          page,
+        })),
       })),
     },
     issues: e.issues.map((i) => ({

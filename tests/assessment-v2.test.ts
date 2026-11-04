@@ -93,6 +93,28 @@ describe("subject-independent checks and bounded grading", () => {
     for (const x of ["process.exit()", "1/0", "x^99", "x/(x+1)", "1e999"])
       expect(() => polynomial(x)).toThrow();
   });
+  it("rejects separated numeric tokens and keeps exponent-prefixed units outside arithmetic", () => {
+    for (const input of ["1 2", "1e 3", "1 e3", "1 .2", "1 0e-3", "1e +3"])
+      expect(() => arithmetic(input)).toThrow();
+    expect(arithmetic(" 1e3 + 2 * ( 4 - 3 ) ")).toBe(1002);
+    const { e } = setup(),
+      q = e.exam.questions[1];
+    q.numeric = {
+      value: 12,
+      absoluteTolerance: 0,
+      relativeTolerance: 0,
+      unit: "",
+    };
+    expect(numericGrade(q, "1 2")).toBe(false);
+    q.numeric!.value = 1000;
+    expect(numericGrade(q, "1e 3")).toBe(false);
+    expect(numericGrade(q, "1e3")).toBe(true);
+    q.numeric!.value = 5;
+    q.numeric!.unit = "eV";
+    for (const response of ["5 eV", "5eV", "(10 / 2) eV", "5e0 eV"])
+      expect(numericGrade(q, response)).toBe(true);
+    expect(numericGrade(q, "5 EV")).toBe(false);
+  });
   it("grades numbers, arithmetic alternatives, precision and units without grading prose", () => {
     const { e } = setup(),
       q = e.exam.questions[1];
@@ -120,6 +142,103 @@ describe("subject-independent checks and bounded grading", () => {
         "INVALID_REFERENCE",
       ]),
     );
+  });
+  it("blocks approved objective, section and page drift while preserving legacy reads", () => {
+    const { e, b, p } = setup();
+    e.exam.questions[0].objective = "Identify Roman emperors";
+    e.exam.questions[0].section = "Different section";
+    expect(checkExam(e.exam, b, undefined, "", p).map((i) => i.code)).toContain(
+      "OBJECTIVE_ALIGNMENT",
+    );
+    e.exam.questions[0].objective = b.slots[0].objective;
+    e.exam.questions[0].section = b.slots[0].section;
+    b.slots[0].evidence = [{ ...b.slots[0].evidence[0], page: 2 }];
+    expect(checkExam(e.exam, b, undefined, "", p).map((i) => i.code)).toContain(
+      "EVIDENCE_ALIGNMENT",
+    );
+    b.schemaVersion = undefined;
+    expect(
+      checkExam(e.exam, b, undefined, "", p).map((i) => i.code),
+    ).not.toContain("OBJECTIVE_ALIGNMENT");
+  });
+  it("applies approved page boundaries to source claims and referenced passages too", () => {
+    const { e, b, p } = setup(),
+      q = e.exam.questions[0],
+      document = p.documents[0];
+    const text = "A different permitted page outside this approved question.";
+    document.pages.push({ ...document.pages[0], number: 99, text });
+    q.claims = [
+      {
+        kind: "source",
+        evidence: {
+          documentId: document.id,
+          page: 99,
+          description: "Other page",
+        },
+        quote: text,
+      },
+    ];
+    expect(checkExam(e.exam, b, undefined, "", p).map((i) => i.code)).toContain(
+      "EVIDENCE_ALIGNMENT",
+    );
+    q.claims = [];
+    e.exam.exhibits!.push({
+      id: "outside-slot",
+      kind: "passage",
+      title: "Outside slot",
+      content: text,
+      columns: [],
+      rows: [],
+      points: [],
+      synthetic: false,
+      source: { documentId: document.id, page: 99 },
+    });
+    q.exhibitIds.push("outside-slot");
+    expect(checkExam(e.exam, b, undefined, "", p).map((i) => i.code)).toContain(
+      "EVIDENCE_ALIGNMENT",
+    );
+    b.slots[0].evidence.push({
+      documentId: document.id,
+      page: 99,
+      description: "Student-approved extra page",
+    });
+    expect(
+      checkExam(e.exam, b, undefined, "", p).map((i) => i.code),
+    ).not.toContain("EVIDENCE_ALIGNMENT");
+  });
+  it("keeps SI prefixes and symbols case-sensitive while accepting explicit word aliases", () => {
+    const { e } = setup(),
+      q = e.exam.questions[1];
+    for (const [expected, wrong] of [
+      ["mF", "MF"],
+      ["m", "M"],
+      ["F", "f"],
+      ["Pa", "pA"],
+      ["T", "t"],
+      ["Hz", "hz"],
+      ["mS", "ms"],
+      ["mS", "ms"],
+      ["J", "j"],
+    ]) {
+      q.numeric = {
+        value: 5,
+        absoluteTolerance: 0,
+        relativeTolerance: 0,
+        unit: expected,
+      };
+      expect(numericGrade(q, `5 ${expected}`)).toBe(true);
+      expect(numericGrade(q, `5 ${wrong}`)).toBe(false);
+    }
+    q.numeric!.unit = "m";
+    expect(numericGrade(q, "5 Meters")).toBe(true);
+    expect(numericGrade(q, "500 cm")).toBe(false);
+    q.numeric!.unit = "J";
+    expect(numericGrade(q, "5 joules")).toBe(true);
+    expect(numericGrade(q, "5 J")).toBe(true);
+    expect(numericGrade(q, "5 j")).toBe(false);
+    q.numeric!.unit = "μF";
+    expect(numericGrade(q, "5 µF")).toBe(true);
+    expect(numericGrade(q, "5 MF")).toBe(false);
   });
   it("does not mistake tiny SI values or permissive tolerances for a checked key", () => {
     const { e, b, p } = setup(),

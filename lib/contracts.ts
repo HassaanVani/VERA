@@ -341,6 +341,10 @@ export type Verification = {
   limitation: string;
 };
 export type CheckedExam = {
+  provenance?: {
+    kind: "reviewed-copy" | "reprocessed";
+    parentExamId: string;
+  };
   id: string;
   packetId: string;
   revisionId: string;

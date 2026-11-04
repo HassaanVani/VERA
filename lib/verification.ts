@@ -8,7 +8,7 @@ import type {
 } from "./contracts";
 import { excludedFromModel } from "./source-policy";
 
-export const CHECKER_VERSION = "vera-checkers/2.1";
+export const CHECKER_VERSION = "vera-checkers/2.2";
 export const capabilities = [
   {
     id: "arithmetic",
@@ -39,15 +39,19 @@ export const capabilities = [
 // A bounded parser, never JavaScript evaluation. Coefficients are increasing powers of x.
 export function polynomial(input: string): number[] {
   if (input.length > 300) throw new Error("Expression exceeds 300 characters.");
-  const source = input.replace(/−/g, "-").replace(/\s+/g, "");
-  const tokens =
-    source.match(/(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?|[x()+*/^\-]/gi) ?? [];
-  if (
-    tokens.join("").toLowerCase() !== source.toLowerCase() ||
-    tokens.length > 150 ||
-    !tokens.length
-  )
-    throw new Error("Unsupported expression notation.");
+  const source = input.replace(/−/g, "-");
+  const tokens: string[] = [];
+  const token = /\s*((?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?|[x()+*/^\-])/giy;
+  let cursor = 0;
+  while (cursor < source.length && source.slice(cursor).trim()) {
+    token.lastIndex = cursor;
+    const match = token.exec(source);
+    if (!match || tokens.length >= 150)
+      throw new Error("Unsupported expression notation.");
+    tokens.push(match[1]);
+    cursor = token.lastIndex;
+  }
+  if (!tokens.length) throw new Error("Unsupported expression notation.");
   let i = 0;
   const trim = (v: number[]) => {
     while (v.length > 1 && v.at(-1) === 0) v.pop();
@@ -165,18 +169,52 @@ export function referenceExists(
       d.pages.some((p) => p.number === ref.page && !excludedFromModel(p)),
   );
 }
-const canonicalUnit = (s: string) =>
-  ({
+export function canonicalUnit(s: string) {
+  const unit = s.trim().normalize("NFC").replaceAll("µ", "μ");
+  const aliases: Record<string, string> = {
     meters: "m",
     meter: "m",
+    metres: "m",
+    metre: "m",
     seconds: "s",
     second: "s",
-    dollars: "usd",
-    $: "usd",
+    farads: "F",
+    farad: "F",
+    volts: "V",
+    volt: "V",
+    coulombs: "C",
+    coulomb: "C",
+    joules: "J",
+    joule: "J",
+    newtons: "N",
+    newton: "N",
+    watts: "W",
+    watt: "W",
+    amperes: "A",
+    ampere: "A",
+    amps: "A",
+    amp: "A",
+    pascals: "Pa",
+    pascal: "Pa",
+    teslas: "T",
+    tesla: "T",
+    hertz: "Hz",
+    siemens: "S",
+    ohms: "Ω",
+    ohm: "Ω",
+    words: "words",
+    usd: "USD",
+    dollars: "USD",
+    $: "USD",
     dimensionless: "",
     unitless: "",
     "": "",
-  })[s.trim().toLowerCase()] ?? s.trim().toLowerCase().replace(/\s/g, "");
+  };
+  // SI symbols and prefixes are case-sensitive: mF != MF, m != M.
+  // Only explicitly listed spelled-out aliases ignore case. No unit conversion.
+  const name = unit.toLowerCase();
+  return Object.hasOwn(aliases, name) ? aliases[name] : unit.replace(/\s/g, "");
+}
 export function numericGrade(
   q: Question,
   response: string,
@@ -187,7 +225,13 @@ export function numericGrade(
     .replace(/\$([^$]+)\$/g, "$1")
     .replace(/\\\((.*?)\\\)/g, "$1")
     .replace(/\\frac\{([\d.+\-]+)\}\{([\d.+\-]+)\}/g, "($1)/($2)");
-  const match = normalized.match(/^([\d.eE+\-*/^()\s]+)(.*?)$/);
+  // Exponents belong to complete numeric tokens, never to the unit suffix
+  // (e.g. eV). Preserve whitespace boundaries rather than joining digits.
+  const match = normalized
+    .replace(/−/g, "-")
+    .match(
+      /^((?:(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?|[+\-*/^()]|\s)+)(.*?)$/,
+    );
   if (!match || canonicalUnit(match[2]) !== canonicalUnit(q.numeric.unit))
     return false;
   try {

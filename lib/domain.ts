@@ -248,6 +248,35 @@ export function checkExam(
         p,
         "Question type, topic, points, or time differs from its slot.",
       );
+    if (slot && b.schemaVersion === 2) {
+      if (q.objective !== slot.objective || q.section !== slot.section)
+        add(
+          "OBJECTIVE_ALIGNMENT",
+          p,
+          "Question objective or section differs from the approved slot. Metadata matching does not prove semantic alignment.",
+        );
+      if (
+        [
+          ...(q.evidence ?? []),
+          ...q.claims.flatMap((c) => (c.kind === "source" ? [c.evidence] : [])),
+          ...(e.exhibits ?? [])
+            .filter((ex) => q.exhibitIds.includes(ex.id) && ex.source)
+            .map((ex) => ex.source!),
+        ].some(
+          (ref) =>
+            !slot.evidence.some(
+              (approved) =>
+                approved.documentId === ref.documentId &&
+                approved.page === ref.page,
+            ),
+        )
+      )
+        add(
+          "EVIDENCE_ALIGNMENT",
+          p,
+          "Question evidence must use a nonempty subset of the pages approved for its slot. Revise the plan to use other pages.",
+        );
+    }
     if (stems.has(stem)) add("DUPLICATE", p, "Question stem is duplicated.");
     stems.add(stem);
     if (q.rubric.reduce((n, r) => n + r.points, 0) !== q.points)
