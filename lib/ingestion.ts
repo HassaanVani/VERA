@@ -8,8 +8,8 @@ export const LIMITS = {
   files: 8,
   fileBytes: 10 * 1024 * 1024,
   packetBytes: 30 * 1024 * 1024,
-  pages: 40,
-  textChars: 180_000,
+  pages: 200,
+  textChars: 600_000,
 };
 export function sniff(bytes: Buffer) {
   if (bytes.subarray(0, 5).toString() === "%PDF-") return "application/pdf";
@@ -100,7 +100,7 @@ export async function ingest(
       );
     if (!selection && info.total > LIMITS.pages)
       throw new Error(
-        `${file.name}: ${info.total} pages exceeds the 40-page packet limit. Upload focused chapter excerpts.`,
+        `${file.name}: ${info.total} pages exceeds the ${LIMITS.pages}-page course limit.`,
       );
     const text = await parser.getText(
       selection ? { partial: selection.pages } : undefined,
@@ -109,31 +109,35 @@ export async function ingest(
       throw new Error(
         `${file.name}: extracted text is too large; upload focused excerpts.`,
       );
-    const screenshots = await parser.getScreenshot({
-      ...(selection ? { partial: selection.pages } : {}),
-      desiredWidth: 1100,
-      imageDataUrl: false,
-      imageBuffer: true,
-    });
-    for (const page of text.pages) {
-      const needsVision =
-        page.text.trim().length < 80 ||
-        /[\u0000-\u0008\uFFFD]|[∑∫λ⃗]/u.test(page.text);
-      const shot = screenshots.pages.find((s) => s.pageNumber === page.num);
-      const imagePath = shot
-        ? path.join(dir, `page-${page.num}.png`)
-        : undefined;
-      if (imagePath && shot) await writeFile(imagePath, shot.data);
-      if (!imagePath)
-        throw new Error(
-          `${file.name}, page ${page.num}: could not render a page image for reliable mathematical inspection.`,
-        );
-      doc.pages.push({
-        number: page.num,
-        text: page.text,
-        imagePath,
-        needsVision,
+    // Render small groups so a long PDF does not retain every bitmap in memory.
+    for (let start = 0; start < text.pages.length; start += 5) {
+      const group = text.pages.slice(start, start + 5);
+      const screenshots = await parser.getScreenshot({
+        partial: group.map((page) => page.num),
+        desiredWidth: 1100,
+        imageDataUrl: false,
+        imageBuffer: true,
       });
+      for (const page of group) {
+        const needsVision =
+          page.text.trim().length < 80 ||
+          /[\u0000-\u0008\uFFFD]|[∑∫λ⃗]/u.test(page.text);
+        const shot = screenshots.pages.find((s) => s.pageNumber === page.num);
+        const imagePath = shot
+          ? path.join(dir, `page-${page.num}.png`)
+          : undefined;
+        if (imagePath && shot) await writeFile(imagePath, shot.data);
+        if (!imagePath)
+          throw new Error(
+            `${file.name}, page ${page.num}: could not render a page image for reliable mathematical inspection.`,
+          );
+        doc.pages.push({
+          number: page.num,
+          text: page.text,
+          imagePath,
+          needsVision,
+        });
+      }
     }
     if (!doc.pages.length)
       throw new Error(`${file.name}: no readable pages found.`);

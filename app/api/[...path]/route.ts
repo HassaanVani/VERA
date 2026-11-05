@@ -300,7 +300,7 @@ export async function POST(
       for (const [i, f] of files.entries())
         documents.push(await ingest(f, roles[i], packetId));
       if (documents.reduce((n, d) => n + d.pages.length, 0) > LIMITS.pages)
-        throw new Error("Packet exceeds 40 pages; select focused excerpts.");
+        throw new Error(`Course materials exceed ${LIMITS.pages} pages.`);
       if (
         documents.reduce(
           (n, d) => n + d.pages.reduce((m, p) => m + p.text.length, 0),

@@ -67,6 +67,43 @@ export function bindSourcePassages(exam: Exam, packet: Packet) {
 type Exhibit = NonNullable<Exam["exhibits"]>[number];
 const normalize = (text: string) => text.replace(/\s+/g, " ").trim();
 
+// Some structured outputs pad optional renderer fields with placeholders. Remove
+// only fields with no rendering effect; retain real geometry and source passages.
+export function normalizeExhibitFields(exam: Exam) {
+  const changes: { exhibitId: string; removed: string[] }[] = [];
+  const exhibits = exam.exhibits?.map((original) => {
+    const exhibit = { ...original };
+    const removed: string[] = [];
+    if (
+      exhibit.kind !== "image" &&
+      exhibit.illustration &&
+      /placeholder.*(?:diagram|render)|(?:precise|structured) diagram.*not.*(?:image|muse)/i.test(
+        exhibit.illustration.prompt,
+      )
+    ) {
+      delete exhibit.illustration;
+      removed.push("illustration");
+    }
+    if (exhibit.kind !== "passage" && exhibit.synthetic && exhibit.source) {
+      delete exhibit.source;
+      removed.push("source");
+    }
+    if (
+      exhibit.kind !== "diagram" &&
+      exhibit.drawing?.axes === "none" &&
+      !exhibit.drawing.segments.length &&
+      !exhibit.drawing.paths.length &&
+      !exhibit.drawing.circles.length
+    ) {
+      delete exhibit.drawing;
+      removed.push("drawing");
+    }
+    if (removed.length) changes.push({ exhibitId: exhibit.id, removed });
+    return removed.length ? exhibit : original;
+  });
+  return { exam: changes.length ? { ...exam, exhibits } : exam, changes };
+}
+
 export function materialProblems(exhibit: Exhibit, packet?: Packet): string[] {
   const problems: string[] = [];
   if (exhibit.illustration && exhibit.kind !== "image")
