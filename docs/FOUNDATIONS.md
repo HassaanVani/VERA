@@ -2,7 +2,7 @@
 
 VERA is a separate product and directory. JEFF was read as an architectural reference and was not modified.
 
-Reference checkout: `JEFF`, commit `505fac640783dfafdbb021dd7ee34cf5871bcb96`.
+Reference foundation: JEFF, commit `505fac640783dfafdbb021dd7ee34cf5871bcb96`.
 
 ## Adapted from existing JEFF work
 
@@ -30,17 +30,8 @@ The [Meta event overview](https://dev.meta.ai/events/global-hackathon) establish
 
 JEFF benchmark numbers are not VERA results. The builder's JEFF-generated practice exam is neither instructor evidence nor a held-out target. Physics II demo materials are a later milestone.
 
+## Subsequent VERA work
 
-## November 3 additions
+VERA adds versioned subject-independent assessments, attempt-scoped solution access, claim-level verification, retained repair artifacts, feedback/dispute records, shared spending reservations, frozen cross-subject comparisons, optional Muse Image figures, exact SVG diagrams, source-bound passages, bounded vector responses, PDF exports and a new study interface.
 
-The subject-independent v2 contracts, explicit public/private assessment projections, attempt-scoped solution access, bounded arithmetic/polynomial and source-location registry, generic table/coordinate exhibits, retained repair artifacts, feedback/dispute records, shared spending ledger, controlled feedback cases and frozen cross-subject OCW evaluation are new VERA work. The revised review workspace, untimed mode, revision ordering, role corrections and editable follow-up approval extend VERA's original interface. JEFF's application and configuration were not changed.
-
-The evaluation compares VERA's current pipeline with direct Meta using the same permitted sources and model settings. JEFF's benchmark results are not reused as evidence. MIT course content is attributed and remains separate from the original distributable demo; model consistency and key agreement are not described as expert verification or learning gains.
-
-The Meta Muse Image adapter, private asset lifecycle, image-aware review/repair, clearer midnight palette, scale-aware small-number checks and bounded cross-question leakage check are new VERA work. The November 3 Physics II illustration pilot supersedes deferral only for this limited capability attempt; a polished or validated Physics II demonstration is still not established. Its failed generated exams and one explicitly assistant-edited copy are recorded separately.
-
-Subsequent VERA work adds content-sized diagram bounds, compact stable assessment layouts, source-text binding with retained proposal/original substrings, explicit prose/lineation display, bounded vector responses with recovery and rubric review, an original authored vector example and small live historical-source/vector probes. These are new changes to VERA; JEFF's application and configuration remain untouched. New capability probes are not relabeled as the earlier frozen benchmark or as hackathon eligibility evidence.
-
-## November 4 export and review evidence
-
-PDF HTML composition, embedded mathematics/fonts, local Chromium rendering, complete precise/reference geometry, submitted-only review export, safe provenance/run-evidence projections, stricter approved-objective/page checks, lexical numeric parsing, case-sensitive SI grading, and mobile checking-summary placement are new VERA work. Two separate agent judging reports retain the actual requested rubric and findings. The demo walkthrough uses original authored material and makes no model calls; it is not substituted for a live Meta quality result or final narrated video. JEFF and its configuration remain unchanged.
+The evaluations compare VERA with direct Meta generation using matched inputs and model settings. JEFF results are not VERA results. Source attribution, verification coverage and evaluation limitations remain in the public evaluation documentation.

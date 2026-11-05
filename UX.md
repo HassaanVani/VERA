@@ -34,7 +34,7 @@ The student's immediate questions are: What do I do next? What are you basing th
 
 Exercise both successful and interrupted paths. Include upload review/back, plan validation and refresh, approval invalidation, start/cancel, answer save failure/retry/refresh, practice resume, question-level finish review, and incomplete grading. Inspect screenshots at desktop and narrow widths in addition to asserting DOM state. Run lint, type checking, the relevant tests, and a production build.
 
-Read [the research and audit](docs/UX-RESEARCH.md) for the rationale and limitations. A browser regression pass is not evidence of usability with real students.
+Read [the design rationale](docs/DESIGN.md) for context and limitations. A browser regression pass is not evidence of usability with real students.
 
 
 ## Cross-subject review rules

@@ -21,7 +21,8 @@
     "evaluate:ocw": "tsx scripts/ocw-evaluate.ts",
     "evaluate:feedback": "tsx scripts/ocw-feedback.ts",
     "evaluate:restore": "tsx scripts/restore-ocw-freeze.ts",
-    "setup:pdf": "playwright install chromium"
+    "setup:pdf": "playwright install chromium",
+    "check:public": "node scripts/check-public-files.mjs"
   },
   "dependencies": {
     "@next/env": "16.4.3",

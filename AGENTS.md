@@ -8,4 +8,4 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 <!-- END:nextjs-agent-rules -->
 
-For interface changes, read `UX.md` for the student tasks, interaction rules, and verification requirements. `docs/UX-RESEARCH.md` records the research and current audit; distinguish its design judgments from evidence gathered with actual users.
+For interface changes, read `UX.md` for the student tasks, interaction rules, and verification requirements. `docs/DESIGN.md` records the public design rationale; distinguish design judgments from evidence gathered with actual users.
